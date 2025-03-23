@@ -2,12 +2,13 @@ import ButtonGoBack from "@/components/ui/ButtonGoBack";
 import Headers from "@/components/ui/Headers";
 import Heading from "@/components/ui/Heading";
 
-export default function AlquileresPage() {
+
+export default function PropiedadesPage() {
     return (
         <>
             <div className="flex justify-between">
                 <div>
-                    <Headers>Administración de Alquileres</Headers>
+                    <Headers>Administración de Propiedades</Headers>
                 </div>
                 <div>
                     <ButtonGoBack />
@@ -18,5 +19,4 @@ export default function AlquileresPage() {
                 <Heading />
             </div>
         </>
-    )
-}
+    )}

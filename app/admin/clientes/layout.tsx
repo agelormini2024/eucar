@@ -1,4 +1,4 @@
-import AdminAlquileresSidebar from "@/components/alquileres/AdminAlquileresSidebar";
+import ClientesSideBar from '@/components/clientes/ClientesSideBar'
 
 export default function RootLayout({
     children,
@@ -9,7 +9,7 @@ export default function RootLayout({
         <>
             <div className="md:flex">
                 <aside className="md:w-72 md:h-screen bg-slate-100">
-                    <AdminAlquileresSidebar />
+                    <ClientesSideBar />
                 </aside>
 
                 <main className="md:flex-1 md:h-screen md:overflow-y-scroll bg-gray-50 p-5">
@@ -18,4 +18,4 @@ export default function RootLayout({
             </div>
         </>
     )
-}  
+}
