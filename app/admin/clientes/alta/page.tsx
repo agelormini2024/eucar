@@ -1,13 +1,13 @@
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 
-export default function AltaAlquilerPage() {
+export default function AltaClientePage() {
     return (
         <>
             <div className='flex justify-between'>
 
                 <div>
-                    <Headers>Nuevo Contrato</Headers>
+                    <Headers>Alta de Cliente</Headers>
                 </div>
                 <div>
                     <ButtonGoBack />

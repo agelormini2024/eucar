@@ -1,12 +1,12 @@
 import Logo from "../ui/Logo";
-import AdminAlquileresRoute from "./AdminAlquileresRoute";
+import AlquileresRoute from "./AlquileresRoute";
 
 const menuItems = [
     { url: '/admin/alquileres/contratos', text: 'Contratos', blank: false , key: 1},
-    { url: '/admin/alquileres/alta', text: 'Alta de alquileres', blank: false, key:2 },
+    { url: '/admin/alquileres/alta', text: 'Nuevo Contrato', blank: false, key:2 },
 ]
 
-export default function AdminAlquileresSidebar() {
+export default function AlquileresSidebar() {
     return (
         <>
             <Logo />
@@ -15,7 +15,7 @@ export default function AdminAlquileresSidebar() {
                 <div className="p-5 px-10">
                     <nav className="flex flex-col uppercase">
                         {menuItems.map((link) => (
-                            <AdminAlquileresRoute
+                            <AlquileresRoute
                                 key={link.key}
                                 link={link}
                             />

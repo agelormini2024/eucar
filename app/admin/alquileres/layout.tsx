@@ -1,4 +1,4 @@
-import AdminAlquileresSidebar from "@/components/alquileres/AdminAlquileresSidebar";
+import AdminAlquileresSidebar from "@/components/alquileres/AlquileresSidebar";
 
 export default function RootLayout({
     children,

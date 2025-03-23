@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type AdminAlquileresRouteProps = {
+type AlquileresRouteProps = {
     link: {
         url: string;
         text: string;
@@ -12,7 +12,7 @@ type AdminAlquileresRouteProps = {
     }
 }
 
-export default function AdminAlquileresRoute({ link }: AdminAlquileresRouteProps) {
+export default function AlquileresRoute({ link }: AlquileresRouteProps) {
     const pathname = usePathname();
     const isActive = pathname.startsWith(link.url);  // Esto lo usamos en el caso que queramos que el link se vea activo
 
