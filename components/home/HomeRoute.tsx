@@ -17,7 +17,7 @@ export default function HomeRoute({ link }: HomeRouteProps) {
 
     return (
         <Link
-            className={`${isActive ? "text-red-300" : "text-white"}  hover:text-red-300`}
+            className={`${isActive ? "text-red-300" : "text-black"}  hover:text-red-700`}
             href={link.url}
             target={link.blank ? "_blank" : undefined}
         >

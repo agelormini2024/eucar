@@ -10,9 +10,9 @@ export default function MenuBar() {
 
     return (
         <div>
-            <header className="bg-gray-600">
-                <div className="p-5 px-10">
-                    <nav className="flex md:justify-end sm:justify-center text-white font-bold space-x-8 uppercase">
+            <header className="border-b-4 border-red-700">
+                <div className="p-3 px-10">
+                    <nav className="flex md:justify-end sm:justify-center font-bold space-x-8 uppercase">
                         {adminNavigation.map((link) => (
                             <HomeRoute
                                 key={link.url}
