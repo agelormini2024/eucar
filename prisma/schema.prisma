@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// MODELOS
+
+model Pais {
+    id     Int    @id @default(autoincrement())
+    nombre String
+    sigla  String
+    provincias Provincia[]
+    clientes Cliente[]
+    propiedades Propiedad[]
+}
+
+model Provincia {
+    id     Int     @id @default(autoincrement())
+    nombre String
+    paisId Int
+    pais   Pais    @relation(fields: [paisId], references: [id])
+    clientes Cliente[]
+    propiedades Propiedad[]
+}
+
+model Cliente {
+    id        Int      @id @default(autoincrement())
+    nombre    String
+    apellido  String
+    razonSocial String
+    cuit      String
+    tipoClienteId Int
+    tipoCliente TipoCliente @relation(fields: [tipoClienteId], references: [id])
+    telefono1 String?
+    telefono2 String?
+    celular   String
+    email     String
+    direccion String
+    paisId    Int
+    pais      Pais     @relation(fields: [paisId], references: [id])
+    provinciaId Int
+    provincia   Provincia @relation(fields: [provinciaId], references: [id])
+    localidad   String
+    codigoPostal String
+    observaciones String?    
+}
+
+model TipoCliente {
+    id     Int    @id @default(autoincrement())
+    nombre String
+    clientes Cliente[]
+}
+
+model CategoriaPropiedad {
+    id     Int    @id @default(autoincrement())
+    nombre String
+    propiedades Propiedad[]
+}
+
+model Propiedad {
+    id        Int      @id @default(autoincrement())
+    nombre    String
+    direccion String
+    localidad String
+    provinciaId Int
+    provincia   Provincia @relation(fields: [provinciaId], references: [id])
+    paisId    Int
+    pais      Pais     @relation(fields: [paisId], references: [id])
+    codigoPostal String
+    ambientes Int
+    dormitorios Int
+    banios Int
+    metrosCuadrados Int
+    categoriaPropiedadId Int
+    categoriaPropiedad CategoriaPropiedad @relation(fields: [categoriaPropiedadId], references: [id])
+    observaciones String?
+}

@@ -10,7 +10,7 @@ export default function MenuBar() {
 
     return (
         <div>
-            <header className="border-b-4 border-red-700">
+            <header className="border-b-4 border-red-800">
                 <div className="p-3 px-10">
                     <nav className="flex md:justify-end sm:justify-center font-bold space-x-8 uppercase">
                         {adminNavigation.map((link) => (
