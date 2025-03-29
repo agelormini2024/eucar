@@ -16,72 +16,97 @@ datasource db {
 // MODELOS
 
 model Pais {
-    id     Int    @id @default(autoincrement())
-    nombre String
-    sigla  String
-    provincias Provincia[]
-    clientes Cliente[]
+    id          Int         @id @default(autoincrement())
+    nombre      String
+    sigla       String
+    provincias  Provincia[]
+    clientes    Cliente[]
     propiedades Propiedad[]
 }
 
 model Provincia {
-    id     Int     @id @default(autoincrement())
-    nombre String
-    paisId Int
-    pais   Pais    @relation(fields: [paisId], references: [id])
-    clientes Cliente[]
+    id          Int         @id @default(autoincrement())
+    nombre      String
+    paisId      Int
+    pais        Pais        @relation(fields: [paisId], references: [id])
+    clientes    Cliente[]
     propiedades Propiedad[]
 }
 
 model Cliente {
-    id        Int      @id @default(autoincrement())
+    id            Int        @id @default(autoincrement())
+    nombre        String
+    apellido      String
+    razonSocial   String?
+    cuit          String
+    telefono1     String?
+    telefono2     String?
+    celular       String
+    email         String
+    calle         String
+    numero        String
+    piso          String?
+    departamento  String?
+    paisId        Int
+    pais          Pais       @relation(fields: [paisId], references: [id])
+    provinciaId   Int
+    provincia     Provincia  @relation(fields: [provinciaId], references: [id])
+    localidad     String
+    codigoPostal  String
+    observaciones String?
+    contratos     Contrato[] // Add the opposite relation field
+    activo        Boolean    @default(true)
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt   
+}
+
+model RolCliente {
+    id        Int        @id @default(autoincrement())
     nombre    String
-    apellido  String
-    razonSocial String
-    cuit      String
-    tipoClienteId Int
-    tipoCliente TipoCliente @relation(fields: [tipoClienteId], references: [id])
-    telefono1 String?
-    telefono2 String?
-    celular   String
-    email     String
-    direccion String
-    paisId    Int
-    pais      Pais     @relation(fields: [paisId], references: [id])
-    provinciaId Int
-    provincia   Provincia @relation(fields: [provinciaId], references: [id])
-    localidad   String
-    codigoPostal String
-    observaciones String?    
+    contratos Contrato[] // Add the opposite relation field
 }
 
-model TipoCliente {
-    id     Int    @id @default(autoincrement())
-    nombre String
-    clientes Cliente[]
-}
-
-model CategoriaPropiedad {
-    id     Int    @id @default(autoincrement())
-    nombre String
+model TipoPropiedad {
+    id          Int         @id @default(autoincrement())
+    nombre      String
     propiedades Propiedad[]
 }
 
 model Propiedad {
-    id        Int      @id @default(autoincrement())
-    nombre    String
-    direccion String
-    localidad String
-    provinciaId Int
-    provincia   Provincia @relation(fields: [provinciaId], references: [id])
-    paisId    Int
-    pais      Pais     @relation(fields: [paisId], references: [id])
-    codigoPostal String
-    ambientes Int
-    dormitorios Int
-    banios Int
+    id              Int           @id @default(autoincrement())
+    descripcion     String
+    calle           String
+    numero          String
+    piso            String?
+    departamento    String?
+    localidad       String
+    provinciaId     Int
+    provincia       Provincia     @relation(fields: [provinciaId], references: [id])
+    paisId          Int
+    pais            Pais          @relation(fields: [paisId], references: [id])
+    codigoPostal    String
+    ambientes       Int
+    dormitorios     Int
+    banios          Int
     metrosCuadrados Int
-    categoriaPropiedadId Int
-    categoriaPropiedad CategoriaPropiedad @relation(fields: [categoriaPropiedadId], references: [id])
-    observaciones String?
+    imagen          String?
+    tipoPropiedadId Int
+    tipoPropiedad   TipoPropiedad @relation(fields: [tipoPropiedadId], references: [id])
+    observaciones   String?
+    contratos       Contrato[] // Add the opposite relation field
+    activo          Boolean       @default(true)
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
+}
+
+//----------------------------------------------------------------------------//
+
+model Contrato {
+    id           Int        @id @default(autoincrement())
+    clienteId    Int
+    cliente      Cliente    @relation(fields: [clienteId], references: [id])
+    rolClienteId Int
+    rolCliente   RolCliente @relation(fields: [rolClienteId], references: [id])
+    propiedadId  Int
+    propiedad    Propiedad  @relation(fields: [propiedadId], references: [id])
 }
