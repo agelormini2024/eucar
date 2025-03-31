@@ -1,17 +1,27 @@
 
-import Prueba2 from '@/components/clientes/Prueba2';
-import PruebaTable from '@/components/clientes/PruebaTableWrapper'
+import ClientesTable from '@/components/clientes/ClientesTable'
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 import { prisma } from '@/src/lib/prisma'
 
 async function getClientes() {
-    const clientes = await prisma.cliente.findMany();
-    return clientes; // Mantén las fechas como objetos Date
+    const clientes = await prisma.cliente.findMany({
+        orderBy: {
+            apellido: 'asc',
+        },
+        include: {
+            provincia: true,
+            pais: true,
+        },
+    })
+    return clientes; 
 }
+
+export type ClientesConProvinciaPais = Awaited<ReturnType<typeof getClientes>>
 
 export default async function ListadoClientesPage() {
     const clientes = await getClientes();
+    console.log(clientes);
 
     return (
         <>
@@ -26,7 +36,7 @@ export default async function ListadoClientesPage() {
             </div>
 
             <div className='mt-10'>
-                <PruebaTable data={clientes} />
+                <ClientesTable data={clientes} />
             </div>
         </>
     );
