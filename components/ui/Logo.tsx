@@ -10,6 +10,8 @@ export default function Logo() {
                         fill
                         alt="Logotipo"
                         src='/logo-eucar.jpg'
+                        quality={50}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         priority
                     />
                 </Link>

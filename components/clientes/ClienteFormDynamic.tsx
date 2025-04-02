@@ -2,6 +2,7 @@
 import Switch from "@mui/material/Switch";
 import { Pais, Provincia } from "@prisma/client";
 import { useState } from "react";
+import { useClienteFormStore } from "@/src/stores/storeClientes";
 
 type ClienteFormDynamicProps = {
     paises: Pais[];
@@ -9,18 +10,27 @@ type ClienteFormDynamicProps = {
 }
 
 export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDynamicProps) {
-    const [selectedPais, setSelectedPais] = useState<string | null>(null);
-    const [isActivo, setIsActivo] = useState(false); // Estado para el switch
+    const [selectedPais, setSelectedPais] = useState<string | null>(null); // Estado para el país seleccionado
+    const [isActivo, setIsActivo] = useState(true) // Estado para el switch
+    const { formValues, setFormValues } = useClienteFormStore()
+
     const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsActivo(event.target.checked);
     };
+
     const handlePaisChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedPais(event.target.value);
     };
 
-    const isArgentina = paises.find(
-        (pais) => pais.id.toString() === selectedPais
-    )?.nombre === "Argentina";
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormValues({ [name]: value });
+    };
+
+
+    // const isArgentina = paises.find((pais) => pais.id.toString() === selectedPais)?.nombre === "Argentina";
+    const isArgentina = true; // Por el momento solo se permite Argentina en el caso de permitir otro pais
+    // considerar la linea de arriba comentada
 
     return (
         <>
@@ -33,6 +43,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                     id="nombre"
                     type="text"
                     name="nombre"
+                    onChange={handleInputChange}
+                    value={formValues.nombre}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="Nombre del Cliente"
                 />
@@ -46,6 +58,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <input
                     id="apellido"
                     name="apellido"
+                    onChange={handleInputChange}
+                    value={formValues.apellido}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="Apellido del Cliente"
                 />
@@ -58,6 +72,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <input
                     id="razonSocial"
                     name="razonSocial"
+                    onChange={handleInputChange}
+                    value={formValues.razonSocial}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="Razón Social S.A. del Cliente"
                 />
@@ -70,8 +86,24 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <input
                     id="cuit"
                     name="cuit"
+                    onChange={(e) => {
+                        const rawValue = e.target.value.replace(/\D/g, ""); // Eliminar todo lo que no sea un número
+                        let formateoValue = rawValue;
+
+                        // Agregar los guiones automáticamente
+                        if (rawValue.length > 2) {
+                            formateoValue = `${rawValue.slice(0, 2)}-${rawValue.slice(2)}`;
+                        }
+                        if (rawValue.length > 10) {
+                            formateoValue = `${rawValue.slice(0, 2)}-${rawValue.slice(2, 10)}-${rawValue.slice(10, 11)}`;
+                        }
+
+                        setFormValues({ cuit: formateoValue }); // Actualizar el estado global
+                    }}
+                    value={formValues.cuit}
                     className="block w-full p-3 bg-slate-100"
-                    placeholder="Ingrese un cuit o cuil"
+                    placeholder="12-12345678-0"
+                    maxLength={13} // Limitar la longitud máxima del CUIT formateado
                 />
             </div>
             <div className="space-y-2">
@@ -82,6 +114,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <input
                     id="calle"
                     name="calle"
+                    onChange={handleInputChange}
+                    value={formValues.calle}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="Ingrese una calle"
                 />
@@ -97,6 +131,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                         <input
                             id="numero"
                             name="numero"
+                            onChange={handleInputChange}
+                            value={formValues.numero}
                             className="block p-3 w-full bg-slate-100"
                             placeholder="Número"
                         />
@@ -109,6 +145,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                         <input
                             id="piso"
                             name="piso"
+                            onChange={handleInputChange}
+                            value={formValues.piso}
                             className="block p-3 w-full bg-slate-100"
                             placeholder="Ingrese un piso"
                         />
@@ -121,6 +159,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                         <input
                             id="departamento"
                             name="departamento"
+                            onChange={handleInputChange}
+                            value={formValues.departamento}
                             className="block p-3 w-full bg-slate-100"
                             placeholder="Ingrese un departamento"
                         />
@@ -130,11 +170,13 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
             <div>
                 <label
                     className="text-slate-800 font-bold"
-                    htmlFor="codigo"
+                    htmlFor="codigoPostal"
                 >Código Postal :</label>
                 <input
-                    id="codigo"
-                    name="codigo"
+                    id="codigoPostal"
+                    name="codigoPostal"
+                    onChange={handleInputChange}
+                    value={formValues.codigoPostal}
                     className="block p-3 bg-slate-100"
                     placeholder="Ingrese un Código"
                 />
@@ -148,11 +190,12 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <input
                     id="localidad"
                     name="localidad"
+                    onChange={handleInputChange}
+                    value={formValues.localidad}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="Localidad"
                 />
             </div>
-
             <div className="space-y-2">
                 <label className="text-slate-800 font-bold"
                     htmlFor="paisId">
@@ -162,6 +205,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                     className="block w-full p-3 bg-slate-100"
                     id="paisId"
                     name="paisId"
+                    defaultValue="1"
+                    disabled={true} // Por el moment Deshabilitar este select y establecer el pais por defecto en 1 
                     onChange={handlePaisChange}
                 >
                     <option value="">-- Seleccione --</option>
@@ -182,6 +227,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                     className="block w-full p-3 bg-slate-100"
                     id="provinciaId"
                     name="provinciaId"
+                    onChange={handleInputChange}
+                    defaultValue={formValues.provinciaId}
                     disabled={!isArgentina} // Deshabilitar si el país no es Argentina
                 >
                     <option value="">-- Seleccione --</option>
@@ -193,6 +240,7 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 </select>
             </div>
 
+
             <div className="space-y-2">
                 <label
                     className="text-slate-800 font-bold"
@@ -202,6 +250,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                     type="tel"
                     id="celular"
                     name="celular"
+                    onChange={handleInputChange}
+                    value={formValues.celular}
                     className="block w-full p-3 bg-slate-100"
                     placeholder="011-3456-7890"
                 />
@@ -218,6 +268,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                             type="tel"
                             id="telefono1"
                             name="telefono1"
+                            onChange={handleInputChange}
+                            value={formValues.telefono1}
                             className="block w-full p-3 bg-slate-100"
                             placeholder="011-3456-7890"
                         />
@@ -231,6 +283,8 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                             type="tel"
                             id="telefono2"
                             name="telefono2"
+                            onChange={handleInputChange}
+                            value={formValues.telefono2}
                             className="block w-full p-3 bg-slate-100"
                             placeholder="011-3456-7890"
                         />
@@ -250,7 +304,22 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                     color="primary" // Cambia el color del switch (opcional)
                     className="ml-4"
                 />
+            </div>
 
+            <div className="space-y-2">
+                <label
+                    className="text-slate-800 font-bold"
+                    htmlFor="email"
+                >Email :</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    onChange={handleInputChange}
+                    value={formValues.email}
+                    className="block w-full p-3 bg-slate-100"
+                    placeholder="Ingrese un email"
+                />
             </div>
             <div>
                 <label
@@ -260,11 +329,13 @@ export default function ClienteFormDynamic({ paises, provincias }: ClienteFormDy
                 <textarea
                     id="observaciones"
                     name="observaciones"
+                    onChange={handleInputChange}
+                    value={formValues.observaciones}
                     className="block w-full p-5 bg-slate-100"
                     placeholder="Ingrese observaciones"
                 />
             </div>
-
         </>
     );
 }
+

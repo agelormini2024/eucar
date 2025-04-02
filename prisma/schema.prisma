@@ -38,13 +38,13 @@ model Cliente {
     nombre        String
     apellido      String
     razonSocial   String?
-    cuit          String
+    cuit          String    @unique
     telefono1     String?
     telefono2     String?
     celular       String
     email         String
     calle         String
-    numero        String
+    numero        Int
     piso          String?
     departamento  String?
     paisId        Int
