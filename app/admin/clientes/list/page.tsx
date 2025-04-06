@@ -21,11 +21,10 @@ export type ClientesConProvinciaPais = Awaited<ReturnType<typeof getClientes>>
 
 export default async function ListadoClientesPage() {
     const clientes = await getClientes();
-    console.log(clientes);
 
     return (
         <>
-            <div className='flex justify-between'>
+            <div className='flex justify-between mt-10'>
                 <div>
                     <Headers>Listado de Clientes</Headers>
                 </div>

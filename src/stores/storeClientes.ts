@@ -1,4 +1,5 @@
 import {create} from "zustand";
+import { devtools } from "zustand/middleware";
 
 type ClienteFormState = {
     formValues: {
@@ -25,7 +26,8 @@ type ClienteFormState = {
     resetForm: () => void;
 }
 
-export const useClienteFormStore = create<ClienteFormState>((set) => ({
+export const useClienteFormStore = create<ClienteFormState>()( // Los dos después de paréntesis <ClienteFormState> son necesarios debido a que el primer paréntesis es para la función create y el segundo es para la función devtools
+    devtools((set) => ({
     formValues: {
         nombre: '',
         apellido: '',
@@ -76,5 +78,5 @@ export const useClienteFormStore = create<ClienteFormState>((set) => ({
 
         }
     }))
-}))
+})))
 

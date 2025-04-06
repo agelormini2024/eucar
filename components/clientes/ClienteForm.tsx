@@ -1,5 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import ClienteFormDynamic from "./ClienteFormDynamic";
+import { Cliente } from "@prisma/client";
 
 async function getPaises() {
     return await prisma.pais.findMany({
@@ -16,8 +17,11 @@ async function getProvincias() {
         },
     });
 }
+type ClienteFormProps = {
+    cliente?: Cliente
+}
 
-export default async function ClienteForm() {
+export default async function ClienteForm({cliente}: ClienteFormProps) {
     const paises = await getPaises();
     const provincias = await getProvincias();
 
@@ -28,7 +32,8 @@ export default async function ClienteForm() {
 
                 <ClienteFormDynamic 
                     paises={paises} 
-                    provincias={provincias} 
+                    provincias={provincias}
+                    cliente={cliente} 
                 />
             </div>
         </>

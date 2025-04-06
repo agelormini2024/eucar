@@ -17,7 +17,7 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 header: "Acciones",
                 Cell: ({ row }) => (
                     <Link
-                        href={`/clientes/${row.original.id}`} // Ruta dinámica basada en el ID del cliente
+                        href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del cliente
                         className="bg-red-800 text-white px-4 py-1.5 rounded hover:bg-red-600"
                     >
                         Editar
@@ -70,6 +70,13 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 accessorKey: "localidad",
                 header: "Localidad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
+            },            
+            {
+                accessorKey: "activo",
+                header: "Activo",
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                Cell: ({ cell }) => (cell.getValue<boolean>() ? "Sí" : "No"), // Renderizar "Sí" o "No" según el valor booleano
+
             },            
         ],
         []
