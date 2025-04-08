@@ -18,7 +18,7 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del cliente
-                        className="bg-red-800 text-white px-4 py-1.5 rounded hover:bg-red-600"
+                        className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-600"
                     >
                         Editar
                     </Link>

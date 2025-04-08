@@ -38,7 +38,7 @@ model Cliente {
     nombre        String
     apellido      String
     razonSocial   String?
-    cuit          String    @unique
+    cuit          String     @unique
     telefono1     String?
     telefono2     String?
     celular       String
@@ -57,7 +57,7 @@ model Cliente {
     contratos     Contrato[] // Add the opposite relation field
     activo        Boolean    @default(true)
     createdAt     DateTime   @default(now())
-    updatedAt     DateTime   @updatedAt   
+    updatedAt     DateTime   @updatedAt
 }
 
 model RolCliente {
@@ -76,7 +76,7 @@ model Propiedad {
     id              Int           @id @default(autoincrement())
     descripcion     String
     calle           String
-    numero          String
+    numero          Int
     piso            String?
     departamento    String?
     localidad       String
@@ -89,6 +89,10 @@ model Propiedad {
     dormitorios     Int
     banios          Int
     metrosCuadrados Int
+    metrosCubiertos Int
+    cochera         Int
+    expensas        Float?
+    antiguedad      Int
     imagen          String?
     tipoPropiedadId Int
     tipoPropiedad   TipoPropiedad @relation(fields: [tipoPropiedadId], references: [id])

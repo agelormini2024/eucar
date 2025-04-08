@@ -4,12 +4,19 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useClienteFormStore } from "@/src/stores/storeClientes";
 import { updateCliente } from "@/actions/update-cliente-action";
+import { useEffect } from "react";
 
 export default function EditClienteForm({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { resetForm } = useClienteFormStore()
     const params = useParams();
     const id  = +params.id! // Asegúrate de que params sea awaited si es necesario
+
+    useEffect(() => {
+        return () => {
+            resetForm(); // Limpia el estado global al desmontar el componente
+        };
+    }, [resetForm]);
 
     const handleSubmit = async (formData: FormData) => {
         const data = {
@@ -52,9 +59,8 @@ export default function EditClienteForm({ children }: { children: React.ReactNod
             return
         }
         toast.success("Se guardaron los cambios correctamente")
-        router.push('/admin/clientes/list')
         resetForm() // Reiniciar el formulario después de guardar los cambios
-        
+        router.push('/admin/clientes/list')
 
     }
 

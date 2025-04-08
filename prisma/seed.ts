@@ -3,6 +3,7 @@ import { paises } from './data/paises'
 import { provincias } from './data/provincias'
 import { rolCliente } from './data/rolClientes'
 import { clientes } from './data/clientes'
+import { propiedades } from './data/propiedades'
 
 const prisma = new PrismaClient()
 
@@ -13,6 +14,7 @@ async function main() {
         await prisma.$executeRaw`TRUNCATE TABLE "RolCliente" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "Provincia" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "Pais" RESTART IDENTITY CASCADE;`
+        await prisma.$executeRaw`TRUNCATE TABLE "Propiedad" RESTART IDENTITY CASCADE;`
         
         // Insertar datos
         await prisma.pais.createMany({
@@ -27,6 +29,10 @@ async function main() {
         await prisma.cliente.createMany({
             data: clientes
         })
+        await prisma.propiedad.createMany({
+            data: propiedades
+        })
+
     } catch (error) {
         console.error(error)
     }

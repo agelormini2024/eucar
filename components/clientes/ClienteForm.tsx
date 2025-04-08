@@ -22,6 +22,7 @@ type ClienteFormProps = {
 }
 
 export default async function ClienteForm({cliente}: ClienteFormProps) {
+
     const paises = await getPaises();
     const provincias = await getProvincias();
 
