@@ -19,6 +19,7 @@ export const propiedades = [
         antiguedad: 5,
         tipoPropiedadId: 1,
         observaciones: 'Propiedad en excelente estado',
+        clienteId: 1,
         activo: true,
     },
     {
@@ -41,6 +42,7 @@ export const propiedades = [
         antiguedad: 10,
         tipoPropiedadId: 2,
         observaciones: 'Propiedad en buen estado',
+        clienteId: 2,
         activo: true,
     },
     {
@@ -63,6 +65,7 @@ export const propiedades = [
         antiguedad: 15,
         tipoPropiedadId: 3,
         observaciones: 'Propiedad en muy buen estado',
+        clienteId: 3,
         activo: true,
     },
     {
@@ -85,6 +88,7 @@ export const propiedades = [
         antiguedad: 2,
         tipoPropiedadId: 1,
         observaciones: 'Propiedad en excelente estado',
+        clienteId: 1,
         activo: true,  
     },
     {
@@ -107,6 +111,7 @@ export const propiedades = [
         antiguedad: 8,
         tipoPropiedadId: 2,
         observaciones: 'Propiedad en buen estado',
+        clienteId: 2,
         activo: true,  
     },
     {
@@ -129,6 +134,7 @@ export const propiedades = [
         antiguedad: 12,
         tipoPropiedadId: 3,
         observaciones: 'Propiedad en muy buen estado',
+        clienteId: 6,
         activo: true,
     },
     {
@@ -151,6 +157,7 @@ export const propiedades = [
         antiguedad: 3,
         tipoPropiedadId: 1,
         observaciones: 'Propiedad en excelente estado',
+        clienteId: 5,
         activo: true,
     },
     {
@@ -173,6 +180,7 @@ export const propiedades = [
         antiguedad: 9,
         tipoPropiedadId: 2,
         observaciones: 'Propiedad en buen estado',
+        clienteId: 2,
         activo: true,
     },
     {
@@ -195,6 +203,7 @@ export const propiedades = [
         antiguedad: 18,
         tipoPropiedadId: 3,
         observaciones: 'Propiedad en muy buen estado',
+        clienteId: 4,
         activo: true,
     },
     {
@@ -217,6 +226,7 @@ export const propiedades = [
         antiguedad: 4,
         tipoPropiedadId: 1,
         observaciones: 'Propiedad en excelente estado',
+        clienteId: 3,
         activo: true,
     },
     {
@@ -239,6 +249,7 @@ export const propiedades = [
         antiguedad: 11,
         tipoPropiedadId: 2,
         observaciones: 'Propiedad en buen estado',
+        clienteId: 9,
         activo: true,
     },
 ]

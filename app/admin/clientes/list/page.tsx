@@ -1,4 +1,3 @@
-
 import ClientesTable from '@/components/clientes/ClientesTable'
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
@@ -17,7 +16,6 @@ async function getClientes() {
     return clientes; 
 }
 
-export type ClientesConProvinciaPais = Awaited<ReturnType<typeof getClientes>>
 
 export default async function ListadoClientesPage() {
     const clientes = await getClientes();

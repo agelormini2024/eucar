@@ -1,16 +1,19 @@
 "use client";
-
-import { ClientesConProvinciaPais } from "@/src/types";
-import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
-import Link from "next/link"; // Importar Link de Next.js
+;
+import Link from "next/link";
 import { useMemo } from "react";
+import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
+import { PropiedadesConRelaciones } from "@/src/types";
 
-type ClientesTableProps = {
-    data: ClientesConProvinciaPais[]; // Cambia el tipo de datos según tu modelo
-};
 
-export default function ClientesTable({ data }: ClientesTableProps) {
-    const columns = useMemo<MRT_ColumnDef<ClientesConProvinciaPais>[]>(
+type PropiedadesTableProps = {
+    data: PropiedadesConRelaciones[]; // Cambia el tipo de datos según tu modelo
+}
+
+export default function PropiedadesTable({ data }: PropiedadesTableProps) {
+
+    // Define las columnas de la tabla
+    const columns = useMemo<MRT_ColumnDef<PropiedadesConRelaciones>[]>(
         () => [
             {
                 id: "acciones", // ID único para la columna
@@ -26,29 +29,35 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 muiTableHeadCellProps: { style: { textAlign: "center" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
+
             {
-                accessorKey: "nombre",
-                header: "Nombre",
+                accessorKey: "descripcion",
+                header: "Descripción",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "apellido",
-                header: "Apellido",
+                accessorKey: "tipoPropiedad.nombre",
+                header: "Tipo de Propiedad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "razonSocial",
-                header: "Razón Social",
+                id: "cliente", // ID único para la columna
+                header: "Cliente", // Título de la columna
+                Cell: ({ row }) => (
+                    <span>
+                        {row.original.cliente.nombre} {row.original.cliente.apellido}
+                    </span>
+                ),
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+            },
+                {
+                accessorKey: "provincia.nombre",
+                header: "Provincia",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "email",
-                header: "Email",
-                muiTableHeadCellProps: { style: { color: "darkred" } },
-            },
-            {
-                accessorKey: "celular",
-                header: "Celular",
+                accessorKey: "localidad",
+                header: "Localidad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
@@ -58,30 +67,24 @@ export default function ClientesTable({ data }: ClientesTableProps) {
             },
             {
                 accessorKey: "numero",
-                header: "Numero",
-                muiTableHeadCellProps: { style: { color: "darkred" } },
-            },            
-            {
-                accessorKey: "provincia.nombre",
-                header: "Provincia",
+                header: "Número",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "localidad",
-                header: "Localidad",
+                accessorKey: "ambientes",
+                header: "Ambientes",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-            },            
+            },
             {
                 accessorKey: "activo",
                 header: "Activo",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 Cell: ({ cell }) => (cell.getValue<boolean>() ? "Sí" : "No"), // Renderizar "Sí" o "No" según el valor booleano
-
             },            
+
         ],
         []
     );
-
     const table = useMaterialReactTable({
         columns,
         data,
@@ -95,5 +98,5 @@ export default function ClientesTable({ data }: ClientesTableProps) {
         <div className="m-4">
             <MaterialReactTable table={table} />
         </div>
-    );
+    )
 }

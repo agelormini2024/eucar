@@ -34,11 +34,11 @@ model Provincia {
 }
 
 model Cliente {
-    id            Int        @id @default(autoincrement())
+    id            Int         @id @default(autoincrement())
     nombre        String
     apellido      String
     razonSocial   String?
-    cuit          String     @unique
+    cuit          String      @unique
     telefono1     String?
     telefono2     String?
     celular       String
@@ -48,16 +48,17 @@ model Cliente {
     piso          String?
     departamento  String?
     paisId        Int
-    pais          Pais       @relation(fields: [paisId], references: [id])
+    pais          Pais        @relation(fields: [paisId], references: [id])
     provinciaId   Int
-    provincia     Provincia  @relation(fields: [provinciaId], references: [id])
+    provincia     Provincia   @relation(fields: [provinciaId], references: [id])
     localidad     String
     codigoPostal  String
     observaciones String?
     contratos     Contrato[] // Add the opposite relation field
-    activo        Boolean    @default(true)
-    createdAt     DateTime   @default(now())
-    updatedAt     DateTime   @updatedAt
+    propiedades   Propiedad[] // Add the opposite relation field
+    activo        Boolean     @default(true)
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
 }
 
 model RolCliente {
@@ -98,6 +99,8 @@ model Propiedad {
     tipoPropiedad   TipoPropiedad @relation(fields: [tipoPropiedadId], references: [id])
     observaciones   String?
     contratos       Contrato[] // Add the opposite relation field
+    clienteId       Int
+    cliente         Cliente       @relation(fields: [clienteId], references: [id])
     activo          Boolean       @default(true)
     createdAt       DateTime      @default(now())
     updatedAt       DateTime      @updatedAt
