@@ -14,27 +14,32 @@ export async function updateCliente(data: unknown, id: number) {
         }
     }
     // Verificar si el cuit ya existe
-    const existingCliente = await prisma.cliente.findFirst({
-        where: {
-            AND: [
-                { cuit: result.data.cuit },
-                { id: { not: id} } 
-            ]
+    // Excluir el cliente actual de la búsqueda
+    // Se usa la transacción para asegurar que ambas operaciones se realicen de manera atómica
+    // Si una falla, la otra no se ejecuta
+    await prisma.$transaction(async (tx) => {
+        const existingCliente = await prisma.cliente.findFirst({
+            where: {
+                AND: [
+                    { cuit: result.data.cuit },
+                    { id: { not: id } }
+                ]
+            }
+
+        });
+
+        if (existingCliente) {
+            return {
+                errors: [{ message: "El CUIT ya está registrado en el sistema" }]
+            };
         }
-        
-    });
 
-    if (existingCliente) {
-        return {
-            errors: [{ message: "El CUIT ya está registrado en el sistema" }]
-        };
-    }
-
-    await prisma.cliente.update({
-        where: {
-            id
-        },
-        data: result.data
+        await prisma.cliente.update({
+            where: {
+                id
+            },
+            data: result.data
+        })
     })
     revalidatePath('/admin/clientes/list')
 } 

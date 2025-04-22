@@ -26,7 +26,7 @@ export default function homePage() {
                             </div>
                         </div>
                     </div>
-                </div> {/* Degradado */}
+                </div> 
 
             </div>
         </>

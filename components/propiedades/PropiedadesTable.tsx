@@ -1,5 +1,4 @@
 "use client";
-;
 import Link from "next/link";
 import { useMemo } from "react";
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
@@ -43,16 +42,29 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
             {
                 id: "cliente", // ID único para la columna
                 header: "Cliente", // Título de la columna
-                Cell: ({ row }) => (
-                    <span>
-                        {row.original.cliente.nombre} {row.original.cliente.apellido}
-                    </span>
-                ),
+                accessorFn: (row) => `${row.cliente.nombre} ${row.cliente.apellido}`, // Combina los valores de calle y número
+                Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
+            },
+            {
+                id: "direccion", // ID único para la columna
+                header: "Domicilio", // Título de la columna
+                accessorFn: (row) => `${row.calle} ${row.numero}`, // Combina los valores de calle y número
+                Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
+            },
+            {
+                accessorKey: "piso",
+                header: "Piso",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
-                {
-                accessorKey: "provincia.nombre",
-                header: "Provincia",
+            {
+                accessorKey: "departamento",
+                header: "Departamento",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
@@ -61,13 +73,8 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "calle",
-                header: "Calle",
-                muiTableHeadCellProps: { style: { color: "darkred" } },
-            },
-            {
-                accessorKey: "numero",
-                header: "Número",
+                accessorKey: "provincia.nombre",
+                header: "Provincia",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
@@ -80,7 +87,7 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
                 header: "Activo",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 Cell: ({ cell }) => (cell.getValue<boolean>() ? "Sí" : "No"), // Renderizar "Sí" o "No" según el valor booleano
-            },            
+            },
 
         ],
         []

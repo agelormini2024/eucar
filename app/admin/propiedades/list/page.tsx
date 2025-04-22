@@ -1,33 +1,25 @@
+"use client"
+import { getPropiedades } from '@/actions/list-propiedades-action';
 import PropiedadesTable from '@/components/propiedades/PropiedadesTable';
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
-import { prisma } from '@/src/lib/prisma'
+import { PropiedadesConRelaciones } from '@/src/types';
 
-async function getPropiedades() {
-    const propiedades = await prisma.propiedad.findMany({
-        orderBy: {
-            cliente: {
-                nombre: 'asc', 
-            },
-        },
-        include: {
-            provincia: true,
-            pais: true,
-            tipoPropiedad: true,
-            cliente: {
-                select: {
-                    id: true,
-                    nombre: true,
-                    apellido: true,
-                },
-            },
-        },
-    })
-    return propiedades;
-}
+import { useEffect, useState } from 'react';
 
-export default async function ListadoPropiedadsPage() {
-    const propiedades = await getPropiedades();
+export default function ListadoPropiedadsPage() {
+    const [propiedades, setPropiedades] = useState<PropiedadesConRelaciones[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+
+    useEffect(() => {
+        async function fetchPropiedades() {
+            const data = await getPropiedades();
+            setPropiedades(data);
+            setIsLoading(false); // Cambiar el estado de carga a falso una vez que los datos se cargan
+        }
+        fetchPropiedades();
+    }, []);
 
     return (
         <>
@@ -39,8 +31,15 @@ export default async function ListadoPropiedadsPage() {
                     <ButtonGoBack />
                 </div>
             </div>
-            <div className='mt-10'>
-                <PropiedadesTable data={propiedades} />
+            <div className='mt-10'>                
+            {isLoading ? (
+                    <div className="text-center">
+                        <p className="text-2xl font-bold">Cargando...</p>
+                        {/* Puedes reemplazar esto con un spinner si lo prefieres */}
+                    </div>
+                ) : (
+                    <PropiedadesTable data={propiedades} />
+                )}
             </div>
 
         </>

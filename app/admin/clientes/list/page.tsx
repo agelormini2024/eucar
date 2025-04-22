@@ -1,24 +1,25 @@
+"use client"
+import { getClientes } from '@/actions/list-clientes-action';
 import ClientesTable from '@/components/clientes/ClientesTable'
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
-import { prisma } from '@/src/lib/prisma'
-
-async function getClientes() {
-    const clientes = await prisma.cliente.findMany({
-        orderBy: {
-            apellido: 'asc',
-        },
-        include: {
-            provincia: true,
-            pais: true,
-        },
-    })
-    return clientes; 
-}
+import { ClientesConProvinciaPais } from '@/src/types';
+import { useEffect, useState } from 'react';
 
 
-export default async function ListadoClientesPage() {
-    const clientes = await getClientes();
+export default function ListadoClientesPage() {
+    const [clientes, setClientes] = useState<ClientesConProvinciaPais[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchClientes() {
+            const data = await getClientes();
+            setClientes(data);
+            setIsLoading(false); // Cambiar el estado de carga a falso una vez que los datos se cargan
+        }
+        fetchClientes();
+    }
+    , []);
 
     return (
         <>
@@ -33,7 +34,14 @@ export default async function ListadoClientesPage() {
             </div>
 
             <div className='mt-10'>
-                <ClientesTable data={clientes} />
+            {isLoading ? (
+                    <div className="text-center">
+                        <p className="text-2xl font-bold">Cargando...</p>
+                        {/* Puedes reemplazar esto con un spinner si lo prefieres */}
+                    </div>
+                ) : (
+                    <ClientesTable data={clientes} />
+                )}
             </div>
         </>
     );

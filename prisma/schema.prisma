@@ -93,7 +93,7 @@ model Propiedad {
     metrosCubiertos Int
     cochera         Int
     expensas        Float?
-    antiguedad      Int
+    antiguedad      Int?
     imagen          String?
     tipoPropiedadId Int
     tipoPropiedad   TipoPropiedad @relation(fields: [tipoPropiedadId], references: [id])
@@ -107,13 +107,55 @@ model Propiedad {
 }
 
 //----------------------------------------------------------------------------//
+// Módulo de Contratos
+//----------------------------------------------------------------------------//
+
+// Modelos para modulo de contratos
+
+// 1) Tipo de contrato
+model TipoContrato {
+    id                         Int        @id @default(autoincrement())
+    descripcion                String
+    cantidadMesesActualizacion Int
+    contratos                  Contrato[] // Add the opposite relation field
+}
+
+// 2) TipoIndice
+model TipoIndice {
+    id               Int               @id @default(autoincrement())
+    descripcion      String
+    contratos        Contrato[] // Add the opposite relation field
+}
+
+// 3) Contrato y DetalleContrato ( realizar un Master Detail )
 
 model Contrato {
-    id           Int        @id @default(autoincrement())
-    clienteId    Int
-    cliente      Cliente    @relation(fields: [clienteId], references: [id])
-    rolClienteId Int
-    rolCliente   RolCliente @relation(fields: [rolClienteId], references: [id])
-    propiedadId  Int
-    propiedad    Propiedad  @relation(fields: [propiedadId], references: [id])
+    id                    Int               @id @default(autoincrement())
+    fechaInicio           DateTime
+    fechaVencimiento      DateTime
+    cantidadMesesDuracion Int
+    diaMesVencimiento     Int
+    clienteId             Int
+    cliente               Cliente           @relation(fields: [clienteId], references: [id])
+    rolClienteId          Int
+    rolCliente            RolCliente        @relation(fields: [rolClienteId], references: [id])
+    propiedadId           Int
+    propiedad             Propiedad         @relation(fields: [propiedadId], references: [id])
+    tipoContratoId        Int
+    tipoContrato          TipoContrato      @relation(fields: [tipoContratoId], references: [id])
+    tipoIndice            TipoIndice        @relation(fields: [tipoIndiceId], references: [id])
+    tipoIndiceId          Int
+    detalleContratos      DetalleContrato[] // Add the opposite relation field
+}
+
+model DetalleContrato {
+    id             Int        @id @default(autoincrement())
+    contratoId     Int
+    contrato       Contrato   @relation(fields: [contratoId], references: [id])
+    fecha          DateTime
+    monto          Float
+    indiceAplicado Float
+    observaciones  String?
+    createdAt      DateTime   @default(now())
+    updatedAt      DateTime   @updatedAt
 }

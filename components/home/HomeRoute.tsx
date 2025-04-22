@@ -13,7 +13,7 @@ type HomeRouteProps = {
 export default function HomeRoute({ link }: HomeRouteProps) {
 
     const pathname = usePathname();
-    const isActive = pathname.startsWith(link.url);  // Esto lo usamos en el caso que queramos que el link se vea activo
+    const isActive = pathname.startsWith(link.url);  // Esto lo usamos para que el link se vea activo
 
     return (
         <Link

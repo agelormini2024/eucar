@@ -27,14 +27,13 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
             {
-                accessorKey: "nombre",
-                header: "Nombre",
+                id: "cliente", // ID único para la columna
+                header: "Cliente", // Título de la columna
+                accessorFn: (row) => `${row.nombre} ${row.apellido}`, // Combina los valores de calle y número
+                Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-            },
-            {
-                accessorKey: "apellido",
-                header: "Apellido",
-                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
             },
             {
                 accessorKey: "razonSocial",
@@ -52,15 +51,14 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "calle",
-                header: "Calle",
+                id: "direccion", // ID único para la columna
+                header: "Domicilio", // Título de la columna
+                accessorFn: (row) => `${row.calle} ${row.numero}`, // Combina los valores de calle y número
+                Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
             },
-            {
-                accessorKey: "numero",
-                header: "Numero",
-                muiTableHeadCellProps: { style: { color: "darkred" } },
-            },            
             {
                 accessorKey: "provincia.nombre",
                 header: "Provincia",
