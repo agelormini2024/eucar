@@ -61,3 +61,39 @@ export const PropiedadSchema = z.object({
     clienteId: z.number().min(1, { message: "El cliente es obligatorio" }),
     activo: z.boolean().default(true),
 })
+
+export const ContratoSchema = z.object({
+    descripcion: z.string().min(3, { message: "La descripción es obligatoria" }),
+    fechaInicio: z.string().min(1, { message: "La fecha de inicio es obligatoria" }),
+    fechaVencimiento: z.string().min(1, { message: "La fecha de vencimiento es obligatoria" }),
+    cantidadMesesDuracion: z.number()
+        .min(1, { message: "La cantidad de meses de duración es obligatoria" })
+        .max(120, { message: "La cantidad de meses de duración no puede ser más de 120" }),
+    diaMesVencimiento: z.number()
+        .min(1, { message: "El día de vencimiento es obligatorio" })
+        .max(31, { message: "El día de vencimiento no puede ser más de 31" }),
+    clienteIdPropietario: z.number().min(1, { message: "El Propietario es obligatorio" }),
+    clienteIdInquilino: z.number().min(1, { message: "El Inquilino es obligatorio" }),
+    propiedadId: z.number().min(1, { message: "La propiedad es obligatoria" }),
+    tipoContratoId: z.number().min(1, { message: "El tipo de contrato es obligatorio" }),
+    tipoIndiceId: z.number().min(1, { message: "El tipo de índice es obligatorio" }),
+    expensas: z.boolean().default(false),
+    abl: z.boolean().default(false),
+    aysa: z.boolean().default(false),
+    luz: z.boolean().default(false),
+    gas: z.boolean().default(false),
+    otros: z.boolean().default(false)
+}).refine((data) => {
+    // Validar que fechaInicio sea menor que fechaVencimiento
+    const fechaInicio = new Date(data.fechaInicio);
+    const fechaVencimiento = new Date(data.fechaVencimiento);
+    return fechaInicio < fechaVencimiento;
+}, {
+    message: "La fecha de inicio debe ser menor que la fecha de vencimiento",
+    path: ["fechaInicio"], // Indica que el error está relacionado con fechaInicio
+}).refine((data) => {
+    // Validar que clienteIdPropietario y clienteIdInquilino sean diferentes
+    return data.clienteIdPropietario !== data.clienteIdInquilino;
+}, {
+    message: "El Propietario y el Inquilino no pueden ser la misma persona",
+})

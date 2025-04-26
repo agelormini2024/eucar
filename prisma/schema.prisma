@@ -6,6 +6,7 @@
 
 generator client {
     provider = "prisma-client-js"
+    //output   = "./node_modules/@prisma/client" // Ruta explícita para el cliente de Prisma
 }
 
 datasource db {
@@ -34,42 +35,37 @@ model Provincia {
 }
 
 model Cliente {
-    id            Int         @id @default(autoincrement())
-    nombre        String
-    apellido      String
-    razonSocial   String?
-    cuit          String      @unique
-    telefono1     String?
-    telefono2     String?
-    celular       String
-    email         String
-    calle         String
-    numero        Int
-    piso          String?
-    departamento  String?
-    paisId        Int
-    pais          Pais        @relation(fields: [paisId], references: [id])
-    provinciaId   Int
-    provincia     Provincia   @relation(fields: [provinciaId], references: [id])
-    localidad     String
-    codigoPostal  String
-    observaciones String?
-    contratos     Contrato[] // Add the opposite relation field
-    propiedades   Propiedad[] // Add the opposite relation field
-    activo        Boolean     @default(true)
-    createdAt     DateTime    @default(now())
-    updatedAt     DateTime    @updatedAt
-}
-
-model RolCliente {
-    id        Int        @id @default(autoincrement())
-    nombre    String
-    contratos Contrato[] // Add the opposite relation field
+    id                   Int         @id @default(autoincrement())
+    nombre               String
+    apellido             String
+    razonSocial          String?
+    cuit                 String      @unique
+    telefono1            String?
+    telefono2            String?
+    celular              String
+    email                String
+    calle                String
+    numero               Int
+    piso                 String?
+    departamento         String?
+    paisId               Int
+    pais                 Pais        @relation(fields: [paisId], references: [id])
+    provinciaId          Int
+    provincia            Provincia   @relation(fields: [provinciaId], references: [id])
+    localidad            String
+    codigoPostal         String
+    observaciones        String?
+    contratosInquilino   Contrato[]  @relation("ClienteInquilino")
+    contratosPropietario Contrato[]  @relation("ClientePropietario")
+    propiedades          Propiedad[] // Add the opposite relation field
+    activo               Boolean     @default(true)
+    createdAt            DateTime    @default(now())
+    updatedAt            DateTime    @updatedAt
 }
 
 model TipoPropiedad {
     id          Int         @id @default(autoincrement())
-    nombre      String
+    descripcion String
     propiedades Propiedad[]
 }
 
@@ -122,40 +118,78 @@ model TipoContrato {
 
 // 2) TipoIndice
 model TipoIndice {
-    id               Int               @id @default(autoincrement())
-    descripcion      String
-    contratos        Contrato[] // Add the opposite relation field
+    id          Int          @id @default(autoincrement())
+    nombre        String
+    descripcion String
+    contratos   Contrato[] // Add the opposite relation field
+    itemsRecibo ItemRecibo[] // Add the opposite relation field
 }
 
-// 3) Contrato y DetalleContrato ( realizar un Master Detail )
+// 3) Contrato
 
 model Contrato {
-    id                    Int               @id @default(autoincrement())
+    id                    Int          @id @default(autoincrement())
+    descripcion           String
     fechaInicio           DateTime
     fechaVencimiento      DateTime
     cantidadMesesDuracion Int
     diaMesVencimiento     Int
-    clienteId             Int
-    cliente               Cliente           @relation(fields: [clienteId], references: [id])
-    rolClienteId          Int
-    rolCliente            RolCliente        @relation(fields: [rolClienteId], references: [id])
+    clienteIdPropietario  Int
+    clientePropietario    Cliente      @relation("ClientePropietario", fields: [clienteIdPropietario], references: [id])
+    clienteIdInquilino    Int
+    clienteInquilino      Cliente      @relation("ClienteInquilino", fields: [clienteIdInquilino], references: [id])
     propiedadId           Int
-    propiedad             Propiedad         @relation(fields: [propiedadId], references: [id])
+    propiedad             Propiedad    @relation(fields: [propiedadId], references: [id])
     tipoContratoId        Int
-    tipoContrato          TipoContrato      @relation(fields: [tipoContratoId], references: [id])
-    tipoIndice            TipoIndice        @relation(fields: [tipoIndiceId], references: [id])
+    tipoContrato          TipoContrato @relation(fields: [tipoContratoId], references: [id])
     tipoIndiceId          Int
-    detalleContratos      DetalleContrato[] // Add the opposite relation field
+    tipoIndice            TipoIndice   @relation(fields: [tipoIndiceId], references: [id])
+    recibos               Recibo[] // Add the opposite relation field
+    montoAlquilerInicial  Float
+    expensas              Boolean
+    abl                   Boolean
+    aysa                  Boolean
+    luz                   Boolean
+    gas                   Boolean
+    otros                 Boolean
 }
 
-model DetalleContrato {
-    id             Int        @id @default(autoincrement())
-    contratoId     Int
-    contrato       Contrato   @relation(fields: [contratoId], references: [id])
-    fecha          DateTime
-    monto          Float
-    indiceAplicado Float
-    observaciones  String?
-    createdAt      DateTime   @default(now())
-    updatedAt      DateTime   @updatedAt
+// Recibos y sus items
+
+model TipoItemRecibo {
+    id          Int          @id @default(autoincrement())
+    descripcion String
+    items       ItemRecibo[] // Add the opposite relation field
+}
+
+model Recibo {
+    id            Int          @id @default(autoincrement())
+    contratoId    Int
+    contrato      Contrato     @relation(fields: [contratoId], references: [id])
+    fecha         DateTime
+    montoTotal    Float
+    items         ItemRecibo[] // Add the opposite relation field
+    observaciones String?
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    expensas      Boolean
+    abl           Boolean
+    aysa          Boolean
+    luz           Boolean
+    gas           Boolean
+}
+
+model ItemRecibo {
+    id               Int            @id @default(autoincrement())
+    descripcion      String
+    monto            Float
+    tipoIndiceId     Int
+    tipoIndice       TipoIndice     @relation(fields: [tipoIndiceId], references: [id])
+    indiceAplicado   Float
+    reciboId         Int
+    recibo           Recibo         @relation(fields: [reciboId], references: [id])
+    tipoItemRecibo   TipoItemRecibo @relation(fields: [tipoItemReciboId], references: [id])
+    tipoItemReciboId Int
+    createdAt        DateTime       @default(now())
+    updatedAt        DateTime       @updatedAt
 }

@@ -3,7 +3,7 @@ import HomeRoute from "./HomeRoute"
 export default function MenuBar() {
 
     const adminNavigation = [
-        { url: '/admin/alquileres', text: 'Alquileres', blank: false },
+        { url: '/admin/contratos', text: 'Alquileres', blank: false },
         { url: '/admin/propiedades', text: 'Propiedades', blank: false },
         { url: '/admin/clientes', text: 'Clientes', blank: false },
     ]

@@ -3,7 +3,6 @@
 import { prisma } from "@/src/lib/prisma";
 import { PropiedadSchema } from "@/src/schema";
 
-
 export async function createPropiedad(data: unknown) {
     // Validar los datos con el esquema de propiedad de Zod
     const result = PropiedadSchema.safeParse(data)

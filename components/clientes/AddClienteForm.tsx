@@ -31,6 +31,7 @@ export default function AddClienteForm({ children }: { children: React.ReactNode
             activo: formData.get('activo') === 'on' ? true : false,
 
         }
+        // Validar los datos con el esquema de cliente de Zod
         const result = ClienteSchema.safeParse(data)
 
         if (!result.success) {
@@ -40,6 +41,7 @@ export default function AddClienteForm({ children }: { children: React.ReactNode
             return
         }
 
+        // Crear el cliente
         const response = await createCliente(result.data)
 
         if (response?.errors) {
@@ -50,6 +52,7 @@ export default function AddClienteForm({ children }: { children: React.ReactNode
         }
         toast.success("Cliente creado correctamente")
         router.push('/admin/clientes/alta')
+        
         // Limpiar el formulario
         resetForm()
 

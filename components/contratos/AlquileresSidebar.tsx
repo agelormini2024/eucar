@@ -2,8 +2,8 @@ import Logo from "../ui/Logo";
 import AlquileresRoute from "./AlquileresRoute";
 
 const menuItems = [
-    { url: '/admin/alquileres/contratos', text: 'Contratos', blank: false , key: 1},
-    { url: '/admin/alquileres/alta', text: 'Nuevo Contrato', blank: false, key:2 },
+    { url: '/admin/contratos/list', text: 'Contratos', blank: false , key: 1},
+    { url: '/admin/contratos/alta', text: 'Nuevo Contrato', blank: false, key:2 },
 ]
 
 export default function AlquileresSidebar() {

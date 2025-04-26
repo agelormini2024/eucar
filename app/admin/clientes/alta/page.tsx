@@ -16,9 +16,9 @@ export default function AltaClientePage() {
                 </div>
             </div>
             <div>
-            <AddClienteForm>
-                <ClienteForm />
-            </AddClienteForm>
+                <AddClienteForm>
+                    <ClienteForm />
+                </AddClienteForm>
             </div>
         </>
     )

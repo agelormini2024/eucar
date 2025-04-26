@@ -1,0 +1,346 @@
+"use client"
+import { useContratoFormStore } from "@/src/stores/storeContratos";
+import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
+import { useEffect } from "react";
+
+type ContratoFormDynamicProps = {
+
+    clientes: Cliente[]
+    propiedades: Propiedad[]
+    tiposContrato: TipoContrato[]
+    tiposIndice: TipoIndice[]
+    contrato?: Contrato
+}
+
+export default function ContratoFormDynamic({ clientes, propiedades, tiposContrato, tiposIndice, contrato }: ContratoFormDynamicProps) {
+
+    const { formValues, setFormValues } = useContratoFormStore()
+
+    useEffect(() => {
+        if (contrato) {
+            setFormValues({
+                descripcion: contrato.descripcion || '',
+                fechaInicio: contrato.fechaInicio ? contrato.fechaInicio.toISOString().split('T')[0] : '', // Convertir a string
+                fechaVencimiento: contrato.fechaVencimiento ? contrato.fechaVencimiento.toISOString().split('T')[0] : '', // Convertir a string
+                cantidadMesesDuracion: contrato.cantidadMesesDuracion || 0,
+                diaMesVencimiento: contrato.diaMesVencimiento || 10,
+                clienteIdPropietario: contrato.clienteIdPropietario || 0,
+                clienteIdInquilino: contrato.clienteIdInquilino || 0,
+                propiedadId: contrato.propiedadId || 0,
+                tipoContratoId: contrato.tipoContratoId || 0,
+                tipoIndiceId: contrato.tipoIndiceId || 0,
+                expensas: contrato.expensas || false,
+                abl: contrato.abl || false,
+                aysa: contrato.aysa || false,
+                luz: contrato.luz || false,
+                gas: contrato.gas || false,
+                otros: contrato.otros || false
+            })
+        }
+
+    }, [contrato, setFormValues])
+
+    //-------------------------------------------------------------------------------------------//
+    //              calcular la cantidad de meses de duración del contrato
+    //-------------------------------------------------------------------------------------------//
+    const calcularCantidadMesesDuracion = () => {
+        const fechaInicio = new Date(formValues.fechaInicio);
+        const fechaVencimiento = new Date(formValues.fechaVencimiento);
+
+        if (isNaN(fechaInicio.getTime()) || isNaN(fechaVencimiento.getTime())) {
+            // Si alguna de las fechas no es válida, no hacemos nada
+            return;
+        }
+
+        // Calcular la diferencia en años y meses
+        const diferenciaAnios = fechaVencimiento.getFullYear() - fechaInicio.getFullYear();
+        const diferenciaMeses = fechaVencimiento.getMonth() - fechaInicio.getMonth();
+        // Total de meses
+        const cantidadMeses = diferenciaAnios * 12 + diferenciaMeses;
+
+
+        setFormValues({ cantidadMesesDuracion: cantidadMeses });
+    }
+
+    useEffect(() => {
+        if (formValues.fechaInicio && formValues.fechaVencimiento) {
+            calcularCantidadMesesDuracion();
+        }
+    }, [formValues.fechaInicio, formValues.fechaVencimiento]);
+    //-------------------------------------------------------------------------------------------//
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | React.ChangeEvent<{ checked: boolean }>) => {
+        const { name, value, type } = e.target as HTMLInputElement;
+        const parsedValue = type === "number" ? Number(value) : value;
+        setFormValues({ [name]: parsedValue });
+    }
+    return (
+        <>
+
+            <div>
+                <input
+                    hidden
+                    id="cantidadMesesDuracion"
+                    type="number"
+                    name="cantidadMesesDuracion"
+                    defaultValue={formValues.cantidadMesesDuracion}
+                />
+                <input
+                    hidden
+                    id="diaMesVencimiento"
+                    type="number"
+                    name="diaMesVencimiento"
+                    defaultValue={formValues.diaMesVencimiento}
+                />
+            </div>
+
+            <div className="space-y-2">
+                <label
+                    className="text-slate-800 font-bold"
+                    htmlFor="descripcion"
+                >Descripción :</label>
+                <input
+                    id="descripcion"
+                    type="text"
+                    name="descripcion"
+                    onChange={handleInputChange}
+                    value={formValues.descripcion}
+                    className="block w-full p-3 bg-slate-200"
+                    placeholder="Descripción del contrato"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-slate-800 font-bold"
+                    htmlFor="propiedadId">
+                    Propiedad :
+                </label>
+                <select
+                    className="block w-full p-3 bg-slate-200"
+                    id="propiedadId"
+                    name="propiedadId"
+                    onChange={handleInputChange}
+                    value={formValues.propiedadId}
+                >
+                    <option value="">-- Seleccione --</option>
+                    {propiedades.map((propiedad) => (
+                        <option
+                            key={propiedad.id}
+                            value={propiedad.id}
+                        >
+                            {propiedad.descripcion}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                    <label
+                        className="text-slate-800 font-bold"
+                        htmlFor="fechaInicio"
+                    >Fecha Inicial :</label>
+                    <input
+                        id="fechaInicio"
+                        type="date"
+                        name="fechaInicio"
+                        onChange={(e) => setFormValues({ fechaInicio: e.target.value })} // Capturar como string
+                        value={formValues.fechaInicio} // Mostrar como string
+                        className="block w-full p-3 bg-slate-200"
+                        placeholder="Fecha de Inicio"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label
+                        className="text-slate-800 font-bold"
+                        htmlFor="fechaVencimiento"
+                    >Fecha de Vto :</label>
+                    <input
+                        id="fechaVencimiento"
+                        type="date"
+                        name="fechaVencimiento"
+                        onChange={(e) => setFormValues({ fechaVencimiento: e.target.value })} // Capturar como string
+                        value={formValues.fechaVencimiento} // Mostrar como string
+                        className="block w-full p-3 bg-slate-200"
+                        placeholder="Fecha de Vencimiento"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+
+                <div className="space-y-2">
+                    <label className="text-slate-800 font-bold"
+                        htmlFor="clienteIdPropietario">
+                        Propiedatrio :
+                    </label>
+                    <select
+                        className="block w-full p-3 bg-slate-200"
+                        id="clienteIdPropietario"
+                        name="clienteIdPropietario"
+                        onChange={handleInputChange}
+                        value={formValues.clienteIdPropietario}
+                    >
+                        <option value="">-- Seleccione --</option>
+                        {clientes.map((cliente) => (
+                            <option
+                                key={cliente.id}
+                                value={cliente.id}
+                            >
+                                {cliente.nombre} {cliente.apellido} ------ {cliente.cuit}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-slate-800 font-bold"
+                        htmlFor="clienteIdInquilino">
+                        Inquilino :
+                    </label>
+                    <select
+                        className="block w-full p-3 bg-slate-200"
+                        id="clienteIdInquilino"
+                        name="clienteIdInquilino"
+                        onChange={handleInputChange}
+                        value={formValues.clienteIdInquilino}
+                    >
+                        <option value="">-- Seleccione --</option>
+                        {clientes.map((cliente) => (
+                            <option
+                                key={cliente.id}
+                                value={cliente.id}
+                            >
+                                {cliente.nombre} {cliente.apellido} ------ {cliente.cuit}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-slate-800 font-bold"
+                        htmlFor="tipoContratoId">
+                        Tipo de Contrato :
+                    </label>
+                    <select
+                        className="block w-full p-3 bg-slate-200"
+                        id="tipoContratoId"
+                        name="tipoContratoId"
+                        onChange={handleInputChange}
+                        value={formValues.tipoContratoId}
+                    >
+                        <option value="">-- Seleccione --</option>
+                        {tiposContrato.map((tiposContrato) => (
+                            <option
+                                key={tiposContrato.id}
+                                value={tiposContrato.id}
+                            >
+                                {tiposContrato.descripcion}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-slate-800 font-bold"
+                        htmlFor="tipoIndiceId">
+                        Tipo de Indice :
+                    </label>
+                    <select
+                        className="block w-full p-3 bg-slate-200"
+                        id="tipoIndiceId"
+                        name="tipoIndiceId"
+                        onChange={handleInputChange}
+                        value={formValues.tipoIndiceId}
+                    >
+                        <option value="">-- Seleccione --</option>
+                        {tiposIndice.map((tiposIndice) => (
+                            <option
+                                key={tiposIndice.id}
+                                value={tiposIndice.id}
+                            >
+                                {tiposIndice.descripcion}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="expensas"
+                        >Expensas :</label>
+                        <input
+                            id="expensas"
+                            type="checkbox"
+                            name="expensas"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.expensas}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="abl"
+                        >ABL :</label>
+                        <input
+                            id="abl"
+                            type="checkbox"
+                            name="abl"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.abl}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="aysa"
+                        >AYSA :</label>
+                        <input
+                            id="aysa"
+                            type="checkbox"
+                            name="aysa"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.aysa}
+                        />
+                    </div>
+
+                </div>
+                <div className="grid lg:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="luz"
+                        >Luz :</label>
+                        <input
+                            id="luz"
+                            type="checkbox"
+                            name="luz"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.luz}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="gas"
+                        >Gas :</label>
+                        <input
+                            id="gas"
+                            type="checkbox"
+                            name="gas"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.gas}
+                        />
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}

@@ -48,7 +48,8 @@ export default function ClienteFormDynamic({ paises, provincias, cliente }: Clie
         } else {
             setFormValues({ [name]: value });
         }
-    }; const isArgentina = true; // Por el momento solo se permite Argentina en el caso de permitir otro pais
+    }; 
+    const isArgentina = true; // Por el momento solo se permite Argentina en el caso de permitir otro pais
 
     return (
         <>
@@ -229,7 +230,8 @@ export default function ClienteFormDynamic({ paises, provincias, cliente }: Clie
                 >
                     <option value="">-- Seleccione --</option>
                     {paises.map((pais) => (
-                        <option key={pais.id} value={pais.id}>
+                        <option key={pais.id}
+                            value={pais.id}>
                             {pais.nombre}
                         </option>
                     ))}

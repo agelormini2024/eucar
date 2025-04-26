@@ -17,7 +17,7 @@ export type PropiedadesConRelaciones = Propiedad & {
     };
     tipoPropiedad: {
         id: number;
-        nombre: string;
+        descripcion: string;
     };
 };
 

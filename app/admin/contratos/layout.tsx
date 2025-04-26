@@ -1,4 +1,5 @@
-import AdminAlquileresSidebar from "@/components/alquileres/AlquileresSidebar";
+import AdminAlquileresSidebar from "@/components/contratos/AlquileresSidebar";
+import ToastNotification from "@/components/ui/ToastNotification";
 
 export default function RootLayout({
     children,
@@ -16,6 +17,7 @@ export default function RootLayout({
                     {children}
                 </main>
             </div>
+            <ToastNotification />
         </>
     )
 }  

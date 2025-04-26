@@ -21,7 +21,7 @@ async function getProvincias() {
 async function getTiposPropiedad() {
     return await prisma.tipoPropiedad.findMany({
         orderBy: {
-            nombre: "asc",
+            descripcion: "asc",
         },
     });
 }
