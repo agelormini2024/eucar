@@ -146,6 +146,7 @@ model Contrato {
     tipoIndice            TipoIndice   @relation(fields: [tipoIndiceId], references: [id])
     recibos               Recibo[] // Add the opposite relation field
     montoAlquilerInicial  Float
+    observaciones         String?
     expensas              Boolean
     abl                   Boolean
     aysa                  Boolean

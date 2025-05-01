@@ -13,6 +13,8 @@ type ContratoFormState = {
         propiedadId: number;
         tipoContratoId: number;
         tipoIndiceId: number;
+        montoAlquilerInicial: number;
+        observaciones: string;
         expensas: boolean;
         abl: boolean;
         aysa: boolean;
@@ -36,6 +38,8 @@ export const useContratoFormStore = create<ContratoFormState>()( // Los dos desp
             propiedadId: 0,
             tipoContratoId: 0,
             tipoIndiceId: 0,
+            montoAlquilerInicial: 0,
+            observaciones: '',
             expensas: false,
             abl: false,
             aysa: false,
@@ -61,6 +65,8 @@ export const useContratoFormStore = create<ContratoFormState>()( // Los dos desp
                 propiedadId: 0,
                 tipoContratoId: 0,
                 tipoIndiceId: 0,
+                montoAlquilerInicial: 0,
+                observaciones: '',
                 expensas: false,
                 abl: false,
                 aysa: false,

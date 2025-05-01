@@ -29,7 +29,7 @@ export default function ClientesTable({ data }: ClientesTableProps) {
             {
                 id: "cliente", // ID único para la columna
                 header: "Cliente", // Título de la columna
-                accessorFn: (row) => `${row.nombre} ${row.apellido}`, // Combina los valores de calle y número
+                accessorFn: (row) => `${row.nombre} ${row.apellido}`, // Combina los valores de nombre y apellido
                 Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
@@ -68,14 +68,14 @@ export default function ClientesTable({ data }: ClientesTableProps) {
                 accessorKey: "localidad",
                 header: "Localidad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-            },            
+            },
             {
                 accessorKey: "activo",
                 header: "Activo",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 Cell: ({ cell }) => (cell.getValue<boolean>() ? "Sí" : "No"), // Renderizar "Sí" o "No" según el valor booleano
 
-            },            
+            },
         ],
         []
     );
@@ -83,6 +83,16 @@ export default function ClientesTable({ data }: ClientesTableProps) {
     const table = useMaterialReactTable({
         columns,
         data,
+        enableStickyHeader: true,
+        muiTablePaperProps: {
+            elevation: 5, //change the mui box shadow
+            //customize paper styles
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                },
+            },
+        },
         enableColumnResizing: true,
         enableColumnOrdering: true,
         enableRowNumbers: true,

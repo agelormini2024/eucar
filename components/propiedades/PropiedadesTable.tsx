@@ -95,6 +95,16 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
     const table = useMaterialReactTable({
         columns,
         data,
+        enableStickyHeader: true,
+        muiTablePaperProps: {
+            elevation: 5, //change the mui box shadow
+            //customize paper styles
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                },
+            },
+        },
         enableColumnResizing: true,
         enableColumnOrdering: true,
         enableRowNumbers: true,

@@ -1,11 +1,40 @@
 "use server"
-import { prisma } from "@/src/lib/prisma";
+import { prisma } from "@/src/lib/prisma"
 
 export async function getContratos() {
-    const clientes = await prisma.contrato.findMany({
-        orderBy: {
-            descripcion: 'asc',
-        },
-     })
-    return clientes; 
+    const contratos = await prisma.contrato.findMany({
+        include: {
+            tipoContrato: true,
+            tipoIndice: true,
+            propiedad: {
+                select: {
+                    calle: true,
+                    numero: true,
+                    piso: true,
+                    departamento: true,
+                }
+            },
+            clienteInquilino: {
+                select: {
+                    apellido: true,
+                    nombre: true,
+                    cuit: true,
+                }
+            },
+            clientePropietario: {
+                select: {
+                    apellido: true,
+                    nombre: true,
+                    cuit: true,
+                }
+            }
+        }
+    
+    })
+    
+
+    return contratos;
 }
+
+
+

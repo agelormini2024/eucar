@@ -77,6 +77,11 @@ export const ContratoSchema = z.object({
     propiedadId: z.number().min(1, { message: "La propiedad es obligatoria" }),
     tipoContratoId: z.number().min(1, { message: "El tipo de contrato es obligatorio" }),
     tipoIndiceId: z.number().min(1, { message: "El tipo de índice es obligatorio" }),
+    montoAlquilerInicial: z.number()
+        .min(1, { message: "El monto de alquiler inicial es obligatorio" }),
+    observaciones: z.string()
+        .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
+        .optional(),
     expensas: z.boolean().default(false),
     abl: z.boolean().default(false),
     aysa: z.boolean().default(false),

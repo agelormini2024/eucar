@@ -3,6 +3,8 @@ import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
 import { useEffect } from "react";
 
+const DIA_MES_VENCIMIENTO = 10
+
 type ContratoFormDynamicProps = {
 
     clientes: Cliente[]
@@ -23,12 +25,14 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                 fechaInicio: contrato.fechaInicio ? contrato.fechaInicio.toISOString().split('T')[0] : '', // Convertir a string
                 fechaVencimiento: contrato.fechaVencimiento ? contrato.fechaVencimiento.toISOString().split('T')[0] : '', // Convertir a string
                 cantidadMesesDuracion: contrato.cantidadMesesDuracion || 0,
-                diaMesVencimiento: contrato.diaMesVencimiento || 10,
+                diaMesVencimiento: contrato.diaMesVencimiento || DIA_MES_VENCIMIENTO,
                 clienteIdPropietario: contrato.clienteIdPropietario || 0,
                 clienteIdInquilino: contrato.clienteIdInquilino || 0,
                 propiedadId: contrato.propiedadId || 0,
                 tipoContratoId: contrato.tipoContratoId || 0,
                 tipoIndiceId: contrato.tipoIndiceId || 0,
+                montoAlquilerInicial: contrato.montoAlquilerInicial || 0,
+                observaciones: contrato.observaciones || '',
                 expensas: contrato.expensas || false,
                 abl: contrato.abl || false,
                 aysa: contrato.aysa || false,
@@ -59,7 +63,10 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
         const cantidadMeses = diferenciaAnios * 12 + diferenciaMeses;
 
 
-        setFormValues({ cantidadMesesDuracion: cantidadMeses });
+        setFormValues({
+            cantidadMesesDuracion: cantidadMeses,
+            diaMesVencimiento: DIA_MES_VENCIMIENTO
+        });
     }
 
     useEffect(() => {
@@ -69,31 +76,13 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     }, [formValues.fechaInicio, formValues.fechaVencimiento]);
     //-------------------------------------------------------------------------------------------//
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement> | React.ChangeEvent<{ checked: boolean }>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target as HTMLInputElement;
         const parsedValue = type === "number" ? Number(value) : value;
         setFormValues({ [name]: parsedValue });
     }
     return (
         <>
-
-            <div>
-                <input
-                    hidden
-                    id="cantidadMesesDuracion"
-                    type="number"
-                    name="cantidadMesesDuracion"
-                    defaultValue={formValues.cantidadMesesDuracion}
-                />
-                <input
-                    hidden
-                    id="diaMesVencimiento"
-                    type="number"
-                    name="diaMesVencimiento"
-                    defaultValue={formValues.diaMesVencimiento}
-                />
-            </div>
-
             <div className="space-y-2">
                 <label
                     className="text-slate-800 font-bold"
@@ -166,6 +155,22 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                         placeholder="Fecha de Vencimiento"
                     />
                 </div>
+                <div className="space-y-2">
+                    <label
+                        className="text-slate-800 font-bold"
+                        htmlFor="montoAlquilerInicial"
+                    >Monto Inicial :</label>
+                    <input
+                        id="montoAlquilerInicial"
+                        type="number"
+                        name="montoAlquilerInicial"
+                        onChange={handleInputChange}
+                        value={formValues.montoAlquilerInicial}
+                        className="block w-full p-3 bg-slate-200"
+                        placeholder="Ing. Monto Inicial"
+                    />
+                </div>
+
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -188,7 +193,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                                 key={cliente.id}
                                 value={cliente.id}
                             >
-                                {cliente.nombre} {cliente.apellido} ------ {cliente.cuit}
+                                {cliente.cuit} ----- {cliente.nombre} {cliente.apellido}
                             </option>
                         ))}
                     </select>
@@ -212,7 +217,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                                 key={cliente.id}
                                 value={cliente.id}
                             >
-                                {cliente.nombre} {cliente.apellido} ------ {cliente.cuit}
+                                {cliente.cuit} ----- {cliente.nombre} {cliente.apellido}
                             </option>
                         ))}
                     </select>
@@ -339,7 +344,35 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                             checked={formValues.gas}
                         />
                     </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="otros"
+                        >Otros :</label>
+                        <input
+                            id="otros"
+                            type="checkbox"
+                            name="otros"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.otros}
+                        />
+                    </div>
                 </div>
+            </div>
+            <div>
+                <label
+                    className="text-slate-800 font-bold"
+                    htmlFor="observaciones"
+                >Observaciones :</label>
+                <textarea
+                    id="observaciones"
+                    name="observaciones"
+                    onChange={handleInputChange}
+                    value={formValues.observaciones}
+                    className="block w-full p-3 bg-slate-200"
+                    placeholder="Observaciones del contrato"
+                />
             </div>
         </>
     )

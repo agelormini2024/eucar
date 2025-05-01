@@ -8,7 +8,7 @@ import { createContrato } from "@/actions/create-contrato-action";
 
 export default function AddContratoForm({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { resetForm } = useContratoFormStore()
+    const { resetForm, formValues } = useContratoFormStore()
 
     const handleSubmit = async (formData: FormData) => {
         // Aquí puedes manejar el envío del formulario
@@ -17,19 +17,21 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             descripcion: formData.get('descripcion'),
             fechaInicio: formData.get('fechaInicio'),
             fechaVencimiento: formData.get('fechaVencimiento'),
-            cantidadMesesDuracion: Number(formData.get('cantidadMesesDuracion')),
-            diaMesVencimiento: Number(formData.get('diaMesVencimiento')),
+            cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion),
+            diaMesVencimiento: Number(formValues.diaMesVencimiento),
             clienteIdPropietario: Number(formData.get('clienteIdPropietario')),
             clienteIdInquilino: Number(formData.get('clienteIdInquilino')),
             propiedadId: Number(formData.get('propiedadId')),
             tipoContratoId: Number(formData.get('tipoContratoId')),
             tipoIndiceId: Number(formData.get('tipoIndiceId')),
-            expensas: formData.get('expensas'),
-            abl: formData.get('abl'),
-            aysa: formData.get('aysa'),
-            luz: formData.get('luz'),
-            gas: formData.get('gas'),
-            otros: formData.get('otros')
+            montoAlquilerInicial: Number(formData.get('montoAlquilerInicial')),
+            observaciones: formData.get('observaciones'),
+            expensas: formData.get('expensas') === "on",
+            abl: formData.get('abl') === "on",
+            aysa: formData.get('aysa') === "on",
+            luz: formData.get('luz') === "on",
+            gas: formData.get('gas') === "on",
+            otros: formData.get('otros') === "on"
         }
 
         // Validar los datos con el esquema de contrato de Zod
@@ -52,7 +54,7 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
         }
         toast.success("Contrato creado correctamente")
         router.push('/admin/contratos/alta')
-        
+
         // Limpiar el formulario
         resetForm()
 

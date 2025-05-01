@@ -332,7 +332,7 @@ export default function PropiedadFormDynamic({ paises, provincias, tiposPropieda
                             key={tipoPropiedad.id}
                             value={tipoPropiedad.id}
                         >
-                            {tipoPropiedad.nombre}
+                            {tipoPropiedad.descripcion}
                         </option>
                     ))}
                 </select>
