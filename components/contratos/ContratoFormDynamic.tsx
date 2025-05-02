@@ -77,8 +77,17 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     //-------------------------------------------------------------------------------------------//
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target as HTMLInputElement;
-        const parsedValue = type === "number" ? Number(value) : value;
+        const { name, type, value } = e.target as HTMLInputElement;
+        let parsedValue: string | number | boolean = "";
+    
+        if (type === "checkbox") {
+            parsedValue = (e.target as HTMLInputElement).checked;
+        } else if (type === "number") {
+            parsedValue = Number(value);
+        } else {
+            parsedValue = value;
+        }
+    
         setFormValues({ [name]: parsedValue });
     }
     return (

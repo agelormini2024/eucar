@@ -1,5 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import ContratoFormDynamic from "./ContratoFormDynamic";
+import { Contrato } from "@prisma/client";
 
 async function getClientes() {
     return await prisma.cliente.findMany({
@@ -33,8 +34,11 @@ async function getTiposIndice() {
     });
 }
 
+type contratoFormProps = {
+    contrato?: Contrato
+}
 
-export default async function ContratoForm() {
+export default async function ContratoForm({ contrato }: contratoFormProps) {
 
     const clientes = await getClientes();
     const propiedades = await getPropiedades();
@@ -50,6 +54,7 @@ export default async function ContratoForm() {
                     propiedades={propiedades} 
                     tiposContrato={tiposContrato}
                     tiposIndice={tiposIndice}
+                    contrato={contrato}
                 />
             </div>
         </>

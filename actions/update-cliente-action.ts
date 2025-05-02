@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache"
 
 
 export async function updateCliente(data: unknown, id: number) {
-    const result = ClienteSchema.safeParse(data)  // validar los datos con el esquema de cliente de Zod
+    const result = ClienteSchema.safeParse(data)  // Validar (del lado del servidor) los datos con el esquema de Cliente de Zod
 
     if (!result.success) {
         return {

@@ -25,7 +25,7 @@ type ContratoFormState = {
     setFormValues: (values: Partial<ContratoFormState['formValues']>) => void;
     resetForm: () => void;
 }
-export const useContratoFormStore = create<ContratoFormState>()( // Los dos después de paréntesis <ContratoFormState> son necesarios debido a que el primer paréntesis es para la función create y el segundo es para la función devtools
+export const useContratoFormStore = create<ContratoFormState>()( // Los dos paréntesis <ContratoFormState> son necesarios debido a que el primer paréntesis es para la función create y el segundo es para la función devtools
     devtools((set) => ({
         formValues: {
             descripcion: '',

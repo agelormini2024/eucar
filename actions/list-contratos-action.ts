@@ -3,6 +3,9 @@ import { prisma } from "@/src/lib/prisma"
 
 export async function getContratos() {
     const contratos = await prisma.contrato.findMany({
+        orderBy: {
+            id: 'asc'
+        },
         include: {
             tipoContrato: true,
             tipoIndice: true,
@@ -29,6 +32,7 @@ export async function getContratos() {
                 }
             }
         }
+        
     
     })
     

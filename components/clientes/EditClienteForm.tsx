@@ -9,7 +9,7 @@ import { useEffect } from "react";
 export default function EditClienteForm({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { resetForm } = useClienteFormStore()
-    const params = useParams();
+    const params = useParams(); // Este hook se utiliza para obtener los parámetros de la URL
     const id  = +params.id! // Asegúrate de que params sea awaited si es necesario
 
     useEffect(() => {

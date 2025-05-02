@@ -25,14 +25,13 @@ async function getClienteById(id: number) {
 
 export default async function EditClientePage({ params }: { params: { id: string } }) {
 
-    const { id } = await params; // Asegúrate de que params sea awaited si es necesario
+    const { id } = await params // Asegúrate de que params sea awaited si es necesario
 
     const cliente = await getClienteById(+id)
 
     return (
         <>
             <div className='flex justify-between'>
-
                 <div>
                     <Headers>Editar Cliente: {cliente.apellido + ' ' + cliente.nombre}</Headers>
                 </div>
