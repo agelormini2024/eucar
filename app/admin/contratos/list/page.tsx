@@ -6,11 +6,12 @@ import Headers from '@/components/ui/Headers'
 import { consultaContratos } from '@/src/types';
 import { Prisma } from '@prisma/client';
 import { useEffect, useState } from 'react';
+import Loading from './loading';
 
 type ContratoConRelaciones = Prisma.ContratoGetPayload<typeof consultaContratos>;
 
 export default function ContratosAlquilerPage() {
-    const [contratos, setContratos] = useState<ContratoConRelaciones []>([]);
+    const [contratos, setContratos] = useState<ContratoConRelaciones[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -37,10 +38,10 @@ export default function ContratosAlquilerPage() {
 
             <div className='mt-10'>
                 {isLoading ? (
-                    <div className='text-center'>
-                        <p className='text-2xl font-bold'>Cargando...</p>
+                    <div className="text-center text-3xl font-bold">
+                        <Loading />
+                        {/* Puedes Incluir en el componente Loading un spinner si lo prefieres */}
                     </div>
-
                 ) : (
                     <ContratosTable data={contratos} />
                 )}

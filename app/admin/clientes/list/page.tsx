@@ -5,6 +5,8 @@ import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 import { ClientesConProvinciaPais } from '@/src/types';
 import { useEffect, useState } from 'react';
+import Loading from './loading';
+
 
 
 export default function ListadoClientesPage() {
@@ -19,7 +21,7 @@ export default function ListadoClientesPage() {
         }
         fetchClientes();
     }
-    , []);
+        , []);
 
     return (
         <>
@@ -34,10 +36,10 @@ export default function ListadoClientesPage() {
             </div>
 
             <div className='mt-10'>
-            {isLoading ? (
-                    <div className="text-center">
-                        <p className="text-2xl font-bold">Cargando...</p>
-                        {/* Puedes reemplazar esto con un spinner si lo prefieres */}
+                {isLoading ? (
+                    <div className="text-center text-3xl font-bold">
+                        <Loading />
+                        {/* Puedes Incluir en el componente Loading un spinner si lo prefieres */}
                     </div>
                 ) : (
                     <ClientesTable data={clientes} />

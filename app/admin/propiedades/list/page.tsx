@@ -6,6 +6,7 @@ import Headers from '@/components/ui/Headers'
 import { PropiedadesConRelaciones } from '@/src/types';
 
 import { useEffect, useState } from 'react';
+import Loading from './loading';
 
 export default function ListadoPropiedadsPage() {
     const [propiedades, setPropiedades] = useState<PropiedadesConRelaciones[]>([]);
@@ -31,11 +32,11 @@ export default function ListadoPropiedadsPage() {
                     <ButtonGoBack />
                 </div>
             </div>
-            <div className='mt-10'>                
-            {isLoading ? (
-                    <div className="text-center">
-                        <p className="text-2xl font-bold">Cargando...</p>
-                        {/* Puedes reemplazar esto con un spinner si lo prefieres */}
+            <div className='mt-10'>
+                {isLoading ? (
+                    <div className="text-center text-3xl font-bold">
+                        <Loading />
+                        {/* Puedes Incluir en el componente Loading un spinner si lo prefieres */}
                     </div>
                 ) : (
                     <PropiedadesTable data={propiedades} />
