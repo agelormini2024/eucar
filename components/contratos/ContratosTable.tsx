@@ -55,6 +55,14 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado
+            }, 
+            {
+                id: "montoAlquilerUltimo",
+                header: "Ultimo Alquiler",
+                accessorFn: (row) => formatCurrency(row.montoAlquilerUltimo ?? 0),
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
             },
             {
                 id: "fechaInicio",
@@ -76,14 +84,6 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 accessorKey: "tipoContrato.descripcion",
                 header: "Actualización",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-            },
-            {
-                id: "montoAlquilerInicial",
-                header: "Monto Inicial",
-                accessorFn: (row) => formatCurrency(row.montoAlquilerInicial),
-                muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
             },
             {
                 accessorKey: "tipoIndice.nombre",

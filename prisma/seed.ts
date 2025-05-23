@@ -6,6 +6,7 @@ import { propiedades } from './data/propiedades'
 import { tiposPropiedad } from './data/tiposPropiedad'
 import { tiposIndice } from './data/tiposIndice'
 import { tiposContrato } from './data/tiposContrato'
+import { estadoRecibo } from './data/estadoRecibos'
 
 const prisma = new PrismaClient()
 
@@ -19,6 +20,7 @@ async function main() {
         await prisma.$executeRaw`TRUNCATE TABLE "TipoPropiedad" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "TipoIndice" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "TipoContrato" RESTART IDENTITY CASCADE;`
+        await prisma.$executeRaw`TRUNCATE TABLE "EstadoRecibo" RESTART IDENTITY CASCADE;`
         
         // Insertar datos
         await prisma.pais.createMany({
@@ -40,6 +42,9 @@ async function main() {
             data: tiposIndice
         })
         await prisma.tipoContrato.createMany({
+            data: tiposContrato
+        })
+        await prisma.estadoRecibo.createMany ({
             data: tiposContrato
         })
         

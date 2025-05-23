@@ -1,6 +1,6 @@
 import { prisma } from "@/src/lib/prisma";
 import ContratoFormDynamic from "./ContratoFormDynamic";
-import { Contrato } from "@prisma/client";
+import { Contrato, TipoContrato } from "@prisma/client";
 
 async function getClientes() {
     return await prisma.cliente.findMany({

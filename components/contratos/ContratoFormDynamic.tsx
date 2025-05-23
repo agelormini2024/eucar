@@ -1,4 +1,5 @@
 "use client"
+import { getMesesRestanActualizar } from "@/actions/find-mesesRestanActualizar-action";
 import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
 import { useEffect } from "react";
@@ -25,6 +26,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                 fechaInicio: contrato.fechaInicio ? contrato.fechaInicio.toISOString().split('T')[0] : '', // Convertir a string
                 fechaVencimiento: contrato.fechaVencimiento ? contrato.fechaVencimiento.toISOString().split('T')[0] : '', // Convertir a string
                 cantidadMesesDuracion: contrato.cantidadMesesDuracion || 0,
+                mesesRestaActualizar: contrato.mesesRestaActualizar || 0,
                 diaMesVencimiento: contrato.diaMesVencimiento || DIA_MES_VENCIMIENTO,
                 clienteIdPropietario: contrato.clienteIdPropietario || 0,
                 clienteIdInquilino: contrato.clienteIdInquilino || 0,
@@ -74,20 +76,43 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             calcularCantidadMesesDuracion();
         }
     }, [formValues.fechaInicio, formValues.fechaVencimiento]);
+
+    //-------------------------------------------------------------------------------------------//
+    //              Traer los meses de actualización del contrato
+    //-------------------------------------------------------------------------------------------//
+    async function fetchMesesRestanActualizar() {
+        if (!formValues.tipoContratoId) return;
+        const tipoContrato = await getMesesRestanActualizar(formValues.tipoContratoId);
+        setFormValues({
+            mesesRestaActualizar: tipoContrato?.cantidadMesesActualizacion ?? 0
+        });
+    }
+
+    useEffect(() => {
+        fetchMesesRestanActualizar()
+    }, [formValues.tipoContratoId])
+
     //-------------------------------------------------------------------------------------------//
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target as HTMLInputElement;
         let parsedValue: string | number | boolean = "";
-    
+
         if (type === "checkbox") {
             parsedValue = (e.target as HTMLInputElement).checked;
-        } else if (type === "number") {
+        } else if (
+            type === "number" ||
+            name === "tipoContratoId" ||
+            name === "tipoIndiceId" ||
+            name === "propiedadId" ||
+            name === "clienteIdPropietario" ||
+            name === "clienteIdInquilino"
+        ) {
             parsedValue = Number(value);
-        } else {
+            } else {
             parsedValue = value;
         }
-    
+
         setFormValues({ [name]: parsedValue });
     }
     return (

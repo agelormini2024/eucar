@@ -21,7 +21,7 @@ export default function ContratosAlquilerPage() {
             setIsLoading(false); // Cambiar el estado de carga a falso una vez que los datos se cargan
             //            console.log(data)
         }
-        fetchContratos();
+        fetchContratos()
     }, []);
 
     return (

@@ -1,4 +1,6 @@
-import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from "@prisma/client";
+import { Cliente, Propiedad } from "@prisma/client";
+import { IpcSchema } from "../schema";
+import { z } from "zod";
 
 export type PropiedadesConRelaciones = Propiedad & {
     cliente: {
@@ -64,3 +66,16 @@ export const consultaContratos = {
         }
     }
 } as const;
+
+
+export type Ipc = z.infer<typeof IpcSchema>;
+
+export type IpcMensual = {
+    fecha: string,
+    inflacion: number
+}[]
+
+export type IclDiario = {
+    fecha: string,
+    indice: number
+}[]

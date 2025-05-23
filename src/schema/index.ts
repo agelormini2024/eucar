@@ -69,6 +69,7 @@ export const ContratoSchema = z.object({
     cantidadMesesDuracion: z.number()
         .min(1, { message: "La cantidad de meses de duración es obligatoria" })
         .max(120, { message: "La cantidad de meses de duración no puede ser más de 120" }),
+    mesesRestaActualizar: z.number().min(1, { message: 'La cantidad de Meses restantes para actualizar el minto del Alquiler es obligatoria' }),
     diaMesVencimiento: z.number()
         .min(1, { message: "El día de vencimiento es obligatorio" })
         .max(31, { message: "El día de vencimiento no puede ser más de 31" }),
@@ -102,3 +103,29 @@ export const ContratoSchema = z.object({
 }, {
     message: "El Propietario y el Inquilino no pueden ser la misma persona",
 })
+
+export const IpcSchema = z.object({
+    "data": z.array(
+        z.array(
+            z.union(
+                [
+                    z.number(),
+                    z.string()
+                ]
+            )
+        )
+    ),
+});
+
+ export const IpcFinal = z.array(
+    z.object({
+        fecha: z.string(),
+        inflacion: z.number()
+    })
+)   
+ export const IclFinal = z.array(
+    z.object({
+        fecha: z.string(),
+        indice: z.number()
+    })
+)   

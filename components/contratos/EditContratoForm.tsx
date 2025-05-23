@@ -25,6 +25,7 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
             fechaInicio: formData.get('fechaInicio'),
             fechaVencimiento: formData.get('fechaVencimiento'),
             cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion),
+            mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // *********
             diaMesVencimiento: Number(formValues.diaMesVencimiento),
             clienteIdPropietario: Number(formData.get('clienteIdPropietario')),
             clienteIdInquilino: Number(formData.get('clienteIdInquilino')),

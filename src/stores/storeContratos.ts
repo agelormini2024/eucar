@@ -7,6 +7,7 @@ type ContratoFormState = {
         fechaInicio: string;
         fechaVencimiento: string;
         cantidadMesesDuracion: number;
+        mesesRestaActualizar: number;
         diaMesVencimiento: number;
         clienteIdPropietario: number;
         clienteIdInquilino: number;
@@ -32,6 +33,7 @@ export const useContratoFormStore = create<ContratoFormState>()( // Los dos par√
             fechaInicio: '',
             fechaVencimiento: '',
             cantidadMesesDuracion: 0,
+            mesesRestaActualizar: 0,
             diaMesVencimiento: 10,
             clienteIdPropietario: 0,
             clienteIdInquilino: 0,
@@ -59,6 +61,7 @@ export const useContratoFormStore = create<ContratoFormState>()( // Los dos par√
                 fechaInicio: '',
                 fechaVencimiento: '',
                 cantidadMesesDuracion: 0,
+                mesesRestaActualizar: 0,
                 diaMesVencimiento: 0,
                 clienteIdPropietario: 0,
                 clienteIdInquilino: 0,

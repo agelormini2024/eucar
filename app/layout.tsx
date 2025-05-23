@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EUCAR S.A.",
+  title: "SOARES PARENTE PROPIEDADES",
   description: "Bienes raíces",
 };
 

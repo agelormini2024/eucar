@@ -108,7 +108,6 @@ model Propiedad {
 
 // Modelos para modulo de contratos
 
-// 1) Tipo de contrato
 model TipoContrato {
     id                         Int        @id @default(autoincrement())
     descripcion                String
@@ -116,16 +115,26 @@ model TipoContrato {
     contratos                  Contrato[] // Add the opposite relation field
 }
 
-// 2) TipoIndice
 model TipoIndice {
     id          Int          @id @default(autoincrement())
-    nombre        String
+    nombre      String
     descripcion String
     contratos   Contrato[] // Add the opposite relation field
     itemsRecibo ItemRecibo[] // Add the opposite relation field
 }
 
-// 3) Contrato
+model Ipc {
+    id         Int    @id @default(autoincrement())
+    annoMes    String @unique
+    porcentaje Float
+}
+
+model Icl {
+    id         Int      @id @default(autoincrement())
+    fecha      DateTime
+    indice     Float
+    porcentaje Float
+}
 
 model Contrato {
     id                    Int          @id @default(autoincrement())
@@ -133,6 +142,7 @@ model Contrato {
     fechaInicio           DateTime
     fechaVencimiento      DateTime
     cantidadMesesDuracion Int
+    mesesRestaActualizar  Int
     diaMesVencimiento     Int
     clienteIdPropietario  Int
     clientePropietario    Cliente      @relation("ClientePropietario", fields: [clienteIdPropietario], references: [id])
@@ -144,8 +154,9 @@ model Contrato {
     tipoContrato          TipoContrato @relation(fields: [tipoContratoId], references: [id])
     tipoIndiceId          Int
     tipoIndice            TipoIndice   @relation(fields: [tipoIndiceId], references: [id])
-    recibos               Recibo[] // Add the opposite relation field
+    recibos               Recibo[]
     montoAlquilerInicial  Float
+    montoAlquilerUltimo   Float?       @default(0)
     observaciones         String?
     expensas              Boolean
     abl                   Boolean
@@ -163,30 +174,39 @@ model TipoItemRecibo {
     items       ItemRecibo[] // Add the opposite relation field
 }
 
+model EstadoRecibo {
+    id          Int      @id @default(autoincrement())
+    descripcion String
+    recibos     Recibo[]
+}
+
 model Recibo {
-    id            Int          @id @default(autoincrement())
-    contratoId    Int
-    contrato      Contrato     @relation(fields: [contratoId], references: [id])
-    fecha         DateTime
-    montoTotal    Float
-    items         ItemRecibo[] // Add the opposite relation field
-    observaciones String?
-    createdAt     DateTime     @default(now())
-    updatedAt     DateTime     @updatedAt
-    expensas      Boolean
-    abl           Boolean
-    aysa          Boolean
-    luz           Boolean
-    gas           Boolean
+    id             Int          @id @default(autoincrement())
+    contratoId     Int
+    contrato       Contrato     @relation(fields: [contratoId], references: [id])
+    estadoReciboId Int
+    estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
+    fecha          DateTime
+    montoTotal     Float
+    items          ItemRecibo[] // Add the opposite relation field
+    observaciones  String?
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    expensas       Boolean
+    abl            Boolean
+    aysa           Boolean
+    luz            Boolean
+    gas            Boolean
+    otros          Boolean
 }
 
 model ItemRecibo {
     id               Int            @id @default(autoincrement())
     descripcion      String
     monto            Float
-    tipoIndiceId     Int
-    tipoIndice       TipoIndice     @relation(fields: [tipoIndiceId], references: [id])
-    indiceAplicado   Float
+    tipoIndiceId     Int?
+    tipoIndice       TipoIndice?    @relation(fields: [tipoIndiceId], references: [id])
+    indiceAplicado   Float?
     reciboId         Int
     recibo           Recibo         @relation(fields: [reciboId], references: [id])
     tipoItemRecibo   TipoItemRecibo @relation(fields: [tipoItemReciboId], references: [id])
