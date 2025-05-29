@@ -6,6 +6,7 @@ const menuItems = [
 ]
 
 export default function UtilidadesSidebar() {
+    
     return (
         <>
             <Logo />
