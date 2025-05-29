@@ -6,6 +6,7 @@ export default function MenuBar() {
         { url: '/admin/contratos', text: 'Alquileres', blank: false },
         { url: '/admin/propiedades', text: 'Propiedades', blank: false },
         { url: '/admin/clientes', text: 'Clientes', blank: false },
+        { url: '/admin/utilidades', text: 'Utilidades', blank: false },
     ]
 
     return (

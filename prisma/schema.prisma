@@ -111,7 +111,9 @@ model Propiedad {
 model TipoContrato {
     id                         Int        @id @default(autoincrement())
     descripcion                String
-    cantidadMesesActualizacion Int
+    cantidadMesesActualizacion Int @unique
+    ipc                        Float @default(0)
+    icl                        Float @default(0)
     contratos                  Contrato[] // Add the opposite relation field
 }
 
@@ -130,10 +132,9 @@ model Ipc {
 }
 
 model Icl {
-    id         Int      @id @default(autoincrement())
-    fecha      DateTime
-    indice     Float
-    porcentaje Float
+    id     Int      @id @default(autoincrement())
+    fecha  DateTime @unique
+    indice Float
 }
 
 model Contrato {

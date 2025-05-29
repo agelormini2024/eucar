@@ -12,8 +12,8 @@ type ClientesRouteProps = {
 }
 
 export default function ClientesRoute({ link }: ClientesRouteProps) {
-    const pathname = usePathname()
-    const isActive = pathname.startsWith(link.url) // Esto lo usamos en el caso que queramos que el link se vea activo
+    const pathName = usePathname()
+    const isActive = pathName.startsWith(link.url) // Esto lo usamos en el caso que queramos que el link se vea activo
 
     return (
         <Link

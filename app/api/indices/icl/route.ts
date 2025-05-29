@@ -52,10 +52,10 @@ console.log('Entramos .........')
 
         const filas = rows.slice(26) // Primera fila con datos es "la número 26"
         const datos: { fecha: string, indice: number }[] = []
-
         for (const fila of filas) {
             const fechaStr = fila[7]
             const indice = fila[8]
+
             // Solo agregamos si ambos valores existen y el índice es un número
             if (fechaStr && typeof !isNaN(indice)) {
                 // Si la fecha está en formato "YYYYMMDD", la convertimos a "YYYY-MM-DD"

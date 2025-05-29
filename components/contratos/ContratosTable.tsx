@@ -1,5 +1,3 @@
-"use client"
-
 import { consultaContratos } from "@/src/types";
 import { Prisma } from "@prisma/client";
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
