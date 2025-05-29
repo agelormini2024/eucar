@@ -37,7 +37,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 ## Calculos en la usados en aplicacion
-
+Ubicación del archivo temporal (excel) del BCRA para extraer los datos 
+para el cálculo del ICL
 ## ICL
 Calcular el ICL acumulado tomando como ejemplo los últimos 6 meses
 
