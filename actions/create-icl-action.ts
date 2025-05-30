@@ -64,7 +64,9 @@ export async function getIcl(data: unknown) {
                 const iclAGuardar = (iclFinal / iclInicial)
                 await prisma.tipoContrato.update({
                     where: { id: tipo.id },
-                    data: { icl: iclAGuardar }
+                    data: { icl: iclAGuardar,
+                            ultimaActualizacion: new Date()
+                     }
                 })
             }
 

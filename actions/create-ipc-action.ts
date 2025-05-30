@@ -51,7 +51,9 @@ export async function getIpc(inflacionMensual: unknown) {
                 // const ipcAnual = ipcTotal / tipoContrato.cantidadMesesActualizacion
                 await prisma.tipoContrato.update({
                     where: { cantidadMesesActualizacion: reg.cantidadMesesActualizacion },
-                    data: { ipc: ipcTotal }
+                    data: { ipc: ipcTotal,
+                            ultimaActualizacion: new Date()
+                     }
                 })
             }
 

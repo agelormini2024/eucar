@@ -1,4 +1,3 @@
-import ToastNotification from "@/components/ui/ToastNotification";
 import UtilidadesSidebar from "@/components/utilidades/UtilidadesSidebar";
 
 export default function RootLayout({
@@ -17,7 +16,6 @@ export default function RootLayout({
                     {children}
                 </main>
             </div>
-            <ToastNotification />
         </>
     )
 }  
