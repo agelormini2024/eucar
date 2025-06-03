@@ -3,11 +3,12 @@ import useSWR from "swr"
 import axios from "axios"
 import { useEffect } from "react"
 import { useIndicesStore } from "@/src/stores/storeIndices"
+import { TipoContrato } from "@prisma/client"
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data)
 
 export default function MostrarIndices() {
-    const { data: tipoContrato, error, isLoading, mutate } = useSWR('/api/indices/tipoContrato', fetcher)
+    const { data: tipoContrato, error, isLoading, mutate } = useSWR<TipoContrato[]>('/api/indices/tipoContrato', fetcher)
     const setRefresh = useIndicesStore(state => state.setRefresh)
 
     useEffect(() => {
@@ -29,7 +30,7 @@ export default function MostrarIndices() {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
-                    {tipoContrato.map((tipo: any) => (
+                    {tipoContrato && tipoContrato.map((tipo: any) => (
                         <tr key={tipo.id}>
                             <td className="whitespace-nowrap py-4 pl-4 pr-20 text-sm font-bold text-gray-900 sm:pl-0 uppercase">
                                 {tipo.descripcion}

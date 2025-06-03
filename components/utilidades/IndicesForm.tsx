@@ -6,6 +6,7 @@ import axios from "axios"
 import { useState } from "react"
 import Loading from "../ui/Loading"
 import { useIndicesStore } from "@/src/stores/storeIndices"
+import MostrarIndices from "./MostrarIndices"
 
 const ANIO = "2024"
 
@@ -24,7 +25,8 @@ async function icl() {
     getIcl(datos)
 }
 
-export default function IndicesForm({ children }: { children: React.ReactNode }) {
+export default function IndicesForm() {
+// export default function IndicesForm({ children }: { children: React.ReactNode }) {
     const [procesando, setProcesando] = useState(false)
     const refresh = useIndicesStore(state => state.refresh)
 
@@ -52,7 +54,7 @@ export default function IndicesForm({ children }: { children: React.ReactNode })
                     }}
                 >
                    {!procesando ?
-                        children :
+                        <MostrarIndices /> :
                         <Loading />
                     }
                     

@@ -11,8 +11,8 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
     const { resetForm, formValues } = useContratoFormStore()
 
     const handleSubmit = async (formData: FormData) => {
-        // Aquí puedes manejar el envío del formulario
-        // Por ejemplo, enviar los datos a una API o realizar alguna acción
+        // Creamos un objeto "data" para guardar los 
+        // datos ingresados extrayendolos de FormData
         const data = {
             descripcion: formData.get('descripcion'),
             fechaInicio: formData.get('fechaInicio'),

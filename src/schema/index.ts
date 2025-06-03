@@ -117,15 +117,20 @@ export const IpcSchema = z.object({
     ),
 });
 
- export const IpcFinal = z.array(
+export const ReciboSchema = z.object({
+    contratoId: z.number().min(1, {message: "Debe selecionar un contrato...."})
+})
+
+export const IpcFinal = z.array(
     z.object({
         fecha: z.string(),
         inflacion: z.number()
     })
-)   
- export const IclFinal = z.array(
+)
+export const IclFinal = z.array(
     z.object({
         fecha: z.string(),
         indice: z.number()
     })
-)   
+)
+

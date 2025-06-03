@@ -123,7 +123,6 @@ model TipoIndice {
     nombre      String
     descripcion String
     contratos   Contrato[] // Add the opposite relation field
-    itemsRecibo ItemRecibo[] // Add the opposite relation field
 }
 
 model Ipc {
@@ -170,12 +169,6 @@ model Contrato {
 
 // Recibos y sus items
 
-model TipoItemRecibo {
-    id          Int          @id @default(autoincrement())
-    descripcion String
-    items       ItemRecibo[] // Add the opposite relation field
-}
-
 model EstadoRecibo {
     id          Int      @id @default(autoincrement())
     descripcion String
@@ -190,7 +183,6 @@ model Recibo {
     estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
     fecha          DateTime
     montoTotal     Float
-    items          ItemRecibo[] // Add the opposite relation field
     observaciones  String?
     createdAt      DateTime     @default(now())
     updatedAt      DateTime     @updatedAt
@@ -202,17 +194,3 @@ model Recibo {
     otros          Boolean
 }
 
-model ItemRecibo {
-    id               Int            @id @default(autoincrement())
-    descripcion      String
-    monto            Float
-    tipoIndiceId     Int?
-    tipoIndice       TipoIndice?    @relation(fields: [tipoIndiceId], references: [id])
-    indiceAplicado   Float?
-    reciboId         Int
-    recibo           Recibo         @relation(fields: [reciboId], references: [id])
-    tipoItemRecibo   TipoItemRecibo @relation(fields: [tipoItemReciboId], references: [id])
-    tipoItemReciboId Int
-    createdAt        DateTime       @default(now())
-    updatedAt        DateTime       @updatedAt
-}

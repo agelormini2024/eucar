@@ -1,5 +1,5 @@
 "use client"
-import { getMesesRestanActualizar } from "@/actions/find-mesesRestanActualizar-action";
+import { getMesesRestanActualizar } from "@/src/lib/buscarMesesRestanActualizar";
 import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
 import { useEffect } from "react";
