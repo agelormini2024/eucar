@@ -134,3 +134,67 @@ export const IclFinal = z.array(
     })
 )
 
+//------------------------------
+
+
+export const ClienteSchemaApi = z.object({
+    "apellido": z.string(),
+    "nombre": z.string(),
+    "cuit": z.string(),
+});
+export type Cliente = z.infer<typeof ClienteSchema>;
+
+export const PropiedadSchemaApi = z.object({
+    "calle": z.string(),
+    "numero": z.number(),
+    "piso": z.string(),
+    "departamento": z.string(),
+});
+export type Propiedad = z.infer<typeof PropiedadSchemaApi>;
+
+export const TipoContratoSchemaApi = z.object({
+    "id": z.number(),
+    "descripcion": z.string(),
+    "cantidadMesesActualizacion": z.number(),
+    "ipc": z.number(),
+    "icl": z.number(),
+    "ultimaActualizacion": z.coerce.date(),
+});
+export type TipoContrato = z.infer<typeof TipoContratoSchemaApi>;
+
+export const TipoIndiceSchemaApi = z.object({
+    "id": z.number(),
+    "nombre": z.string(),
+    "descripcion": z.string(),
+});
+export type TipoIndice = z.infer<typeof TipoIndiceSchemaApi>;
+
+export const ContratoSchemaApi = z.object({
+    "id": z.number(),
+    "descripcion": z.string(),
+    "fechaInicio": z.coerce.date(),
+    "fechaVencimiento": z.coerce.date(),
+    "cantidadMesesDuracion": z.number(),
+    "mesesRestaActualizar": z.number(),
+    "diaMesVencimiento": z.number(),
+    "clienteIdPropietario": z.number(),
+    "clienteIdInquilino": z.number(),
+    "propiedadId": z.number(),
+    "tipoContratoId": z.number(),
+    "tipoIndiceId": z.number(),
+    "montoAlquilerInicial": z.number(),
+    "montoAlquilerUltimo": z.number(),
+    "observaciones": z.string(),
+    "expensas": z.boolean(),
+    "abl": z.boolean(),
+    "aysa": z.boolean(),
+    "luz": z.boolean(),
+    "gas": z.boolean(),
+    "otros": z.boolean(),
+    "tipoContrato": TipoContratoSchemaApi,
+    "tipoIndice": TipoIndiceSchemaApi,
+    "propiedad": PropiedadSchemaApi,
+    "clienteInquilino": ClienteSchemaApi,
+    "clientePropietario": ClienteSchemaApi,
+});
+export type Contrato = z.infer<typeof ContratoSchemaApi>;

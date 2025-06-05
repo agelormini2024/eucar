@@ -6,7 +6,7 @@ import { propiedades } from './data/propiedades'
 import { tiposPropiedad } from './data/tiposPropiedad'
 import { tiposIndice } from './data/tiposIndice'
 import { tiposContrato } from './data/tiposContrato'
-import { estadoRecibo } from './data/estadoRecibos'
+import { estadoRecibo } from './data/estadoRecibo'
 
 const prisma = new PrismaClient()
 
@@ -45,7 +45,7 @@ async function main() {
             data: tiposContrato
         })
         await prisma.estadoRecibo.createMany ({
-            data: tiposContrato
+            data: estadoRecibo
         })
         
     } catch (error) {

@@ -119,7 +119,7 @@ model TipoContrato {
 }
 
 model TipoIndice {
-    id          Int          @id @default(autoincrement())
+    id          Int        @id @default(autoincrement())
     nombre      String
     descripcion String
     contratos   Contrato[] // Add the opposite relation field
@@ -181,7 +181,10 @@ model Recibo {
     contrato       Contrato     @relation(fields: [contratoId], references: [id])
     estadoReciboId Int
     estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
-    fecha          DateTime
+    fechaPendiente DateTime
+    fechaGenerado  DateTime
+    fechaImpreso   DateTime
+    fechaAnulado   DateTime
     montoTotal     Float
     observaciones  String?
     createdAt      DateTime     @default(now())
@@ -193,4 +196,3 @@ model Recibo {
     gas            Boolean
     otros          Boolean
 }
-

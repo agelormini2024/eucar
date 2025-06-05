@@ -67,6 +67,18 @@ export const consultaContratos = {
     }
 } as const;
 
+export const selectContratoPropietario = {
+    include: {
+        clientePropietario: {
+            select: {
+                apellido: true,
+                nombre: true,
+                cuit: true,
+            }
+        },
+    }
+} as const
+//--------------------------------------------------------
 
 export type Ipc = z.infer<typeof IpcSchema>;
 
