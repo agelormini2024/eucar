@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "TipoContrato" ADD COLUMN     "icp" DOUBLE PRECISION NOT NULL DEFAULT 0;

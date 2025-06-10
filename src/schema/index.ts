@@ -69,7 +69,7 @@ export const ContratoSchema = z.object({
     cantidadMesesDuracion: z.number()
         .min(1, { message: "La cantidad de meses de duración es obligatoria" })
         .max(120, { message: "La cantidad de meses de duración no puede ser más de 120" }),
-    mesesRestaActualizar: z.number().min(1, { message: 'La cantidad de Meses restantes para actualizar el minto del Alquiler es obligatoria' }),
+    mesesRestaActualizar: z.number().min(1, { message: 'La cantidad de Meses restantes para actualizar el monto del Alquiler es obligatoria' }),
     diaMesVencimiento: z.number()
         .min(1, { message: "El día de vencimiento es obligatorio" })
         .max(31, { message: "El día de vencimiento no puede ser más de 31" }),
@@ -104,6 +104,11 @@ export const ContratoSchema = z.object({
     message: "El Propietario y el Inquilino no pueden ser la misma persona",
 })
 
+
+//-------------------------------------------------
+// Schemas para las APIs de Calculos de IPC - ICL 
+//-------------------------------------------------
+
 export const IpcSchema = z.object({
     "data": z.array(
         z.array(
@@ -117,10 +122,6 @@ export const IpcSchema = z.object({
     ),
 });
 
-export const ReciboSchema = z.object({
-    contratoId: z.number().min(1, {message: "Debe selecionar un contrato...."})
-})
-
 export const IpcFinal = z.array(
     z.object({
         fecha: z.string(),
@@ -133,9 +134,38 @@ export const IclFinal = z.array(
         indice: z.number()
     })
 )
+//-------------------------------------------------
+// Schemas para las APIs de Recibos 
+//-------------------------------------------------
 
-//------------------------------
+export const ReciboSchema = z.object({
+    contratoId: z.number().min(1, { message: "Debe selecionar un contrato...." }),
+    estadoReciboId: z.number().min(1, { message: "Es obligatorio un estado" }),
+    fechaPendiente: z.string().min(1, { message: "La fecha del Estado pendiente es obligatoria" }),
+    fechaGenerado: z.string().optional(),
+    fechaImpreso: z.string().optional(),
+    fechaAnulado: z.string().optional(),
+    montoAnterior: z.number().min(1, { message: "Es obligatorio el Monto Anterior" }),
+    montoTotal: z.number().min(1, { message: "Es obligatorio el Monto Total" }),
+    expensas: z.boolean().default(false).optional(),
+    abl: z.boolean().default(false).optional(),
+    aysa: z.boolean().default(false).optional(),
+    luz: z.boolean().default(false).optional(),
+    gas: z.boolean().default(false).optional(),
+    otros: z.boolean().default(false).optional(),
+    observaciones: z.string()
+        .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
+        .optional(),
 
+})
+
+export const EstadoReciboSchema = z.object({
+    id: z.number(),
+    descripcion: z.string()
+})
+//-------------------------------------------------
+// Schemas para la API de Contrato 
+//-------------------------------------------------
 
 export const ClienteSchemaApi = z.object({
     "apellido": z.string(),
@@ -158,6 +188,7 @@ export const TipoContratoSchemaApi = z.object({
     "cantidadMesesActualizacion": z.number(),
     "ipc": z.number(),
     "icl": z.number(),
+    "icp": z.number(),
     "ultimaActualizacion": z.coerce.date(),
 });
 export type TipoContrato = z.infer<typeof TipoContratoSchemaApi>;

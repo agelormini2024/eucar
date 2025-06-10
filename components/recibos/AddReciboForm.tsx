@@ -4,32 +4,46 @@ import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-const handleSubmit = async (formData: FormData) => {
-    // Aquí puedes manejar el envío del formulario
-
-}
 export default function AddReciboForm({ children }: { children: React.ReactNode }) {
 
     const router = useRouter()
     const formValues = useRecibosFormStore((state) => state.formValues)
+    const resetForm = useRecibosFormStore((state) => state.resetForm)
 
     const handleSubmit = (formData: FormData) => {
         // Creamos un objeto "data" para guardar los 
         // datos ingresados extrayendolos de FormData
         const data = {
-            contratoId: Number(formData.get('contratoId'))
+            contratoId: Number(formData.get('contratoId')),
+            estadoReciboId: Number(formValues.estadoReciboId),
+            fechaPendiente: formValues.fechaPendiente,
+            fechaGenerado: formValues.fechaGenerado,
+            fechaImpreso: formValues.fechaImpreso,
+            fechaAnulado: formValues.fechaAnulado,
+            montoAnterior: formValues.montoAnterior,
+            montoTotal: formValues.montoTotal,
+            observaciones: formData.get('observaciones'),
+            expensas: formData.get('expensas') === "on",
+            abl: formData.get('abl') === "on",
+            aysa: formData.get('aysa') === "on",
+            luz: formData.get('luz') === "on",
+            gas: formData.get('gas') === "on",
+            otros: formData.get('otros') === "on"
+
         }
 
         const result = ReciboSchema.safeParse(data)
+
         if (!result.success) {
             result.error.issues.forEach(issue => {
                 toast.error(issue.message)
             })
             return
         }
-        
+
         toast.success("Recibo Generado correctamente")
         router.push('/admin/recibos/alta')
+        resetForm()
 
         //-------------------- Aqui generar el recibo -------------------
 
@@ -37,9 +51,6 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
         //---------------------------------------------------------------
 
     }
-
-
-
 
     return (
         <div className='bg-white shadow-xl mt-10 px-5 py-10 rounded-md max-w-5xl mx-auto'>
@@ -56,8 +67,9 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
                 <input
                     type="submit"
                     className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
-                    cursor-pointer font-bold uppercase mt-5'
+                    cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
                     value="Generar Recibo"
+                    disabled={!formValues.habilitarBoton}
                 />
             </form>
         </div>

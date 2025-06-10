@@ -22,14 +22,6 @@ async function getContrato() {
     })
 }
 
-async function getEstadoRecibo(){
-    return await prisma.estadoRecibo.findMany({
-        orderBy: {
-            id: "asc"
-        }
-    })
-}
-
 type ReciboFormProps = {
     recibo?: Recibo;
 }
@@ -37,14 +29,12 @@ type ReciboFormProps = {
 export default async function ReciboForm({ recibo }: ReciboFormProps) {
 
     const contratos = await getContrato()
-    const estadosRecibo = await getEstadoRecibo()
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
             <ReciboFormDynamic
                 contratos={contratos}
                 recibo={recibo}
-                estadosRecibo={estadosRecibo}
             />
         </div>
     )

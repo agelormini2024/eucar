@@ -17,9 +17,9 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             descripcion: formData.get('descripcion'),
             fechaInicio: formData.get('fechaInicio'),
             fechaVencimiento: formData.get('fechaVencimiento'),
-            cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion),
-            mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // *********
-            diaMesVencimiento: Number(formValues.diaMesVencimiento),
+            cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion), // Valores tomados del estado global "storeContratos"
+            mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // Valores tomados del estado global "storeContratos"
+            diaMesVencimiento: Number(formValues.diaMesVencimiento), // Valores tomados del estado global "storeContratos"
             clienteIdPropietario: Number(formData.get('clienteIdPropietario')),
             clienteIdInquilino: Number(formData.get('clienteIdInquilino')),
             propiedadId: Number(formData.get('propiedadId')),
@@ -34,10 +34,10 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             gas: formData.get('gas') === "on",
             otros: formData.get('otros') === "on"
         }
-
+        
         // Validar los datos con el esquema de contrato de Zod
         const result = ContratoSchema.safeParse(data)
-
+        
         if (!result.success) {
             result.error.issues.forEach(issue => {
                 toast.error(issue.message)

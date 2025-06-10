@@ -114,6 +114,7 @@ model TipoContrato {
     cantidadMesesActualizacion Int        @unique
     ipc                        Float      @default(0)
     icl                        Float      @default(0)
+    icp                        Float      @default(0)
     ultimaActualizacion        DateTime?
     contratos                  Contrato[] // Add the opposite relation field
 }
@@ -185,6 +186,7 @@ model Recibo {
     fechaGenerado  DateTime
     fechaImpreso   DateTime
     fechaAnulado   DateTime
+    montoAnterior  Float
     montoTotal     Float
     observaciones  String?
     createdAt      DateTime     @default(now())
