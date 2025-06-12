@@ -1,4 +1,5 @@
 "use client"
+import { createRecibo } from "@/actions/create-recibo-action";
 import { ReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { useRouter } from "next/navigation";
@@ -10,7 +11,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
     const formValues = useRecibosFormStore((state) => state.formValues)
     const resetForm = useRecibosFormStore((state) => state.resetForm)
 
-    const handleSubmit = (formData: FormData) => {
+    const handleSubmit = async (formData: FormData) => {
         // Creamos un objeto "data" para guardar los 
         // datos ingresados extrayendolos de FormData
         const data = {
@@ -41,14 +42,20 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
             return
         }
 
+        /**-------------------- Aqui generar el recibo -------------------*/
+
+        const response = await createRecibo(result.data)
+        if (response?.errors){
+            response.errors.forEach(issue => {
+                toast.error(issue.message)
+            })
+            return
+        }
+     
+
         toast.success("Recibo Generado correctamente")
         router.push('/admin/recibos/alta')
         resetForm()
-
-        //-------------------- Aqui generar el recibo -------------------
-
-
-        //---------------------------------------------------------------
 
     }
 

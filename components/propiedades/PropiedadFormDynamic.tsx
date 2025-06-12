@@ -15,7 +15,12 @@ type PropiedadFormDynamicProps = {
 
 export default function PropiedadFormDynamic({ paises, provincias, tiposPropiedad, clientes, propiedad }: PropiedadFormDynamicProps) {
 
-    const { formValues, setFormValues } = usePropiedadFormStore()
+    const { formValues, setFormValues, resetForm } = usePropiedadFormStore()
+    useEffect(() => {
+        return () => {
+            resetForm();
+        };
+    }, [resetForm]);
 
     // Si la propiedad existe, cargar los valores en el formulario
     useEffect(() => {
@@ -58,7 +63,6 @@ export default function PropiedadFormDynamic({ paises, provincias, tiposPropieda
         }
     };
     const isArgentina = true; // Por el momento solo se permite Argentina en el caso de permitir otro pais
-
 
     return (
         <>

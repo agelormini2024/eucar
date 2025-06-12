@@ -1,5 +1,6 @@
 "use client"
 import { calculaImporteRecibo } from "@/src/lib/calculaImporteRecibo";
+import { verificaIpcActual } from "@/src/lib/verificaIpcActual";
 import { Contrato, ContratoSchemaApi, EstadoReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { selectContratoPropietario } from "@/src/types";
@@ -11,14 +12,21 @@ type ReciboFormDynamicProps = {
 
     contratos: Prisma.ContratoGetPayload<typeof selectContratoPropietario>[]
     recibo?: Recibo
-    // estadosRecibo: EstadoRecibo[]
 }
 
 export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynamicProps) {
     const [selectContrato, setSelectContrato] = useState<Contrato>()
+    const [mesValidado, setMesValidado] = useState(false)
     const formValues = useRecibosFormStore((state) => state.formValues)
     const setFormValues = useRecibosFormStore((state) => state.setFormValues)
+    const resetForm = useRecibosFormStore((state) => state.resetForm)
     const setHabilitarBoton = useRecibosFormStore((state) => state.setHabilitarBoton)
+
+    useEffect(() => {
+        return () => {
+            resetForm();
+        };
+    }, [resetForm]);
 
     useEffect(() => {
         if (recibo) {
@@ -50,24 +58,26 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
 
         // Traer los datos del contrato Seleccionado
         if (name === "contratoId") {
+            resetForm()
+
             // Datos del Contrato
             const contrato = await fetch(`/api/recibos/contrato/${Number(value)}`).then(res => res.json())
             const { data: contratoSelecionado } = ContratoSchemaApi.safeParse(contrato) // Validar contrato con zod
             if (contratoSelecionado) {
                 setSelectContrato(contratoSelecionado)
-                setFormValues({
-                    propiedad: contratoSelecionado?.propiedad
-                        ? `${contratoSelecionado.propiedad.calle || ""}  ${contratoSelecionado.propiedad.numero || ""} - Piso: ${contratoSelecionado.propiedad.piso || ""} - Dpto: ${contratoSelecionado.propiedad.departamento || ""}`
-                        : ""
-                })
-                // Calcular el importe del Recibo
-                const { montoCalculado } = calculaImporteRecibo(contrato)
+                const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+
                 setFormValues({
                     montoAnterior: contratoSelecionado.montoAlquilerUltimo ?? 0,
                     montoTotal: montoCalculado ?? 0,
+                    tipoContratoId: contratoSelecionado.tipoContratoId,
                     tipoContrato: contratoSelecionado.tipoContrato.descripcion,
                     clientePropietario: contratoSelecionado.clientePropietario.apellido,
-                    clienteInquilino: contratoSelecionado.clienteInquilino.apellido
+                    clienteInquilino: contratoSelecionado.clienteInquilino.apellido,
+                    propiedad: contratoSelecionado?.propiedad
+                        ? `${contratoSelecionado.propiedad.calle || ""}  ${contratoSelecionado.propiedad.numero || ""} - Piso: ${contratoSelecionado.propiedad.piso || ""} - Dpto: ${contratoSelecionado.propiedad.departamento || ""}`
+                        : ""
+
                 })
 
             } else {
@@ -99,7 +109,15 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
         setFormValues({ [name]: parsedValue });
 
     }
-    /* ------------------------------------------------------------- */
+    /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
+
+    useEffect(() => {
+        async function checkMesHabilitado() {
+            const mesHabilitado = await verificaIpcActual('2025-05-01');
+            setMesValidado(mesHabilitado)
+        }
+        checkMesHabilitado();
+    }, [formValues.contratoId]);
 
     useEffect(() => {
         if (selectContrato?.abl !== formValues.abl ||
@@ -107,18 +125,21 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
             selectContrato.expensas !== formValues.expensas ||
             selectContrato.luz !== formValues.luz ||
             selectContrato.gas !== formValues.gas ||
-            selectContrato.otros !== formValues.otros
+            selectContrato.otros !== formValues.otros ||
+            !mesValidado
         ) {
             setHabilitarBoton(false)
         } else {
             setHabilitarBoton(true)
         }
+        console.log(`HabilitarBoton:  ${formValues.habilitarBoton}`)
+        console.log(`mesValidado:  ${mesValidado}`)
     }, [formValues.abl,
-        formValues.aysa,
-        formValues.expensas,
-        formValues.luz,
-        formValues.gas,
-        formValues.otros])
+    formValues.aysa,
+    formValues.expensas,
+    formValues.luz,
+    formValues.gas,
+    formValues.otros])
 
     /* ------------------------------------------------------------- */
 

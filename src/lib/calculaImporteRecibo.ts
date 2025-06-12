@@ -18,7 +18,7 @@ export function calculaImporteRecibo(contrato: Contrato) {
     }
 
     let montoCalculado = 0
-    if (contrato.mesesRestaActualizar = 0) {
+    if (contrato.mesesRestaActualizar !== 0) { // 
         montoCalculado = contrato.montoAlquilerUltimo
     } else {
         montoCalculado = importeCalculado(contrato.montoAlquilerUltimo)

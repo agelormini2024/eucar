@@ -1,5 +1,4 @@
 "use server"
-
 import { prisma } from "@/src/lib/prisma"
 import { ContratoSchema } from "@/src/schema"
 

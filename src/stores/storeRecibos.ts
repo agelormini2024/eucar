@@ -20,6 +20,7 @@ export type RecibosFormState = {
         otros: boolean
         observaciones: string
         propiedad: string
+        tipoContratoId: number
         tipoContrato: string
         clientePropietario: string
         clienteInquilino: string
@@ -44,6 +45,7 @@ export type RecibosFormState = {
         otros: boolean
         observaciones: string
         propiedad: string
+        tipoContratoId: number
         tipoContrato: string
         clientePropietario: string
         clienteInquilino: string
@@ -72,6 +74,7 @@ const useRecibosFormStore = create<RecibosFormState>()(
             otros: false,
             observaciones: "",
             propiedad: "",
+            tipoContratoId: 0,
             tipoContrato: "",
             clientePropietario: "",
             clienteInquilino: "",
@@ -102,6 +105,7 @@ const useRecibosFormStore = create<RecibosFormState>()(
                 otros: false,
                 observaciones: "",
                 propiedad: "",
+                tipoContratoId: 0,
                 tipoContrato: "",
                 clientePropietario: "",
                 clienteInquilino: "",

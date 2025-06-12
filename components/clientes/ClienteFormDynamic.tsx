@@ -12,7 +12,13 @@ type ClienteFormDynamicProps = {
 
 export default function ClienteFormDynamic({ paises, provincias, cliente }: ClienteFormDynamicProps) {
 
-    const { formValues, setFormValues } = useClienteFormStore()
+    const { formValues, setFormValues, resetForm } = useClienteFormStore()
+
+        useEffect(() => {
+        return () => {
+            resetForm();
+        };
+    }, [resetForm]);
 
     // Si el cliente existe, cargar los valores en el formulario
     useEffect(() => {

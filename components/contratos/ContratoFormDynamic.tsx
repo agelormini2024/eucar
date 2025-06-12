@@ -17,7 +17,12 @@ type ContratoFormDynamicProps = {
 
 export default function ContratoFormDynamic({ clientes, propiedades, tiposContrato, tiposIndice, contrato }: ContratoFormDynamicProps) {
 
-    const { formValues, setFormValues } = useContratoFormStore()
+    const { formValues, setFormValues, resetForm } = useContratoFormStore()
+    useEffect(() => {
+        return () => {
+            resetForm();
+        };
+    }, [resetForm]);
 
     useEffect(() => {
         if (contrato) {
@@ -109,7 +114,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             name === "clienteIdInquilino"
         ) {
             parsedValue = Number(value);
-            } else {
+        } else {
             parsedValue = value;
         }
 
