@@ -26,6 +26,8 @@ export type RecibosFormState = {
         clienteInquilino: string
         estadoRecibo: string
         habilitarBoton: boolean
+        tipoIndice: string
+        mesesRestaActualizar: number
     }
     setFormValues: (values: Partial<RecibosFormState['formValues']>) => void
     resetForm: () => {
@@ -51,6 +53,8 @@ export type RecibosFormState = {
         clienteInquilino: string
         estadoRecibo: string
         habilitarBoton: boolean
+        tipoIndice: string
+        mesesRestaActualizar: number
     }
     setHabilitarBoton: (opc: boolean) => void
 }
@@ -79,7 +83,9 @@ const useRecibosFormStore = create<RecibosFormState>()(
             clientePropietario: "",
             clienteInquilino: "",
             estadoRecibo: "",
-            habilitarBoton: false
+            habilitarBoton: false,
+            tipoIndice: "",
+            mesesRestaActualizar: 0
         },
         setFormValues: (values) => set((state) => ({
             formValues: {
@@ -110,15 +116,17 @@ const useRecibosFormStore = create<RecibosFormState>()(
                 clientePropietario: "",
                 clienteInquilino: "",
                 estadoRecibo: "",
-                habilitarBoton: false
+                habilitarBoton: false,
+                tipoIndice: "",
+                mesesRestaActualizar: 0
             }
         })),
-        setHabilitarBoton: (opc)=> set((state) => ({
-                formValues: {
+        setHabilitarBoton: (opc) => set((state) => ({
+            formValues: {
                 ...state.formValues,
                 habilitarBoton: opc
             }
-        
+
         }))
 
 

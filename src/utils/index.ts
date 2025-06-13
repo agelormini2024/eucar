@@ -31,7 +31,8 @@ export function formatFechaIpc(fecha: Date) {
 }
 
 export function restarUnMes(fecha: string): string { // restarUnMes("2025-06-10")); // "2025-05-10"
-    const fechaObj = new Date(fecha);
+    const [anio, mes, dia] = fecha.split('-').map(Number); // Esto es para evitar errores con la zona horaria
+    const fechaObj = new Date(anio, mes - 1, dia);
     fechaObj.setMonth(fechaObj.getMonth() - 1);
     const yyyy = fechaObj.getFullYear();
     const mm = String(fechaObj.getMonth() + 1).padStart(2, '0');
@@ -39,11 +40,3 @@ export function restarUnMes(fecha: string): string { // restarUnMes("2025-06-10"
     return `${yyyy}-${mm}-${dd}`;
 }
 
-export function sumarUnMes(fecha: string): string { // restarUnMes("2025-06-10")); // "2025-05-10"
-    const fechaObj = new Date(fecha);
-    fechaObj.setMonth(fechaObj.getMonth() + 1);
-    const yyyy = fechaObj.getFullYear();
-    const mm = String(fechaObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(fechaObj.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-}

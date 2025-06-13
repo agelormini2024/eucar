@@ -58,7 +58,14 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
 
         // Traer los datos del contrato Seleccionado
         if (name === "contratoId") {
-            resetForm()
+            setFormValues({
+                expensas: false,
+                abl: false,
+                luz: false,
+                gas: false,
+                aysa: false,
+                otros: false
+            })
 
             // Datos del Contrato
             const contrato = await fetch(`/api/recibos/contrato/${Number(value)}`).then(res => res.json())
@@ -70,14 +77,14 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
                 setFormValues({
                     montoAnterior: contratoSelecionado.montoAlquilerUltimo ?? 0,
                     montoTotal: montoCalculado ?? 0,
-                    tipoContratoId: contratoSelecionado.tipoContratoId,
                     tipoContrato: contratoSelecionado.tipoContrato.descripcion,
                     clientePropietario: contratoSelecionado.clientePropietario.apellido,
                     clienteInquilino: contratoSelecionado.clienteInquilino.apellido,
                     propiedad: contratoSelecionado?.propiedad
                         ? `${contratoSelecionado.propiedad.calle || ""}  ${contratoSelecionado.propiedad.numero || ""} - Piso: ${contratoSelecionado.propiedad.piso || ""} - Dpto: ${contratoSelecionado.propiedad.departamento || ""}`
-                        : ""
-
+                        : "",
+                    tipoIndice: contratoSelecionado.tipoIndice.nombre,
+                    mesesRestaActualizar: contratoSelecionado.mesesRestaActualizar
                 })
 
             } else {
@@ -113,13 +120,22 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
 
     useEffect(() => {
         async function checkMesHabilitado() {
-            const mesHabilitado = await verificaIpcActual('2025-05-01');
-            setMesValidado(mesHabilitado)
+            
+            if(formValues.tipoIndice === 'IPC' && formValues.mesesRestaActualizar === 0){
+                const mesHabilitado = await verificaIpcActual(formValues.fechaPendiente);
+                setMesValidado(mesHabilitado)
+            } else {
+                const mesHabilitado = true
+                setMesValidado(mesHabilitado)
+            }
         }
+                
         checkMesHabilitado();
+
     }, [formValues.contratoId]);
 
     useEffect(() => {
+        console.log(`mesValidado:  ${mesValidado}`)
         if (selectContrato?.abl !== formValues.abl ||
             selectContrato.aysa !== formValues.aysa ||
             selectContrato.expensas !== formValues.expensas ||
@@ -128,18 +144,16 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
             selectContrato.otros !== formValues.otros ||
             !mesValidado
         ) {
-            setHabilitarBoton(false)
+             setHabilitarBoton(false)
         } else {
             setHabilitarBoton(true)
         }
-        console.log(`HabilitarBoton:  ${formValues.habilitarBoton}`)
-        console.log(`mesValidado:  ${mesValidado}`)
     }, [formValues.abl,
     formValues.aysa,
     formValues.expensas,
     formValues.luz,
     formValues.gas,
-    formValues.otros])
+    formValues.otros, mesValidado])
 
     /* ------------------------------------------------------------- */
 
