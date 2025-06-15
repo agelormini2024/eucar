@@ -15,18 +15,33 @@ export default function ContratosTable({ data }: ContratosTableProps) {
         () => [
             {
                 id: "acciones", // ID único para la columna
-                header: "Acciones",
+                header: "Contratos",
                 Cell: ({ row }) => (
                     <Link
-                        href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del cliente
-                        className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-600"
+                        href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del contrato
+                        className="bg-red-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500"
                     >
                         Editar
                     </Link>
                 ),
                 muiTableHeadCellProps: { style: { textAlign: "center" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
+            }, 
+            {
+                id: "generarRecibo", // ID único para la columna
+                header: "Recibos",
+                Cell: ({ row }) => (
+                    <Link
+                        href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
+                        className="bg-blue-800 text-white px-4 py-2 font-bold rounded hover:bg-blue-500"
+                    >
+                        Recibo
+                    </Link>
+                ),
+                muiTableHeadCellProps: { style: { textAlign: "center" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
+
             {
                 id: "clientePropietario", // ID único para la columna
                 header: "Propietario", // Título de la columna
@@ -53,7 +68,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado
-            }, 
+            },
             {
                 id: "montoAlquilerUltimo",
                 header: "Ultimo Alquiler",

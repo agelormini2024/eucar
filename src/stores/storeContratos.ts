@@ -3,6 +3,7 @@ import { devtools } from "zustand/middleware";
 
 type ContratoFormState = {
     formValues: {
+        id: number
         descripcion: string;
         fechaInicio: string;
         fechaVencimiento: string;
@@ -29,6 +30,7 @@ type ContratoFormState = {
 export const useContratoFormStore = create<ContratoFormState>()( 
     devtools((set) => ({
         formValues: {
+            id: 0,
             descripcion: '',
             fechaInicio: '',
             fechaVencimiento: '',
@@ -57,6 +59,7 @@ export const useContratoFormStore = create<ContratoFormState>()(
         })),
         resetForm: () => set(() => ({
             formValues: {
+                id: 0,
                 descripcion: '',
                 fechaInicio: '',
                 fechaVencimiento: '',

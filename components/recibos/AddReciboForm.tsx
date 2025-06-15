@@ -52,11 +52,10 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
             return
         }
      
-
         toast.success("Recibo Generado correctamente")
         router.push('/admin/recibos/alta')
         resetForm()
-
+        /**--------------------------------------------------------------*/
     }
 
     return (

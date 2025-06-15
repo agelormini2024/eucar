@@ -12,7 +12,7 @@ export async function getIpc(inflacionMensual: unknown) {
     }
 
     try {
-        // Hay que usar for of porque el .map no espera a que se resuelvan las promesas
+        // Hay que usar "for of" porque el .map no espera a que se resuelvan las promesas
         // y no se puede usar Promise.all porque no se puede usar await dentro de un .map
         for (const item of result.data) {
 
@@ -42,13 +42,12 @@ export async function getIpc(inflacionMensual: unknown) {
                     porcentaje: true
                 }
             })
-
+// console.log('ipcAcumulado......',ipcAcumulado)
             // Si hay datos, calcular el IPC total y actualizar el tipoContrato
 
             if (ipcAcumulado.length > 0) {
                 const ipcTotal = ipcAcumulado.reduce((acc, item) => acc * (item.porcentaje / 100 + 1), 1)
-                console.log("ipcTotal", ipcTotal)
-                // const ipcAnual = ipcTotal / tipoContrato.cantidadMesesActualizacion
+// console.log("ipcTotal", ipcTotal)
                 await prisma.tipoContrato.update({
                     where: { cantidadMesesActualizacion: reg.cantidadMesesActualizacion },
                     data: { ipc: ipcTotal,
@@ -59,8 +58,6 @@ export async function getIpc(inflacionMensual: unknown) {
 
         }
         console.log("IPC actualizado correctamente")
-
-
 
     } catch (error) {
         console.error(error)

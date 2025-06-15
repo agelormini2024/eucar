@@ -3,9 +3,15 @@ import EditContratoForm from "@/components/contratos/EditContratoForm"
 import ButtonGoBack from "@/components/ui/ButtonGoBack"
 import Headers from "@/components/ui/Headers"
 import { prisma } from "@/src/lib/prisma"
+import { Contrato } from "@prisma/client"
 import { notFound } from "next/navigation"
 
-async function getContratoById(id: number) {
+
+type getContratoByIdProps = {
+    id: Contrato["id"]
+}
+
+async function getContratoById({id}: getContratoByIdProps) {
 
     const contrato = await prisma.contrato.findUnique({
         where: {
@@ -50,7 +56,7 @@ export default async function EditContratoPage({ params }: { params: { id: strin
 
     const { id } = await params // Asegúrate de que params sea awaited si es necesario
 
-    const contrato = await getContratoById(+id)
+    const contrato = await getContratoById({ id: +id })
 
     return (
         <>

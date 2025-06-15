@@ -5,7 +5,6 @@ const menuItems = [
     { url: '/admin/contratos/list', text: 'Contratos', blank: false , key: 1},
     { url: '/admin/contratos/alta', text: 'Nuevo Contrato', blank: false, key:2 },
     { url: '/admin/recibos/list', text: 'Recibos', blank: false , key: 3},
-    { url: '/admin/recibos/alta', text: 'Nuevo Recibo', blank: false, key:4 },
 ]
 
 export default function AlquileresSidebar() {

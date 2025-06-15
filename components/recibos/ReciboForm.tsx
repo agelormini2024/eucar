@@ -1,40 +1,26 @@
-import { prisma } from "@/src/lib/prisma"
-import { Recibo } from "@prisma/client";
 import ReciboFormDynamic from "./ReciboFormDynamic";
-
-
-async function getContrato() {
-    return await prisma.contrato.findMany({
-        where: {
-            fechaVencimiento: {
-                gte: new Date(),
-            }
-        },
-        include: {
-            clientePropietario: {
-                select: {
-                    apellido: true,
-                    nombre: true,
-                    cuit: true,
-                }
-            },
-        }
-    })
-}
+import { ContratoSchemaApi } from "@/src/schema";
 
 type ReciboFormProps = {
-    recibo?: Recibo;
+    contrato: number
 }
 
-export default async function ReciboForm({ recibo }: ReciboFormProps) {
+export default async function ReciboForm({ contrato }: ReciboFormProps) {
 
-    const contratos = await getContrato()
+    const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const result = await fetch(`${baseUrl}/api/recibos/contrato/${contrato}`).then(res => res.json());
+    const parsed = ContratoSchemaApi.safeParse(result) // Validar contrato con zod
+
+    if (!parsed.success) {
+        return <div>Error al cargar el contrato</div>
+    }
+
+    const contratoSeleccionado = parsed.data
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
             <ReciboFormDynamic
-                contratos={contratos}
-                recibo={recibo}
+                contrato={contratoSeleccionado}
             />
         </div>
     )

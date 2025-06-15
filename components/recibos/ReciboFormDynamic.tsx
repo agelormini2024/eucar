@@ -1,7 +1,7 @@
 "use client"
 import { calculaImporteRecibo } from "@/src/lib/calculaImporteRecibo";
 import { verificaIpcActual } from "@/src/lib/verificaIpcActual";
-import { Contrato, ContratoSchemaApi, EstadoReciboSchema } from "@/src/schema";
+import { Contrato, EstadoReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { selectContratoPropietario } from "@/src/types";
 import { formatCurrency } from "@/src/utils";
@@ -10,17 +10,60 @@ import { useEffect, useState } from "react";
 
 type ReciboFormDynamicProps = {
 
-    contratos: Prisma.ContratoGetPayload<typeof selectContratoPropietario>[]
+    contrato: Contrato
     recibo?: Recibo
 }
 
-export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynamicProps) {
+export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynamicProps) {
     const [selectContrato, setSelectContrato] = useState<Contrato>()
     const [mesValidado, setMesValidado] = useState(false)
     const formValues = useRecibosFormStore((state) => state.formValues)
     const setFormValues = useRecibosFormStore((state) => state.setFormValues)
     const resetForm = useRecibosFormStore((state) => state.resetForm)
     const setHabilitarBoton = useRecibosFormStore((state) => state.setHabilitarBoton)
+
+
+    async function cargarContrato() {
+
+        setFormValues({
+            expensas: false,
+            abl: false,
+            luz: false,
+            gas: false,
+            aysa: false,
+            otros: false
+        })
+
+        setSelectContrato(contrato)
+        const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+        setFormValues({
+            montoAnterior: contrato.montoAlquilerUltimo ?? 0,
+            montoTotal: montoCalculado ?? 0,
+            tipoContrato: contrato.tipoContrato.descripcion,
+            clientePropietario: contrato.clientePropietario.apellido,
+            clienteInquilino: contrato.clienteInquilino.apellido,
+            propiedad: contrato?.propiedad
+                ? `${contrato.propiedad.calle || ""}  ${contrato.propiedad.numero || ""} - Piso: ${contrato.propiedad.piso || ""} - Dpto: ${contrato.propiedad.departamento || ""}`
+                : "",
+            tipoIndice: contrato.tipoIndice.nombre,
+            mesesRestaActualizar: contrato.mesesRestaActualizar
+        })
+
+
+        // Traer el estado del Recibo
+        const result = await fetch(`/api/recibos/estadoRecibo/${formValues.estadoReciboId}`).then(res => res.json())
+        const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
+        if (estadoRecibo) {
+            setFormValues({ estadoRecibo: estadoRecibo.descripcion })
+        } else {
+            console.log('No se encontró el Estado para el recibo  !!!')
+        }
+    }
+
+    // Efectos
+    useEffect(() => {
+        cargarContrato()
+    }, [])
 
     useEffect(() => {
         return () => {
@@ -56,52 +99,6 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
 
         let parsedValue: string | number | boolean = ""
 
-        // Traer los datos del contrato Seleccionado
-        if (name === "contratoId") {
-            setFormValues({
-                expensas: false,
-                abl: false,
-                luz: false,
-                gas: false,
-                aysa: false,
-                otros: false
-            })
-
-            // Datos del Contrato
-            const contrato = await fetch(`/api/recibos/contrato/${Number(value)}`).then(res => res.json())
-            const { data: contratoSelecionado } = ContratoSchemaApi.safeParse(contrato) // Validar contrato con zod
-            if (contratoSelecionado) {
-                setSelectContrato(contratoSelecionado)
-                const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
-
-                setFormValues({
-                    montoAnterior: contratoSelecionado.montoAlquilerUltimo ?? 0,
-                    montoTotal: montoCalculado ?? 0,
-                    tipoContrato: contratoSelecionado.tipoContrato.descripcion,
-                    clientePropietario: contratoSelecionado.clientePropietario.apellido,
-                    clienteInquilino: contratoSelecionado.clienteInquilino.apellido,
-                    propiedad: contratoSelecionado?.propiedad
-                        ? `${contratoSelecionado.propiedad.calle || ""}  ${contratoSelecionado.propiedad.numero || ""} - Piso: ${contratoSelecionado.propiedad.piso || ""} - Dpto: ${contratoSelecionado.propiedad.departamento || ""}`
-                        : "",
-                    tipoIndice: contratoSelecionado.tipoIndice.nombre,
-                    mesesRestaActualizar: contratoSelecionado.mesesRestaActualizar
-                })
-
-            } else {
-                console.log('No se encontró el Contrato  !!!')
-            }
-
-            // Traer el estado del Recibo
-            const result = await fetch(`/api/recibos/estadoRecibo/${formValues.estadoReciboId}`).then(res => res.json())
-            const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
-            if (estadoRecibo) {
-                setFormValues({ estadoRecibo: estadoRecibo.descripcion })
-            } else {
-                console.log('No se encontró el Estado para el recibo  !!!')
-            }
-
-        }
-
         if (type === "checkbox") {
             parsedValue = (e.target as HTMLInputElement).checked
         } else if (
@@ -120,8 +117,8 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
 
     useEffect(() => {
         async function checkMesHabilitado() {
-            
-            if(formValues.tipoIndice === 'IPC' && formValues.mesesRestaActualizar === 0){
+
+            if (formValues.tipoIndice === 'IPC' && formValues.mesesRestaActualizar === 0) {
                 const mesHabilitado = await verificaIpcActual(formValues.fechaPendiente);
                 setMesValidado(mesHabilitado)
             } else {
@@ -129,7 +126,7 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
                 setMesValidado(mesHabilitado)
             }
         }
-                
+
         checkMesHabilitado();
 
     }, [formValues.contratoId]);
@@ -144,7 +141,7 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
             selectContrato.otros !== formValues.otros ||
             !mesValidado
         ) {
-             setHabilitarBoton(false)
+            setHabilitarBoton(false)
         } else {
             setHabilitarBoton(true)
         }
@@ -164,25 +161,14 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
                     htmlFor="contratoId">
                     Contrato :
                 </label>
-                <select
+                <input
                     className="block w-full p-3 bg-slate-200"
                     id="contratoId"
                     name="contratoId"
-                    onChange={handleInputChange}
-                    value={formValues.contratoId || ""}
-                >
-                    <option
-                        value=""
-                        disabled >-- Seleccione un Contrato --</option>
-                    {contratos.map((item) => (
-                        <option
-                            key={item.id}
-                            value={item.id}
-                        >
-                            {item.descripcion} ----- {item.clientePropietario.apellido} ---- {item.clientePropietario.cuit}
-                        </option>
-                    ))}
-                </select>
+
+                    value={contrato.descripcion}
+                    disabled
+                />
             </div>
             {/* ------------------------------------------------------------- */}
             <div className="grid grid-cols-2 gap-4">
@@ -196,7 +182,6 @@ export default function ReciboFormDynamic({ contratos, recibo }: ReciboFormDynam
                         id="propiedad"
                         type="text"
                         name="propiedad"
-                        onChange={handleInputChange}
                         value={formValues.propiedad ? formValues.propiedad : ""}
                         className="block w-full p-3 bg-slate-200 text-slate-600 font-bold"
                         disabled
