@@ -35,8 +35,10 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         })
 
         setSelectContrato(contrato)
+        console.log('contrato.....', contrato.id)
         const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
         setFormValues({
+            contratoId: contrato.id,
             montoAnterior: contrato.montoAlquilerUltimo ?? 0,
             montoTotal: montoCalculado ?? 0,
             tipoContrato: contrato.tipoContrato.descripcion,
@@ -74,7 +76,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     useEffect(() => {
         if (recibo) {
             setFormValues({
-                contratoId: recibo.contratoId || 0,
+                contratoId: recibo.contratoId || contrato.id,
                 estadoReciboId: recibo.estadoReciboId || 1,
                 fechaPendiente: recibo.fechaPendiente ? recibo.fechaPendiente.toISOString().split('T')[0] : '',
                 fechaGenerado: recibo.fechaGenerado ? recibo.fechaGenerado.toISOString().split('T')[0] : '',
@@ -93,26 +95,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         }
     }, [recibo, setFormValues])
 
-    //------------------------------------------------------------------------------------
-    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, type, value } = e.target as HTMLInputElement;
-
-        let parsedValue: string | number | boolean = ""
-
-        if (type === "checkbox") {
-            parsedValue = (e.target as HTMLInputElement).checked
-        } else if (
-            type === "number" ||
-            name === "contratoId" ||
-            name === "estadoReciboId"
-        ) {
-            parsedValue = Number(value)
-        } else {
-            parsedValue = value
-        }
-        setFormValues({ [name]: parsedValue });
-
-    }
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
 
     useEffect(() => {
@@ -132,7 +114,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     }, [formValues.contratoId]);
 
     useEffect(() => {
-        console.log(`mesValidado:  ${mesValidado}`)
         if (selectContrato?.abl !== formValues.abl ||
             selectContrato.aysa !== formValues.aysa ||
             selectContrato.expensas !== formValues.expensas ||
@@ -151,8 +132,27 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     formValues.luz,
     formValues.gas,
     formValues.otros, mesValidado])
+    //------------------------------------------------------------------------------------
+    
+    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, type, value } = e.target as HTMLInputElement;
 
-    /* ------------------------------------------------------------- */
+        let parsedValue: string | number | boolean = ""
+
+        if (type === "checkbox") {
+            parsedValue = (e.target as HTMLInputElement).checked
+        } else if (
+            type === "number" ||
+            name === "contratoId" ||
+            name === "estadoReciboId"
+        ) {
+            parsedValue = Number(value)
+        } else {
+            parsedValue = value
+        }
+        setFormValues({ [name]: parsedValue });
+
+    }
 
     return (
         <>

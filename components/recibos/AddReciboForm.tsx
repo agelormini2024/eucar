@@ -15,7 +15,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
         // Creamos un objeto "data" para guardar los 
         // datos ingresados extrayendolos de FormData
         const data = {
-            contratoId: Number(formData.get('contratoId')),
+            contratoId: formValues.contratoId,
             estadoReciboId: Number(formValues.estadoReciboId),
             fechaPendiente: formValues.fechaPendiente,
             fechaGenerado: formValues.fechaGenerado,
