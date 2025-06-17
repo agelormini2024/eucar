@@ -147,12 +147,12 @@ export const ReciboSchema = z.object({
     fechaAnulado: z.string().optional(),
     montoAnterior: z.number().min(1, { message: "Es obligatorio el Monto Anterior" }),
     montoTotal: z.number().min(1, { message: "Es obligatorio el Monto Total" }),
-    expensas: z.boolean().default(false).optional(),
-    abl: z.boolean().default(false).optional(),
-    aysa: z.boolean().default(false).optional(),
-    luz: z.boolean().default(false).optional(),
-    gas: z.boolean().default(false).optional(),
-    otros: z.boolean().default(false).optional(),
+    expensas: z.boolean().default(false),
+    abl: z.boolean().default(false),
+    aysa: z.boolean().default(false),
+    luz: z.boolean().default(false),
+    gas: z.boolean().default(false),
+    otros: z.boolean().default(false),
     observaciones: z.string()
         .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
         .optional(),

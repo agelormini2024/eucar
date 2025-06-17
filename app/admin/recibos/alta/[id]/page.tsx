@@ -1,6 +1,7 @@
 import AddReciboForm from "@/components/recibos/AddReciboForm"
 import ReciboForm from "@/components/recibos/ReciboForm"
 import ButtonGoBack from "@/components/ui/ButtonGoBack"
+import Headers from "@/components/ui/Headers"
 
 export default async function AddReciboPage({ params }: { params: { id: string } }) {
 
@@ -11,6 +12,10 @@ export default async function AddReciboPage({ params }: { params: { id: string }
     return (
         <>
             <div className="flex justify-between">
+                <div>
+                    <Headers>Recibos</Headers>
+                </div>
+
                 <div>
                     <ButtonGoBack />
                 </div>

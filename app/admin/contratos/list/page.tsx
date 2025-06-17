@@ -7,12 +7,27 @@ import { consultaContratos } from '@/src/types';
 import { Prisma } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import Loading from './loading';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 type ContratoConRelaciones = Prisma.ContratoGetPayload<typeof consultaContratos>;
 
 export default function ContratosAlquilerPage() {
     const [contratos, setContratos] = useState<ContratoConRelaciones[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const searchParams = useSearchParams()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (searchParams.get("toast") === "success") {
+            toast.success("Recibo Generado correctamente")
+            // Limpiar el parámetro "toast" de la URL
+            const params = new URLSearchParams(window.location.search);
+            console.log('Params....',params)
+            params.delete("toast");
+            router.replace(`?${params.toString()}`);
+        }
+    }, [searchParams])
 
     useEffect(() => {
         async function fetchContratos() {

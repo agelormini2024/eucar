@@ -35,15 +35,16 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         })
 
         setSelectContrato(contrato)
-        console.log('contrato.....', contrato.id)
+        // console.log('inicial.....', contrato.montoAlquilerInicial)
+        // console.log('ultimo.....', contrato.montoAlquilerUltimo)
         const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
         setFormValues({
             contratoId: contrato.id,
-            montoAnterior: contrato.montoAlquilerUltimo ?? 0,
+            montoAnterior: contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo,
             montoTotal: montoCalculado ?? 0,
             tipoContrato: contrato.tipoContrato.descripcion,
-            clientePropietario: contrato.clientePropietario.apellido,
-            clienteInquilino: contrato.clienteInquilino.apellido,
+            clientePropietario: `${contrato.clientePropietario.apellido} ${contrato.clientePropietario.nombre}`,
+            clienteInquilino: `${contrato.clienteInquilino.apellido} ${contrato.clienteInquilino.nombre}`,
             propiedad: contrato?.propiedad
                 ? `${contrato.propiedad.calle || ""}  ${contrato.propiedad.numero || ""} - Piso: ${contrato.propiedad.piso || ""} - Dpto: ${contrato.propiedad.departamento || ""}`
                 : "",

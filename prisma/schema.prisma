@@ -183,9 +183,9 @@ model Recibo {
     estadoReciboId Int
     estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
     fechaPendiente DateTime
-    fechaGenerado  DateTime
-    fechaImpreso   DateTime
-    fechaAnulado   DateTime
+    fechaGenerado  DateTime?
+    fechaImpreso   DateTime?
+    fechaAnulado   DateTime?
     montoAnterior  Float
     montoTotal     Float
     observaciones  String?
