@@ -27,7 +27,7 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
             cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion),
             mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // *********
             diaMesVencimiento: Number(formValues.diaMesVencimiento),
-            clienteIdPropietario: Number(formData.get('clienteIdPropietario')),
+            clienteIdPropietario: formValues.clienteIdPropietario,
             clienteIdInquilino: Number(formData.get('clienteIdInquilino')),
             propiedadId: Number(formData.get('propiedadId')),
             tipoContratoId: Number(formData.get('tipoContratoId')),

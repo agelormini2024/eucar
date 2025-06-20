@@ -35,7 +35,8 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                accessorKey: "tipoPropiedad.nombre",
+                
+                accessorKey: "tipoPropiedad.descripcion",
                 header: "Tipo de Propiedad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },

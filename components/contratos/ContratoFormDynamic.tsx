@@ -1,8 +1,9 @@
 "use client"
 import { getMesesRestanActualizar } from "@/src/lib/buscarMesesRestanActualizar";
+import { ClientePropietarioSchemaApi, ClienteSchema } from "@/src/schema";
 import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const DIA_MES_VENCIMIENTO = 10
 
@@ -16,7 +17,7 @@ type ContratoFormDynamicProps = {
 }
 
 export default function ContratoFormDynamic({ clientes, propiedades, tiposContrato, tiposIndice, contrato }: ContratoFormDynamicProps) {
-
+    const [propietario, setPropietario] = useState({ apellido: '', nombre: '', cuit: '' })
     const { formValues, setFormValues, resetForm } = useContratoFormStore()
     useEffect(() => {
         return () => {
@@ -97,9 +98,35 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
         fetchMesesRestanActualizar()
     }, [formValues.tipoContratoId])
 
+    //-----------------------------------------------------------------------------------------//
+    // Se busca el propietario de la propiedad del contrato 
+    //-----------------------------------------------------------------------------------------//
+    async function buscarPropietario() {
+        const result = await fetch(`/api/contratos/propiedad/${formValues.propiedadId}`).then(res => res.json())
+        const { data: clientePropietario } = ClientePropietarioSchemaApi.safeParse(result) // Validar contrato con zod
+
+        if (clientePropietario) {
+            setFormValues({
+                clienteIdPropietario: clientePropietario.id
+            })
+            setPropietario({
+                apellido: clientePropietario.apellido,
+                nombre: clientePropietario.nombre,
+                cuit: clientePropietario.cuit
+            })
+        } else {
+            console.log('No se encontró el Propietario  !!!')
+        }
+    }
+
+    useEffect(() => {
+        if (formValues.propiedadId) {
+            buscarPropietario();
+        }
+    }, [formValues.propiedadId]);
     //-------------------------------------------------------------------------------------------//
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target as HTMLInputElement;
         let parsedValue: string | number | boolean = "";
 
@@ -213,8 +240,8 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-
-                <div className="space-y-2">
+                {/* ------------------------------------------------------------------------ */}
+                {/* <div className="space-y-2">
                     <label className="text-slate-800 font-bold"
                         htmlFor="clienteIdPropietario">
                         Propiedatrio :
@@ -236,8 +263,25 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                             </option>
                         ))}
                     </select>
+                </div> */}
+
+
+                <div className="space-y-2">
+                    <label className="text-slate-800 font-bold"
+                        htmlFor="clienteIdPropietario">
+                        Propiedatrio :
+                    </label>
+                    <input
+                        id="clienteIdPropietario"
+                        type="text"
+                        name="clienteIdPropietario"
+                        value={`${propietario.nombre} ${propietario.apellido} - ${propietario.cuit}`}
+                        className="block w-full p-3 bg-slate-200"
+                        disabled
+                    />
                 </div>
 
+                {/* ------------------------------------------------------------------------ */}
                 <div className="space-y-2">
                     <label className="text-slate-800 font-bold"
                         htmlFor="clienteIdInquilino">

@@ -1,7 +1,6 @@
 "use server"
 import { prisma } from "@/src/lib/prisma";
 import { ReciboSchema } from "@/src/schema"
-import { formatFecha } from "@/src/utils";
 
 export async function createRecibo(data: unknown) {
     const result = ReciboSchema.safeParse(data)

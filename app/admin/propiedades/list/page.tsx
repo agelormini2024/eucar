@@ -4,7 +4,6 @@ import PropiedadesTable from '@/components/propiedades/PropiedadesTable';
 import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 import { PropiedadesConRelaciones } from '@/src/types';
-
 import { useEffect, useState } from 'react';
 import Loading from './loading';
 

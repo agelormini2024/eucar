@@ -1,4 +1,4 @@
-import { Cliente, Propiedad } from "@prisma/client";
+import { Cliente, Propiedad, Recibo } from "@prisma/client";
 import { IpcSchema } from "../schema";
 import { z } from "zod";
 
@@ -35,6 +35,29 @@ export type ClientesConProvinciaPais = Cliente & {
         paisId: number;
     }
 }
+
+export type RecibosConRelaciones = Recibo & {
+    contrato: {
+        mesesRestaActualizar: number,
+        clienteInquilino: {
+            nombre: string;
+            apellido: string;
+        },
+        propiedad: {
+            calle: string,
+            numero: number,
+            piso: string,
+            departamento: string
+        }
+    }
+    estadoRecibo: {
+        descripcion: string;
+    }
+    fechaPendiente: Date;
+    fechaGenerado: Date | null;
+    montoAnterior: number;
+    montoTotal: number;
+};
 
 // Uso esta constante para que en el client component ( page.tsx ) el type sea inferido por Prisma
 // Prisma.ContratoGetPayload<typeof consultaContratos>;

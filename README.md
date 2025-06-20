@@ -47,7 +47,7 @@ Calcular el ICL acumulado tomando como ejemplo los últimos 6 meses
     Supongamos:
 
     Contrato firmado el 1 de enero de 2024
-    Ajuste a los 6 meses, o sea: 1 de julio de 2024
+    Ajuste a los 6 meses: 1 de julio de 2024
     Alquiler inicial: $1000
 
         ICL del 01/01/2024: 1.123456

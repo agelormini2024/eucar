@@ -3,9 +3,8 @@ import { calculaImporteRecibo } from "@/src/lib/calculaImporteRecibo";
 import { verificaIpcActual } from "@/src/lib/verificaIpcActual";
 import { Contrato, EstadoReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
-import { selectContratoPropietario } from "@/src/types";
 import { formatCurrency } from "@/src/utils";
-import { EstadoRecibo, Prisma, Recibo } from "@prisma/client";
+import { Recibo } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 type ReciboFormDynamicProps = {
@@ -133,7 +132,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     formValues.luz,
     formValues.gas,
     formValues.otros, mesValidado])
-    //------------------------------------------------------------------------------------
+    //------Fin de Efectos---------
     
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target as HTMLInputElement;

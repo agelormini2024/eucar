@@ -167,6 +167,14 @@ export const EstadoReciboSchema = z.object({
 // Schemas para la API de Contrato 
 //-------------------------------------------------
 
+export const ClientePropietarioSchemaApi = z.object({
+    "id": z.number(),
+    "apellido": z.string(),
+    "nombre": z.string(),
+    "cuit": z.string(),
+});
+
+
 export const ClienteSchemaApi = z.object({
     "apellido": z.string(),
     "nombre": z.string(),
