@@ -124,12 +124,12 @@ export default function ContratosTable({ data }: ContratosTableProps) {
         enableColumnOrdering: true,
         enableRowNumbers: true,
         enableRowSelection: false, // Deshabilitar selección de filas si no es necesaria
-    });
+    })
 
     return (
         <div className="m-4">
             <MaterialReactTable table={table} />
         </div>
-    );
+    )
 }
 

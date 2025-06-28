@@ -34,7 +34,6 @@ export async function getIcl(data: unknown) {
 
         for (const tipo of cntTiposContrato) {
             const meses = tipo.cantidadMesesActualizacion
-            // Calcular el ICL acumulado de los últimos 6 meses
             const nuevaFecha = new Date(FECHA_ACTUAL)
             nuevaFecha.setMonth(nuevaFecha.getMonth() - meses)
             const fechaFinal = `${formatFechaIpc(FECHA_ACTUAL)}-01`

@@ -57,7 +57,7 @@ export type RecibosConRelaciones = Recibo & {
     fechaGenerado: Date | null;
     montoAnterior: number;
     montoTotal: number;
-};
+}
 
 // Uso esta constante para que en el client component ( page.tsx ) el type sea inferido por Prisma
 // Prisma.ContratoGetPayload<typeof consultaContratos>;
@@ -88,7 +88,7 @@ export const consultaContratos = {
             }
         }
     }
-} as const;
+} as const
 
 export const selectContratoPropietario = {
     include: {

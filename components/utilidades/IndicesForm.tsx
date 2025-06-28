@@ -8,7 +8,7 @@ import Loading from "../ui/Loading"
 import { useIndicesStore } from "@/src/stores/storeIndices"
 import MostrarIndices from "./MostrarIndices"
 
-const ANIO = "2024"
+const ANIO = new Date().getFullYear().toString();
 
 async function ipc() {
     const urlIpc = '/api/indices/ipc'

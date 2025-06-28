@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         if (!fs.existsSync(rutaTemp)) {
             return NextResponse.json({ error: `El archivo icl_${anno}.xls no existe en la carpeta temporal` }, { status: 500 })
         }
-console.log('Entramos .........')
+console.log('Entramos a ICL .........', anno)
         // Leer el archivo
         const buffer = fs.readFileSync(rutaTemp)
         const sheets = xlsx.parse(buffer)

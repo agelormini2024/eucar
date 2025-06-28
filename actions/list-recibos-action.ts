@@ -2,8 +2,6 @@
 
 import { prisma } from "@/src/lib/prisma"
 
-
-
 export async function getRecibos() {
 
     const recibos = await prisma.recibo.findMany({
@@ -34,5 +32,6 @@ export async function getRecibos() {
             }
         }
     });
+
     return recibos
 }

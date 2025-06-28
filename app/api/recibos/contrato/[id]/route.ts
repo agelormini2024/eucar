@@ -8,6 +8,9 @@ export async function GET(request: Request, context: { params: { id: string } })
     if (!id || isNaN(Number(id))) {
         return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
+    
+    // Aquí se podría validar si ya hay un Recibo GENERADO para este contrato en el mes en curso
+    // Esta Validación también se encuentra en la acción "create-recibo-action.ts"
 
     try {
         const contrato = await prisma.contrato.findFirst({

@@ -12,15 +12,14 @@ export async function createRecibo(data: unknown) {
     }
 
     // Convertir las fechas a objetos Date
-    const { fechaPendiente, fechaGenerado, fechaImpreso, fechaAnulado, estadoReciboId, ...rest } = result.data;
+    const { fechaPendiente, fechaGenerado, fechaImpreso, fechaAnulado, ...rest } = result.data;
 
     const reciboData = {
         ...rest,
         fechaPendiente: new Date(fechaPendiente), // Convertir fechaInicio a Date
         fechaGenerado: new Date(),
         fechaImpreso: null,
-        fechaAnulado: null,
-        estadoReciboId: 2 // Se pasa a estado "GENERADO" 
+        fechaAnulado: null
     };
 
     // Validar que no se cree un recibo para un mismo contrato en el mismo mes

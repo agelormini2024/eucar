@@ -15,12 +15,10 @@ type ReciboFormDynamicProps = {
 
 export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynamicProps) {
     const [selectContrato, setSelectContrato] = useState<Contrato>()
-    const [mesValidado, setMesValidado] = useState(false)
     const formValues = useRecibosFormStore((state) => state.formValues)
     const setFormValues = useRecibosFormStore((state) => state.setFormValues)
     const resetForm = useRecibosFormStore((state) => state.resetForm)
     const setHabilitarBoton = useRecibosFormStore((state) => state.setHabilitarBoton)
-
 
     async function cargarContrato() {
 
@@ -34,13 +32,9 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         })
 
         setSelectContrato(contrato)
-        // console.log('inicial.....', contrato.montoAlquilerInicial)
-        // console.log('ultimo.....', contrato.montoAlquilerUltimo)
-        const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
         setFormValues({
             contratoId: contrato.id,
             montoAnterior: contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo,
-            montoTotal: montoCalculado ?? 0,
             tipoContrato: contrato.tipoContrato.descripcion,
             clientePropietario: `${contrato.clientePropietario.apellido} ${contrato.clientePropietario.nombre}`,
             clienteInquilino: `${contrato.clienteInquilino.apellido} ${contrato.clienteInquilino.nombre}`,
@@ -50,7 +44,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             tipoIndice: contrato.tipoIndice.nombre,
             mesesRestaActualizar: contrato.mesesRestaActualizar
         })
-
 
         // Traer el estado del Recibo
         const result = await fetch(`/api/recibos/estadoRecibo/${formValues.estadoReciboId}`).then(res => res.json())
@@ -96,22 +89,34 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     }, [recibo, setFormValues])
 
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
+    // TODO: En función de checkMesHabilitado, determinar si el Recibo es 
+    // Provisorio o Final ( estado: PENDIENTE ó GENERADO )
 
     useEffect(() => {
         async function checkMesHabilitado() {
 
             if (formValues.tipoIndice === 'IPC' && formValues.mesesRestaActualizar === 0) {
-                const mesHabilitado = await verificaIpcActual(formValues.fechaPendiente);
-                setMesValidado(mesHabilitado)
+                const mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
+
+                if (mesHabilitado) {
+                    const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+                    setFormValues({
+                        montoTotal: montoCalculado,
+                        estadoReciboId: 2   // Seteamos el "estado" como GENERADO
+                    })
+                } else {
+                    setFormValues({
+                        montoTotal: formValues.montoAnterior,
+                        estadoReciboId: 1   // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
+                                            // correspondiente al mes a cobrar
+                    })
+                }
             } else {
-                const mesHabilitado = true
-                setMesValidado(mesHabilitado)
+                setFormValues({ estadoReciboId: 2 })
             }
         }
-
-        checkMesHabilitado();
-
-    }, [formValues.contratoId]);
+        checkMesHabilitado()
+    }, [formValues.contratoId])
 
     useEffect(() => {
         if (selectContrato?.abl !== formValues.abl ||
@@ -119,8 +124,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             selectContrato.expensas !== formValues.expensas ||
             selectContrato.luz !== formValues.luz ||
             selectContrato.gas !== formValues.gas ||
-            selectContrato.otros !== formValues.otros ||
-            !mesValidado
+            selectContrato.otros !== formValues.otros
         ) {
             setHabilitarBoton(false)
         } else {
@@ -131,9 +135,9 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     formValues.expensas,
     formValues.luz,
     formValues.gas,
-    formValues.otros, mesValidado])
+    formValues.otros])
     //------Fin de Efectos---------
-    
+
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target as HTMLInputElement;
 
