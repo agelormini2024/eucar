@@ -1,6 +1,6 @@
 {
     "github.copilot.enable": {
-        "*": false,
+        "*": true,
         "plaintext": false,
         "markdown": false,
         "scminput": false,
@@ -8,8 +8,9 @@
         "javascriptreact": false,
         "scss": true,
         "html": true,
-        "typescriptreact": false,
-        "typescript": false
+        "typescriptreact": true,
+        "typescript": true,
+        "prisma": false
     },
     "editor.fontSize": 14
 }

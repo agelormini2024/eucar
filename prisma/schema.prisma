@@ -14,7 +14,17 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// MODELOS
+// Usuarios
+
+model Usuario {
+    id Int @id @default(autoincrement())
+    email String
+    password String
+    nombre String
+    confirmado Boolean @default(false)
+}
+
+// Clientes
 
 model Pais {
     id          Int         @id @default(autoincrement())
@@ -63,6 +73,8 @@ model Cliente {
     updatedAt            DateTime    @updatedAt
 }
 
+// Propiedades
+
 model TipoPropiedad {
     id          Int         @id @default(autoincrement())
     descripcion String
@@ -102,11 +114,7 @@ model Propiedad {
     updatedAt       DateTime      @updatedAt
 }
 
-//----------------------------------------------------------------------------//
-// Módulo de Contratos
-//----------------------------------------------------------------------------//
-
-// Modelos para modulo de contratos
+// Contratos
 
 model TipoContrato {
     id                         Int        @id @default(autoincrement())
@@ -168,7 +176,7 @@ model Contrato {
     otros                 Boolean
 }
 
-// Recibos y sus items
+// Recibos
 
 model EstadoRecibo {
     id          Int      @id @default(autoincrement())
@@ -198,3 +206,4 @@ model Recibo {
     gas            Boolean
     otros          Boolean
 }
+

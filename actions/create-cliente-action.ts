@@ -1,8 +1,6 @@
 "use server"
-
 import { prisma } from "@/src/lib/prisma"
 import { ClienteSchema } from "@/src/schema"
-
 
 export async function createCliente(data: unknown) {
     const result = ClienteSchema.safeParse(data)  // validar los datos con el esquema de cliente de Zod
