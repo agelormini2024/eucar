@@ -19,6 +19,7 @@
     "@mui/x-date-pickers": "^7.28.0",
     "@prisma/client": "^6.6.0",
     "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
     "material-react-table": "^3.2.1",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^5.0.2",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20",
     "@types/react": "^19",

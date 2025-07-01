@@ -1,33 +1,43 @@
 "use client"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+    const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm();
 
-    const onSubmit = handleSubmit(data => {
+    const onSubmit = handleSubmit(async data => {
+
         if (data.password !== data.confirmarPassword) {
             alert("Las contraseñas no coinciden");
             return;
         }
         // Aquí puedes enviar los datos al servidor o procesarlos como necesites
-        fetch('/api/auth/register', {
+        const res = await fetch('/api/auth/register', {
             method: 'POST',
+            body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            // Aquí puedes manejar la respuesta del servidor, como redirigir al usuario o mostrar un mensaje de éxito
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-        // Eliminar confirmarPassword antes de enviar los datos
-        delete data.confirmarPassword;
-        console.log(data);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            alert(`Error al registrar el usuario: ${errorText}`);
+            return;
+        }if (res.ok && res.status === 201) {
+            router.push('/auth/login'); // Redirigir al login después del registro
+            return;
+        }
+
+        const resJSON = await res.json();
+        if (resJSON.error) {
+            alert(resJSON.error);
+            return;
+        }
+
+        // Aquí podrías redirigir al usuario o limpiar el formulario
+        console.log("Usuario registrado:", resJSON);
     })
     return (
         <div className="h-[clac(100vh - 7rem)] flex items-center justify-center">
@@ -35,47 +45,51 @@ export default function RegisterPage() {
                 <h1 className="text-2xl font-bold mb-4">Registrarse</h1>
                 <label
                     className="block mb-2 text-sm font-bold text-gray-700"
-                    htmlFor="usuario">
+                    htmlFor="nombre">
                     Nombre de Usuario
                     {errors.usuario && <span className="text-red-500"> - El nombre de usuario es obligatorio y debe tener al menos 3 caracteres</span>}
                 </label>
                 <input
+                    id="nombre"
                     type="text"
                     className="p-3 rounded block w-full mb-2 bg-red-50"
                     placeholder="Nombre de Usuario"
-                    {...register("usuario", { required: true, minLength: 3 })}
+                    {...register("nombre", { required: true, minLength: 3 })}
                 />
-                <label 
+                <label
                     className="block mb-2 text-sm font-bold text-gray-700"
                     htmlFor="email">
                     Correo Electrónico
                     {errors.email && <span className="text-red-500"> - El correo electrónico es obligatorio y debe ser válido</span>}
                 </label>
                 <input
+                    id="email"
                     type="email"
                     className="p-3 rounded block w-full mb-2 bg-red-50"
                     placeholder="mail@mail.com"
                     {...register("email", { required: true, pattern: /^\S+@\S+$/i })}
                 />
-                <label 
+                <label
                     className="block mb-2 text-sm font-bold text-gray-700"
                     htmlFor="password">
                     Contraseña
                     {errors.password && <span className="text-red-500"> - La contraseña es obligatoria y debe tener al menos 6 caracteres</span>}
                 </label>
                 <input
+                    id="password"
                     type="password"
                     className="p-3 rounded block w-full mb-2 bg-red-50"
                     placeholder="******"
                     {...register("password", { required: true, minLength: 6 })}
                 />
-                <label 
+                <label
                     className="block mb-2 text-sm font-bold text-gray-700"
                     htmlFor="confirmarPassword">
                     Confirmar Contraseña
                     {errors.confirmarPassword && <span className="text-red-500"> - La confirmación de contraseña es obligatoria y debe tener al menos 6 caracteres</span>}
                 </label>
                 <input
+                    id="confirmarPassword"
                     type="password"
                     className="p-3 rounded block w-full mb-2 bg-red-50"
                     placeholder="******"

@@ -5,7 +5,7 @@ import { ContratoSchema } from "@/src/schema"
 
 export async function createContrato(data: unknown) {
 
-    const result = ContratoSchema.safeParse(data)  // validar los datos con el esquema de cliente de Zod
+    const result = ContratoSchema.safeParse(data)  // validar los datos con el esquema de contrato de Zod
 
     if (!result.success) {
         return {
