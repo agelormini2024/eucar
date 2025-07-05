@@ -1,3 +1,5 @@
+"use server"
+import { buscarContratoParaRecibo } from "@/src/lib/buscarContratoPara Recibo";
 import ReciboFormDynamic from "./ReciboFormDynamic";
 import { ContratoSchemaApi } from "@/src/schema";
 
@@ -7,8 +9,7 @@ type ReciboFormProps = {
 
 export default async function ReciboForm({ contrato }: ReciboFormProps) {
 
-    const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-    const result = await fetch(`${baseUrl}/api/recibos/contrato/${contrato}`).then(res => res.json());
+    const result = await buscarContratoParaRecibo(contrato)
     const parsed = ContratoSchemaApi.safeParse(result) // Validar contrato con zod
 
     if (!parsed.success) {

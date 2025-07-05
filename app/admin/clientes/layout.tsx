@@ -12,7 +12,6 @@ export default function RootLayout({
                 <aside className="md:w-72 md:h-screen bg-slate-100">
                     <ClientesSideBar />
                 </aside>
-
                 <main className="md:flex-1 md:h-screen md:overflow-y-scroll bg-slate-50 p-5">
                     {children}
                 </main>

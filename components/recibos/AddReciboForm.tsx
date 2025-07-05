@@ -43,7 +43,6 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
         }
 
         /**-------------------- Aqui generar el recibo -------------------*/
-
         const response = await createRecibo(result.data)
 
         if (response?.errors){

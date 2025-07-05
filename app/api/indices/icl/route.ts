@@ -1,3 +1,4 @@
+"use server"
 import { NextRequest, NextResponse } from 'next/server'
 import https from 'https'
 import fs from 'fs'

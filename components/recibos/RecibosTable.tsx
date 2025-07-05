@@ -1,19 +1,19 @@
 "use client"
-
+import { useMemo } from "react"
 import { RecibosConRelaciones } from "@/src/types"
 import { formatCurrency, formatFecha } from "@/src/utils"
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table"
-import { useMemo } from "react"
 
 
 type RecibosTableProps = {
     data: RecibosConRelaciones[]
 }
 export default function RecibosTable({ data }: RecibosTableProps) {
-    console.log(data)
 
     const columns = useMemo<MRT_ColumnDef<RecibosConRelaciones>[]>(
         () => [
+// className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+
             {
                 id: "cliente", // ID único para la columna
                 header: "Cliente", // Título de la columna

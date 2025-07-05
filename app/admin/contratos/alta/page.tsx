@@ -1,6 +1,5 @@
 import AddContratoForm from '@/components/contratos/AddContratoForm'
 import ContratoForm from '@/components/contratos/ContratoForm'
-import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 
 export default function AltaAlquilerPage() {
@@ -10,9 +9,6 @@ export default function AltaAlquilerPage() {
 
                 <div>
                     <Headers>Nuevo Contrato</Headers>
-                </div>
-                <div>
-                    <ButtonGoBack />
                 </div>
             </div>
             <div>

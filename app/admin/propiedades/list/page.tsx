@@ -1,25 +1,10 @@
-"use client"
 import { getPropiedades } from '@/actions/list-propiedades-action';
 import PropiedadesTable from '@/components/propiedades/PropiedadesTable';
-import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
-import { PropiedadesConRelaciones } from '@/src/types';
-import { useEffect, useState } from 'react';
-import Loading from './loading';
 
-export default function ListadoPropiedadsPage() {
-    const [propiedades, setPropiedades] = useState<PropiedadesConRelaciones[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+export default async function ListadoPropiedadsPage() {
 
-
-    useEffect(() => {
-        async function fetchPropiedades() {
-            const data = await getPropiedades();
-            setPropiedades(data);
-            setIsLoading(false); // Cambiar el estado de carga a falso una vez que los datos se cargan
-        }
-        fetchPropiedades();
-    }, []);
+    const data = await getPropiedades();
 
     return (
         <>
@@ -27,19 +12,11 @@ export default function ListadoPropiedadsPage() {
                 <div>
                     <Headers>Listado de Propiedades</Headers>
                 </div>
-                <div>
-                    <ButtonGoBack />
-                </div>
             </div>
             <div className='mt-10'>
-                {isLoading ? (
-                    <div className="text-center text-3xl font-bold">
-                        <Loading />
-                        {/* Puedes Incluir en el componente Loading un spinner si lo prefieres */}
-                    </div>
-                ) : (
-                    <PropiedadesTable data={propiedades} />
-                )}
+
+                <PropiedadesTable data={data} />
+
             </div>
 
         </>

@@ -95,20 +95,22 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     useEffect(() => {
         async function checkMesHabilitado() {
 
-            if (formValues.tipoIndice === 'IPC' && formValues.mesesRestaActualizar === 0) {
-                const mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
-
+            if (formValues.tipoIndice === 'IPC') {
+                let mesHabilitado = true
+                if (formValues.mesesRestaActualizar === 0) {
+                    mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
+                }
                 if (mesHabilitado) {
                     const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
                     setFormValues({
                         montoTotal: montoCalculado,
-                        estadoReciboId: 2   // Seteamos el "estado" como GENERADO
+                        // estadoReciboId: 2   // Seteamos el "estado" como GENERADO
                     })
                 } else {
                     setFormValues({
-                        montoTotal: formValues.montoAnterior,
-                        estadoReciboId: 1   // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
-                                            // correspondiente al mes a cobrar
+                        montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
+                        estadoReciboId: 1   // correspondiente al mes a cobrar 
+                                            
                     })
                 }
             } else {
@@ -299,7 +301,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                     <label
                         className="text-slate-800 font-bold"
                         htmlFor="montoTotal"
-                    >Monto Recibido :</label>
+                    >Monto a Recibir :</label>
                     <input
                         id="montoTotal"
                         type="text"
@@ -367,7 +369,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                         htmlFor="luz"
                     >Luz :</label>
                     <input
-                        id="expenluzsluzas"
+                        id="luz"
                         type="checkbox"
                         name="luz"
                         className="align-middle ml-2"

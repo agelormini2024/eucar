@@ -37,9 +37,6 @@ export default async function EditPropiedadPage({ params }: { params: { id: stri
                 <div>
                     <Headers>Editar Propiedad: {propiedad.descripcion}</Headers>
                 </div>
-                <div>
-                    <ButtonGoBack />
-                </div>
             </div>
             <div>
             <EditPropiedadForm>

@@ -1,6 +1,4 @@
-import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
-import Heading from '@/components/ui/Heading'
 import React from 'react'
 
 export default function RecibosPage() {
@@ -8,17 +6,11 @@ export default function RecibosPage() {
           <>
               <div className="flex justify-between">
                   <div>
-                      <Headers>Administración de Alquileres</Headers>
+                      <Headers>Administración de Recibos</Headers>
+                      <h1 className='text-6xl font-bold text-gray-800 mt-10' > Sin uso Aún</h1>
                   </div>
-                  <div>
-                      <ButtonGoBack />
-                  </div>
-  
               </div>
-              <div>
-                  <Heading />
-              </div>
-          </>
+         </>
       )
   
 }

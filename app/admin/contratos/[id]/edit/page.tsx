@@ -1,6 +1,5 @@
 import ContratoForm from "@/components/contratos/ContratoForm"
 import EditContratoForm from "@/components/contratos/EditContratoForm"
-import ButtonGoBack from "@/components/ui/ButtonGoBack"
 import Headers from "@/components/ui/Headers"
 import { prisma } from "@/src/lib/prisma"
 import { Contrato } from "@prisma/client"
@@ -63,9 +62,6 @@ export default async function EditContratoPage({ params }: { params: { id: strin
             <div className="flex justify-between">
                 <div>
                     <Headers>Editar Contrato: {contrato?.descripcion}</Headers>
-                </div>
-                <div>
-                    <ButtonGoBack />
                 </div>
             </div>
             <div>

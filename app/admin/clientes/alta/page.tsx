@@ -1,6 +1,5 @@
 import AddClienteForm from '@/components/clientes/AddClienteForm'
 import ClienteForm from '@/components/clientes/ClienteForm'
-import ButtonGoBack from '@/components/ui/ButtonGoBack'
 import Headers from '@/components/ui/Headers'
 
 export default function AltaClientePage() {
@@ -10,9 +9,6 @@ export default function AltaClientePage() {
 
                 <div>
                     <Headers>Alta de Cliente</Headers>
-                </div>
-                <div>
-                    <ButtonGoBack />
                 </div>
             </div>
             <div>

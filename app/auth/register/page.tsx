@@ -1,10 +1,13 @@
 "use client"
 import { useForm } from "react-hook-form"
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { set } from "zod";
 
 export default function RegisterPage() {
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const [error, setError] = useState<string | null>(null);
 
     const onSubmit = handleSubmit(async data => {
 
@@ -12,7 +15,7 @@ export default function RegisterPage() {
             alert("Las contraseñas no coinciden");
             return;
         }
-        // Aquí puedes enviar los datos al servidor o procesarlos como necesites
+        // Enviar los datos al servidor
         const res = await fetch('/api/auth/register', {
             method: 'POST',
             body: JSON.stringify(data),
@@ -20,28 +23,23 @@ export default function RegisterPage() {
                 'Content-Type': 'application/json',
             },
         })
-
+        
         if (!res.ok) {
-            const errorText = await res.text();
-            alert(`Error al registrar el usuario: ${errorText}`);
+            const resJSON = await res.json();
+            setError(resJSON.error)
             return;
         }if (res.ok && res.status === 201) {
             router.push('/auth/login'); // Redirigir al login después del registro
             return;
         }
 
-        const resJSON = await res.json();
-        if (resJSON.error) {
-            alert(resJSON.error);
-            return;
-        }
-
-        // Aquí podrías redirigir al usuario o limpiar el formulario
-        console.log("Usuario registrado:", resJSON);
     })
     return (
         <div className="h-[clac(100vh - 7rem)] flex items-center justify-center">
             <form onSubmit={onSubmit} className="mt-20 w-1/4 bg-white p-5 rounded-lg shadow-lg">
+
+                {error && <p className="bg-red-700 text-center p-2 text-white font-black mb-4">{error}</p>}
+
                 <h1 className="text-2xl font-bold mb-4">Registrarse</h1>
                 <label
                     className="block mb-2 text-sm font-bold text-gray-700"

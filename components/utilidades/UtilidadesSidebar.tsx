@@ -1,4 +1,3 @@
-import Logo from '../ui/Logo'
 import UtilidadesRoute from './UtilidadesRoute'
 
 const menuItems = [
@@ -9,8 +8,6 @@ export default function UtilidadesSidebar() {
     
     return (
         <>
-            <Logo />
-
             <div>
                 <div className="space-y-3">
                     <p className="mt-10 uppercase font-bold text-gray-600 text-center">Navegación</p>

@@ -1,3 +1,4 @@
+"use server"
 import { prisma } from "@/src/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -19,8 +20,8 @@ export async function GET(request: Request, context: { params: { id: string } })
         if (!estadoRecibo) {
             return NextResponse.json({ error: "Estado de recibo no encontrado" }, { status: 404 });
         }
-
-        return NextResponse.json(estadoRecibo);
+        const res = NextResponse.json(estadoRecibo);
+        return res
     } catch (error) {
         console.error("Error fetching estado de recibo:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

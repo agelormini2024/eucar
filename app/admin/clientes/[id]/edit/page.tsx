@@ -1,6 +1,5 @@
 import ClienteForm from "@/components/clientes/ClienteForm";
 import EditClienteForm from "@/components/clientes/EditClienteForm";
-import ButtonGoBack from "@/components/ui/ButtonGoBack";
 import Headers from "@/components/ui/Headers";
 import { prisma } from "@/src/lib/prisma"
 import { notFound } from "next/navigation";
@@ -34,9 +33,6 @@ export default async function EditClientePage({ params }: { params: { id: string
             <div className='flex justify-between'>
                 <div>
                     <Headers>Editar Cliente: {cliente.apellido + ' ' + cliente.nombre}</Headers>
-                </div>
-                <div>
-                    <ButtonGoBack />
                 </div>
             </div>
             <div>

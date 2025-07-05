@@ -1,11 +1,14 @@
+import Logo from "@/components/ui/Logo";
+
+
 export default function RootLayout({
     children,
-  }: Readonly<{
+}: Readonly<{
     children: React.ReactNode;
-  }>) {
-    return(
+}>) {
+    return (
         <>
             {children}
         </>
     )
-  }  
+}  

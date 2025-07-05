@@ -18,13 +18,14 @@ export function calculaImporteRecibo(contrato: Contrato) {
     }
 
     let montoCalculado = 0
+    console.log('Meses a actualizar:', contrato)
     if (contrato.mesesRestaActualizar !== 0) { // 
         montoCalculado = contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo
     } else {
         montoCalculado = importeCalculado(contrato.montoAlquilerUltimo)
     }
 
-
+console.log('Monto calculado:', montoCalculado, 'Tipo de índice:', contrato.tipoIndiceId, 'Meses a actualizar:', contrato.mesesRestaActualizar)
     return {
         montoCalculado
     }

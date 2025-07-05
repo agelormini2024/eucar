@@ -1,4 +1,3 @@
-import Logo from '../ui/Logo'
 import ClientesRoute from './ClientesRoute'
 
 
@@ -11,7 +10,6 @@ const menuPropiedades = [
 export default function ClientesSideBar() {
     return (
         <>
-            <Logo />
             <div className='space-y-3'>
                 <p className='mt-10 uppercase font-bold text-gray-600 text-center'>Navegación</p>
                 <div className='p-5 px-10'>

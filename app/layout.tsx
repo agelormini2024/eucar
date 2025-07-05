@@ -1,34 +1,43 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import NavBar from "@/components/ui/NavBar";
+import Logo from "@/components/ui/Logo";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "SOARES PARENTE PROPIEDADES",
-  description: "Bienes raíces",
+    title: "SOARES PARENTE PROPIEDADES",
+    description: "Bienes raíces",
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-100`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-100`}
+            >
+                <div className="flex justify-between items-center px-5">
+                    <Logo />
+                    <h1 className="text-4xl font-bold text-red-800" >Administracion de Alquileres</h1>
+                    <div>
+                        <NavBar />
+                    </div>
+                </div>
+                {children}
+            </body>
+        </html>
+    );
 }

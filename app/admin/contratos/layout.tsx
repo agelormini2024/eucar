@@ -13,7 +13,7 @@ export default function RootLayout({
                     <AdminAlquileresSidebar />
                 </aside>
 
-                <main className="md:flex-1 md:h-screen md:overflow-y-scroll bg-gray-50 p-5">
+                <main className="md:flex-1 md:h-screen md:overflow-y-scroll bg-slate-50 p-5">
                     {children}
                 </main>
             </div>

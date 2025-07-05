@@ -19,7 +19,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del contrato
-                        className="bg-red-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500"
+                        className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
                     >
                         Editar
                     </Link>
@@ -33,7 +33,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
-                        className="bg-blue-800 text-white px-4 py-2 font-bold rounded hover:bg-blue-500"
+                        className="bg-orange-400 text-white px-4 py-2 font-bold rounded hover:bg-orange-600 transition-colors duration-400"
                     >
                         Recibo
                     </Link>
@@ -65,6 +65,14 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 header: "Propiedad", // Título de la columna
                 accessorFn: (row) => `${row.propiedad.calle} ${row.propiedad.numero} - ${row.propiedad.piso} "${row.propiedad.departamento}"`, // Combina los valores de calle y número
                 Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
+            },
+            {
+                id: "montoAlquilerInicial",
+                header: "Alquiler Inicial",
+                accessorFn: (row) => formatCurrency(row.montoAlquilerInicial ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado

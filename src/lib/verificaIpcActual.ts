@@ -11,5 +11,5 @@ export async function verificaIpcActual(fecha: string) {
         where: { annoMes: mesAnterior } // Reemplazar el parámetro fecha por el que corresponda 
     })
 
-    return result ? true : false;
+    return result ? true : false
 }
