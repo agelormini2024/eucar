@@ -35,6 +35,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
 
         const result = ReciboSchema.safeParse(data)
 
+
         if (!result.success) {
             result.error.issues.forEach(issue => {
                 toast.error(issue.message)
@@ -45,16 +46,15 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
         /**-------------------- Aqui generar el recibo -------------------*/
         const response = await createRecibo(result.data)
 
-        if (response?.errors){
+        if (response?.errors) {
             response.errors.forEach(issue => {
                 toast.error(issue.message)
             })
             return
         }
 
-        toast.success("Recibo Generado correctamente")
-        router.push('/admin/contratos/list?toast=success',  )
-        // resetForm()
+        // toast.success("Recibo Generado correctamente") El mensaje de éxito se maneja en la página de destino
+        router.push('/admin/contratos/list?toast=success',)
         /**--------------------------------------------------------------*/
     }
 

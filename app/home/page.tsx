@@ -7,7 +7,7 @@ export default function homePage() {
         <>
             <div className="relative bg-cover bg-center bg-no-repeat h-screen" style={{ backgroundImage: "url('exterior.jpg')" }}>
 
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-100 to-transparent">
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-transparent">
 
                     <main >
                         <div className="md:w-full">

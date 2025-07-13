@@ -7,7 +7,7 @@ export default function UtilidadesPage() {
         <>
             <div className="flex justify-between">
                 <div>
-                    <Headers>Administración de Alquileres</Headers>
+                    <Headers>Utilidades</Headers>
                 </div>
             </div>
         </>

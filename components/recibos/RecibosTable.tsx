@@ -3,6 +3,7 @@ import { useMemo } from "react"
 import { RecibosConRelaciones } from "@/src/types"
 import { formatCurrency, formatFecha } from "@/src/utils"
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table"
+import Link from "next/link"
 
 
 type RecibosTableProps = {
@@ -12,8 +13,37 @@ export default function RecibosTable({ data }: RecibosTableProps) {
 
     const columns = useMemo<MRT_ColumnDef<RecibosConRelaciones>[]>(
         () => [
-// className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
-
+            // className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+            {
+                id: "imprimirRecibo", // ID único para la columna
+                header: "Acciones",
+                Cell: ({ row }) => (
+                    <Link
+                        href={`${row.original.id}/imprimir`}
+                        className="bg-red-800 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+                    >
+                        Imprimir
+                    </Link>
+                ),
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
+            {
+                id: "generarRecibo", // ID único para la columna
+                header: "Recibos",
+                Cell: ({ row }) =>
+                    row.original.montoTotal === 0 ? (
+                        <Link
+                            href={`../recibos/alta/${row.original.contratoId}`}
+                            className="bg-orange-400 text-white px-4 py-2 font-bold rounded hover:bg-orange-600 transition-colors duration-400"
+                        >
+                            Generar
+                        </Link>
+                    ) : null
+                ,
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
             {
                 id: "cliente", // ID único para la columna
                 header: "Cliente", // Título de la columna
@@ -40,7 +70,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado
-             },
+            },
             {
                 id: "fechaGenerado",
                 header: "Generado",

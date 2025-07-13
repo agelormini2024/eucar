@@ -1,6 +1,6 @@
 <svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
   <!-- Elementos geométricos con efecto 3D -->
-  <g transform="translate(110, 20)">
+  <g transform="translate(120, 20)">
     <!-- Primer elemento -->
     <g>
       <!-- Cara lateral derecha roja -->

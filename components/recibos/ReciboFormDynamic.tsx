@@ -1,11 +1,11 @@
 "use client"
+import { useEffect, useState } from "react";
 import { calculaImporteRecibo } from "@/src/lib/calculaImporteRecibo";
 import { verificaIpcActual } from "@/src/lib/verificaIpcActual";
 import { Contrato, EstadoReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { formatCurrency } from "@/src/utils";
 import { Recibo } from "@prisma/client";
-import { useEffect, useState } from "react";
 
 type ReciboFormDynamicProps = {
 
@@ -35,6 +35,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         setFormValues({
             contratoId: contrato.id,
             montoAnterior: contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo,
+            tipoContratoId: contrato.tipoContratoId,
             tipoContrato: contrato.tipoContrato.descripcion,
             clientePropietario: `${contrato.clientePropietario.apellido} ${contrato.clientePropietario.nombre}`,
             clienteInquilino: `${contrato.clienteInquilino.apellido} ${contrato.clienteInquilino.nombre}`,
@@ -45,8 +46,13 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             mesesRestaActualizar: contrato.mesesRestaActualizar
         })
 
-        // Traer el estado del Recibo
-        const result = await fetch(`/api/recibos/estadoRecibo/${formValues.estadoReciboId}`).then(res => res.json())
+    }
+
+    // Traer el estado del Recibo
+
+    async function cargarEstadoRecibo() {
+        const formValuesEstadoRecibo = formValues.estadoReciboId // Por defecto, si no hay estado, se usa el ID 1 (PENDIENTE)
+        const result = await fetch(`/api/recibos/estadoRecibo/${formValuesEstadoRecibo}`).then(res => res.json())
         const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
         if (estadoRecibo) {
             setFormValues({ estadoRecibo: estadoRecibo.descripcion })
@@ -86,37 +92,32 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                 observaciones: recibo.observaciones || ''
             })
         }
+        cargarEstadoRecibo()
+
     }, [recibo, setFormValues])
 
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
-    // TODO: En función de checkMesHabilitado, determinar si el Recibo es 
-    // Provisorio o Final ( estado: PENDIENTE ó GENERADO )
-
+    // TODO: verificar si es necesario tipoIndice ICL
     useEffect(() => {
         async function checkMesHabilitado() {
 
-            if (formValues.tipoIndice === 'IPC') {
-                let mesHabilitado = true
-                if (formValues.mesesRestaActualizar === 0) {
-                    mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
-                }
-                if (mesHabilitado) {
-                    const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
-                    setFormValues({
-                        montoTotal: montoCalculado,
-                        // estadoReciboId: 2   // Seteamos el "estado" como GENERADO
-                    })
-                } else {
-                    setFormValues({
-                        montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
-                        estadoReciboId: 1   // correspondiente al mes a cobrar 
-                                            
-                    })
-                }
+            let mesHabilitado = true
+            if (formValues.mesesRestaActualizar === 0 && formValues.tipoIndice === 'IPC') { // TODO: verificar si es necesario tipoIndice ICL
+                mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
+            }
+            if (mesHabilitado) {
+                const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+                setFormValues({
+                    montoTotal: montoCalculado,
+                })
             } else {
-                setFormValues({ estadoReciboId: 2 })
+                setFormValues({
+                    montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
+                    estadoReciboId: 1   // correspondiente al mes a cobrar 
+                })
             }
         }
+
         checkMesHabilitado()
     }, [formValues.contratoId])
 

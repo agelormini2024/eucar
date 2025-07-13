@@ -151,11 +151,11 @@ export const ReciboSchema = z.object({
     contratoId: z.number().min(1, { message: "Debe selecionar un contrato...." }),
     estadoReciboId: z.number().min(1, { message: "Es obligatorio un estado" }),
     fechaPendiente: z.string().min(1, { message: "La fecha del Estado pendiente es obligatoria" }),
-    fechaGenerado: z.string().optional(),
-    fechaImpreso: z.string().optional(),
+    fechaGenerado: z.string().nullable().optional(),
+    fechaImpreso: z.string().nullable().optional(),
     fechaAnulado: z.string().optional(),
     montoAnterior: z.number().min(1, { message: "Es obligatorio el Monto Anterior" }),
-    montoTotal: z.number().min(1, { message: "Es obligatorio el Monto Total" }),
+    montoTotal: z.number(),
     expensas: z.boolean().default(false),
     abl: z.boolean().default(false),
     aysa: z.boolean().default(false),
@@ -166,7 +166,18 @@ export const ReciboSchema = z.object({
         .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
         .optional(),
 
-})
+}).refine((data) => {
+        // Solo validar si estadoReciboId !== 1
+        if (data.estadoReciboId !== 1) {
+            return data.montoTotal > 0;
+        }
+        return true; 
+    },
+    {
+        message: "El Monto Total es obligatorio",
+        path: ["montoTotal"],
+    }
+);
 
 export const EstadoReciboSchema = z.object({
     id: z.number(),
@@ -222,7 +233,7 @@ export const ContratoSchemaApi = z.object({
     "descripcion": z.string(),
     "fechaInicio": z.coerce.date(),
     "fechaVencimiento": z.coerce.date(),
-    "cantidadMesesDuracion": z.number(),
+    "cantidadMesesDuracion": z.number().min(1, { message: "La duración de este contrato está en 0 (cero) es muy probable que esté vencido" }),
     "mesesRestaActualizar": z.number(),
     "diaMesVencimiento": z.number(),
     "clienteIdPropietario": z.number(),

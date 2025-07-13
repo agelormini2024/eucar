@@ -19,29 +19,40 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del contrato
-                        className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+                        className="bg-slate-600 text-white px-4 py-2 font-bold rounded hover:bg-red-600 transition-colors duration-400"
                     >
                         Editar
                     </Link>
                 ),
-                muiTableHeadCellProps: { style: { textAlign: "center" } },
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
-            }, 
+            },
             {
                 id: "generarRecibo", // ID único para la columna
                 header: "Recibos",
-                Cell: ({ row }) => (
-                    <Link
-                        href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
-                        className="bg-orange-400 text-white px-4 py-2 font-bold rounded hover:bg-orange-600 transition-colors duration-400"
-                    >
-                        Recibo
-                    </Link>
-                ),
-                muiTableHeadCellProps: { style: { textAlign: "center" } },
+                Cell: ({ row }) =>
+                    row.original.recibos.length > 0 ? null :
+                        (<Link
+                            href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
+                            className="bg-red-800 text-white px-4 py-2 font-bold rounded hover:bg-red-600 transition-colors duration-400"
+                        >
+                            Generar
+                        </Link>
+                        ),
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
-            },
 
+            },
+            {
+                accessorKey: "mesesRestaActualizar",
+                header: "Meses p / Actualizar",
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+            },
+            {
+                accessorKey: "cantidadMesesDuracion",
+                header: "Meses /  Vencimiento",
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+            },
             {
                 id: "clientePropietario", // ID único para la columna
                 header: "Propietario", // Título de la columna
@@ -71,7 +82,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             },
             {
                 id: "montoAlquilerInicial",
-                header: "Alquiler Inicial",
+                header: "Alquiler  /  Inicial",
                 accessorFn: (row) => formatCurrency(row.montoAlquilerInicial ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
@@ -79,7 +90,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             },
             {
                 id: "montoAlquilerUltimo",
-                header: "Ultimo Alquiler",
+                header: "Ultimo.  /  Alquiler",
                 accessorFn: (row) => formatCurrency(row.montoAlquilerUltimo ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
@@ -87,7 +98,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             },
             {
                 id: "fechaInicio",
-                header: "Fecha inicio",
+                header: "Fecha     /  inicial",
                 accessorFn: (row) => formatFecha(row.fechaInicio),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
@@ -95,7 +106,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             },
             {
                 id: "fechaVencimiento",
-                header: "Fecha Vto",
+                header: "Fecha  /  Vencimiento",
                 accessorFn: (row) => formatFecha(row.fechaVencimiento),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
@@ -109,6 +120,11 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             {
                 accessorKey: "tipoIndice.nombre",
                 header: "Indice",
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+            },
+            {
+                accessorKey: "descripcion",
+                header: "Descripción",
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             }
         ],

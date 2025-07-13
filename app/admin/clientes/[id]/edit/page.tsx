@@ -4,7 +4,7 @@ import Headers from "@/components/ui/Headers";
 import { prisma } from "@/src/lib/prisma"
 import { notFound } from "next/navigation";
 
-// This is a server component
+// Server component
 async function getClienteById(id: number) {
     const cliente = await prisma.cliente.findUnique({
         where: {

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -22,6 +22,7 @@
     "bcrypt": "^6.0.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
+    "jspdf": "^3.0.1",
     "material-react-table": "^3.2.1",
     "next": "^15.2.4",
     "next-auth": "^4.24.11",
