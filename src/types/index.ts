@@ -109,6 +109,50 @@ export const selectContratoPropietario = {
         },
     }
 } as const
+
+export const selectContratoInquilino = {
+    include: {
+        clienteInquilino: {
+            select: {
+                apellido: true,
+                nombre: true,
+                cuit: true,
+            }
+        },
+    }
+} as const
+
+export const consultaRecibos = {
+        include: {
+            contrato: {
+                include: {
+                    clienteInquilino: {
+                        select: {
+                            apellido: true,
+                            nombre: true,
+                            cuit: true,
+                        }
+                    },
+                    clientePropietario: {
+                        select: {
+                            apellido: true,
+                            nombre: true,
+                            cuit: true,
+                        }
+                    },
+                    propiedad: {
+                        select: {
+                            calle: true,
+                            numero: true,
+                            piso: true,
+                            departamento: true,
+                        }
+                    },
+                }
+            }
+        }
+    } as const
+
 //--------------------------------------------------------
 
 export type Ipc = z.infer<typeof IpcSchema>;

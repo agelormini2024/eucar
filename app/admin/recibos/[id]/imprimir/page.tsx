@@ -1,7 +1,6 @@
+import ImprimirRecibo from "@/components/recibos/ImprimirRecibo";
 import { prisma } from "@/src/lib/prisma";
 import { notFound } from "next/navigation";
-
-
 
 async function getReciboById(id: number) {
     const recibo = await prisma.recibo.findUnique({
@@ -41,17 +40,19 @@ async function getReciboById(id: number) {
     }
 
     return recibo;
-
 }
 
 export default async function ImprimirReciboPage({ params }: { params: { id: string } }) {
 
-    const { id } = params; // Asegúrate de que params sea awaited si es necesario
-    
-    const recibo = await getReciboById(+id);
+    const { id } = await params; // Asegúrate de que params sea awaited si es necesario
 
-    
+    const recibo = await getReciboById(+id)
+
     return (
-        <div>{recibo.contrato.clienteInquilino.apellido } </div>
+        <>
+            {/* <div className="text-2xl">{recibo.contrato.clienteInquilino.apellido} </div> */}
+            <ImprimirRecibo recibo={recibo} />
+        </>
+
     )
 }
