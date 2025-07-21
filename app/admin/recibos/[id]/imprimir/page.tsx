@@ -49,8 +49,7 @@ export default async function ImprimirReciboPage({ params }: { params: { id: str
     const recibo = await getReciboById(+id)
 
     return (
-        <>
-            {/* <div className="text-2xl">{recibo.contrato.clienteInquilino.apellido} </div> */}
+        <>            
             <ImprimirRecibo recibo={recibo} />
         </>
 

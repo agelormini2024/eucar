@@ -8,17 +8,9 @@ export default async function ListadoPropiedadsPage() {
 
     return (
         <>
-            <div className='flex justify-between mt-10'>
-                <div>
-                    <Headers>Listado de Propiedades</Headers>
-                </div>
-            </div>
-            <div className='mt-10'>
+            <Headers>Listado de Propiedades</Headers>
 
-                <PropiedadesTable data={data} />
-
-            </div>
-
+            <PropiedadesTable data={data} />
         </>
     )
 }

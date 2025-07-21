@@ -13,7 +13,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
 
     const columns = useMemo<MRT_ColumnDef<RecibosConRelaciones>[]>(
         () => [
-            // className="bg-slate-500 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+
             {
                 id: "imprimirRecibo", // ID único para la columna
                 header: "Acciones",

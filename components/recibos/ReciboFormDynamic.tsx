@@ -48,7 +48,43 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
 
     }
 
-    // Traer el estado del Recibo
+    async function checkMesHabilitado() {
+
+        let mesHabilitado = true
+        if (formValues.mesesRestaActualizar === 0 && formValues.tipoIndice === 'IPC') { // TODO: verificar si es necesario tipoIndice ICL
+            mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
+        }
+        if (mesHabilitado) {
+            const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+            setFormValues({
+                montoTotal: montoCalculado,
+            })
+        } else {
+            setFormValues({
+                montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
+                estadoReciboId: 1   // correspondiente al mes a cobrar 
+            })
+        }
+    }
+
+    // Efectos
+    useEffect(() => {
+        cargarContrato();
+    }, []);
+
+    useEffect(() => {
+        if (formValues.tipoIndice) {
+            checkMesHabilitado();
+        }
+    }, [formValues.tipoIndice]);
+
+    useEffect(() => {
+        return () => {
+            resetForm();
+        };
+    }, [resetForm]);
+
+    //--------------------- Traer el estado del Recibo -------------------
 
     async function cargarEstadoRecibo() {
         const formValuesEstadoRecibo = formValues.estadoReciboId // Por defecto, si no hay estado, se usa el ID 1 (PENDIENTE)
@@ -60,17 +96,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             console.log('No se encontró el Estado para el recibo  !!!')
         }
     }
-
-    // Efectos
-    useEffect(() => {
-        cargarContrato()
-    }, [])
-
-    useEffect(() => {
-        return () => {
-            resetForm();
-        };
-    }, [resetForm]);
+    // ---------------------------------------------------------------------
 
     useEffect(() => {
         if (recibo) {
@@ -97,29 +123,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     }, [recibo, setFormValues])
 
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
-    // TODO: verificar si es necesario tipoIndice ICL
-    useEffect(() => {
-        async function checkMesHabilitado() {
-
-            let mesHabilitado = true
-            if (formValues.mesesRestaActualizar === 0 && formValues.tipoIndice === 'IPC') { // TODO: verificar si es necesario tipoIndice ICL
-                mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
-            }
-            if (mesHabilitado) {
-                const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
-                setFormValues({
-                    montoTotal: montoCalculado,
-                })
-            } else {
-                setFormValues({
-                    montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
-                    estadoReciboId: 1   // correspondiente al mes a cobrar 
-                })
-            }
-        }
-
-        checkMesHabilitado()
-    }, [formValues.contratoId])
 
     useEffect(() => {
         if (selectContrato?.abl !== formValues.abl ||

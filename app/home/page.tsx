@@ -1,5 +1,4 @@
 import MenuBar from "@/components/home/MenuBar";
-import Logo from "@/components/ui/Logo";
 
 
 export default function homePage() {
@@ -9,12 +8,8 @@ export default function homePage() {
 
                 <div className="absolute inset-0 bg-gradient-to-b from-slate-100 to-transparent">
 
-                    <main >
-                        <div className="md:w-full">
-                            <div >
-                                <MenuBar />
-                            </div>
-                        </div>
+                    <main className="md:w-full">
+                        <MenuBar />
                     </main>
                 </div>
 

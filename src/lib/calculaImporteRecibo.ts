@@ -3,6 +3,7 @@ import { Contrato } from "../schema";
 export function calculaImporteRecibo(contrato: Contrato) {
 
     const importeCalculado = (monto: number) => {
+        console.log("🚀 ~ importeCalculado ~ monto:", monto)
         const tipoIndice = contrato.tipoIndiceId
 
         let result = 0
@@ -20,14 +21,18 @@ export function calculaImporteRecibo(contrato: Contrato) {
     // Si el contrato tiene meses restantes para actualizar, se calcula el monto del alquiler inicial o el último
     // Si no tiene meses restantes, se calcula el importe según el tipo de índice
     // Si el monto del alquiler último es 0, se usa el monto del alquiler inicial
+    const { montoAlquilerInicial, montoAlquilerUltimo } = contrato
+    const montoAlquiler = montoAlquilerUltimo === 0 ? montoAlquilerInicial : montoAlquilerUltimo
     let montoCalculado = 0
     if (contrato.mesesRestaActualizar !== 0) { // 
-        montoCalculado = contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo
+        montoCalculado = montoAlquiler // TODO: Crear una variable para el monto base
+
+        // montoCalculado = contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo
     } else {
-        montoCalculado = importeCalculado(contrato.montoAlquilerUltimo)
+        montoCalculado = importeCalculado(montoAlquiler)
     }
 
-    console.log('Monto calculado:', montoCalculado, 'Tipo de índice:', contrato.tipoIndiceId, 'Meses a actualizar:', contrato.mesesRestaActualizar)
+    console.log('Monto calculado:', montoCalculado, 'montoAlquilerInicial:', montoAlquilerInicial, 'montoAlquilerUltimo:', montoAlquilerUltimo)
     return {
         montoCalculado
     }

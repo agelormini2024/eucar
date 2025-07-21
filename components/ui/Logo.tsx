@@ -3,13 +3,15 @@ import Link from "next/link";
 
 export default function Logo() {
     return (
-        <div className="flex justify-center mt-1">
+
+        <div className="flex mt-1">
             <Link href="/">
-                <div className="relative w-60 h-40">
+                <div className="relative w-56 h-36">
                     <Image
                         fill
                         alt="Logotipo"
                         src='/logo.svg'
+                        priority={true}
                     />
                 </div>
             </Link>

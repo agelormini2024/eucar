@@ -3,7 +3,7 @@
 export default function Headers({ children }: { children: React.ReactNode }) {
     return (
         <h1
-            className='text-2xl font-semibold'
+            className='text-3xl font-semibold text-red-800'
         >
             {children}
         </h1>

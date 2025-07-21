@@ -2,7 +2,7 @@
 import { consultaRecibos } from "@/src/types";
 import { Prisma } from "@prisma/client";
 import jsPDF from "jspdf";
-import { useEffect } from "react";
+import ButtonGoBack from "../ui/ButtonGoBack";
 
 type ImprimirReciboProps = {
     recibo: Prisma.ReciboGetPayload<typeof consultaRecibos>
@@ -11,6 +11,9 @@ type ImprimirReciboProps = {
 export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
 
     const generarPdf = async (id: number) => {
+
+        // TODO: Aquí modificar la fechaImpreso en la tabla Recibo
+
         const pdfContent = new jsPDF()
         pdfContent.text(`Recibo ID: ${recibo.id}`, 10, 10)
         pdfContent.text(`Cliente: ${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre}`, 10, 20)
@@ -27,30 +30,43 @@ export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
 
     return (
         <>
-            <section className="flex flex-col space-y-4">
-                <div className="text-3xl font-bold justify-end">
-                    {recibo.estadoReciboId === 1 ? "RECIBO PROVISORIO" : "RECIBO OFICIAL"}
-                </div><span className="text-2xl"> {`Número: ${recibo.id} `} </span>
-                <div className="text-2xl font-bold">
-                    {`${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre} ( ${recibo.contrato.clienteInquilino.cuit} )`}
-                </div>
-                <div className="text-2xl">
-                    Propiedad:  <span className="font-bold">{`${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`}</span>
-                </div>
-                <div className="text-2xl">
-                    Monto Total: <span className="font-bold">{` $ ${recibo.montoTotal ? recibo.montoTotal : recibo.montoAnterior}`}</span>
-                </div>
-                <div className="text-2xl">
-                    {recibo.fechaGenerado ? new Date(recibo.fechaGenerado).toLocaleDateString() : 'N/A'}
-                </div>
-                <div className="text-2xl">{recibo.fechaImpreso ? new Date(recibo.fechaImpreso).toLocaleDateString() : 'N/A'}</div>
-            </section>
 
-            <button className="mt-4 bg-blue-500 text-white px-4 py-2 font-bold rounded hover:bg-blue-700 transition-colors duration-400"
-                onClick={() => generarPdf(recibo.id)}
-            >
-                Generar PDF
-            </button>
+
+            <div className="max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-lg p-10 flex flex-col space-y-4 mb-10">
+
+                <section className="flex flex-row justify-between mb-8 bg-white p-4 rounded-lg shadow-lg">
+                    <h1 className="text-2xl font-bold">
+                        {recibo.estadoReciboId === 1 ? "RECIBO PROVISORIO" : "RECIBO OFICIAL"}
+                    </h1>
+                    <h2 className="text-xl">Número:</h2><span className="text-2xl font-bold">{recibo.id.toString().padStart(8, '0')} </span>
+                </section>
+
+                <section className="space-y-4 bg-white p-4 rounded-lg shadow-lg">
+                    <div className="text-2xl font-bold mt-4">
+                        {`${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre} ( ${recibo.contrato.clienteInquilino.cuit} )`}
+                    </div>
+                    <div className="text-2xl">
+                        Propiedad:  <span className="font-bold">{`${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`}</span>
+                    </div>
+                    <div className="text-2xl">
+                        Monto Total: <span className="font-bold">{` $ ${recibo.montoTotal ? recibo.montoTotal : recibo.montoAnterior}`}</span>
+                    </div>
+                    <div className="text-2xl">
+                        Fecha: <span className="font-bold">
+                            {recibo.fechaGenerado ? new Date(recibo.fechaGenerado).toLocaleDateString() : 'N/A'}
+                        </span>
+                    </div>
+                    <div className="text-2xl">
+                        {recibo.fechaImpreso ? new Date(recibo.fechaImpreso).toLocaleDateString() : 'N/A'}
+                    </div>
+                </section>
+
+                <button className="mt-4 uppercase text-lg bg-red-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+                    onClick={() => generarPdf(recibo.id)}
+                >
+                    Generar PDF
+                </button>
+            </div>
         </>
     )
 }

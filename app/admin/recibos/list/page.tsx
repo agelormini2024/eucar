@@ -8,7 +8,7 @@ export default async function ListadoRecibosPage() {
 
     return (
         <>
-            <div className='flex justify-between mt-10'>
+            <div className='flex justify-between'>
                 <div>
                     <Headers>Listado de Recibos</Headers>
                 </div>

@@ -8,5 +8,6 @@ export default function ClientesPage() {
                     <Headers>Administración de Clientes</Headers>
                 </div>
             </div>
-       </>
-    )}
+        </>
+    )
+}
