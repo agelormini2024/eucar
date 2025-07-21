@@ -3,7 +3,6 @@ import { Contrato } from "../schema";
 export function calculaImporteRecibo(contrato: Contrato) {
 
     const importeCalculado = (monto: number) => {
-        console.log("🚀 ~ importeCalculado ~ monto:", monto)
         const tipoIndice = contrato.tipoIndiceId
 
         let result = 0
@@ -32,7 +31,7 @@ export function calculaImporteRecibo(contrato: Contrato) {
         montoCalculado = importeCalculado(montoAlquiler)
     }
 
-    console.log('Monto calculado:', montoCalculado, 'montoAlquilerInicial:', montoAlquilerInicial, 'montoAlquilerUltimo:', montoAlquilerUltimo)
+  
     return {
         montoCalculado
     }

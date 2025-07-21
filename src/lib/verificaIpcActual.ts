@@ -6,13 +6,9 @@ export async function verificaIpcActual(fecha: string) {
 
     const fechaAnterior = restarUnMes(fecha)
     const mesAnterior = fechaAnterior.substring(0, 7) + '-01'
-    
-    console.log("🚀 ~ verificaIpcActual ~ mesAnterior:", mesAnterior)
    
     const result = await prisma.ipc.findUnique({
         where: { annoMes: mesAnterior } // Reemplazar el parámetro fecha por el que corresponda 
     })
 
-    console.log("🚀 ~ verificaIpcActual ~ result:", result)
-    return result ? true : false
 }
