@@ -11,7 +11,7 @@ export default function RootLayout({
         <>
         <div>
 
-            <header className="flex flex-row justify-between items-center mx-8">
+            <header className="flex flex-row justify-between items-center mx-8 uppercase">
                 <Logo />
                 <Headers>Soares Parente Propiedades</Headers>
             </header>

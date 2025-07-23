@@ -122,39 +122,47 @@ export const selectContratoInquilino = {
     }
 } as const
 
-export const consultaRecibos = {
-        include: {
-            contrato: {
-                include: {
-                    clienteInquilino: {
-                        select: {
-                            apellido: true,
-                            nombre: true,
-                            cuit: true,
-                        }
-                    },
-                    clientePropietario: {
-                        select: {
-                            apellido: true,
-                            nombre: true,
-                            cuit: true,
-                        }
-                    },
-                    propiedad: {
-                        select: {
-                            calle: true,
-                            numero: true,
-                            piso: true,
-                            departamento: true,
-                        }
-                    },
-                }
-            }
-        }
-    } as const
-
 //--------------------------------------------------------
 
+export type ReciboConRelaciones = {
+    id: number;
+    contratoId: number;
+    estadoReciboId: number;
+    fechaPendiente: string; // ISO string (Date serializado)
+    fechaGenerado: string | null;
+    fechaImpreso: string | null;
+    fechaAnulado: string | null;
+    montoAnterior: number;
+    montoTotal: number;
+    observaciones?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    expensas: boolean;
+    abl: boolean;
+    aysa: boolean;
+    luz: boolean;
+    gas: boolean;
+    otros: boolean;
+    contrato: {
+        clienteInquilino: {
+            apellido: string;
+            nombre: string;
+            cuit: string;
+        };
+        clientePropietario: {
+            apellido: string;
+            nombre: string;
+            cuit: string;
+        };
+        propiedad: {
+            calle: string;
+            numero: number;
+            piso: string | null;
+            departamento: string | null;
+        };
+    };
+};
+//---------------------------------------------------------
 export type Ipc = z.infer<typeof IpcSchema>;
 
 export type IpcMensual = {

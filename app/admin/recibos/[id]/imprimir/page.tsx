@@ -1,57 +1,34 @@
 import ImprimirRecibo from "@/components/recibos/ImprimirRecibo";
 import { prisma } from "@/src/lib/prisma";
-import { notFound } from "next/navigation";
-
-async function getReciboById(id: number) {
-    const recibo = await prisma.recibo.findUnique({
-        where: { id },
-        include: {
-            contrato: {
-                include: {
-                    clienteInquilino: {
-                        select: {
-                            apellido: true,
-                            nombre: true,
-                            cuit: true,
-                        }
-                    },
-                    clientePropietario: {
-                        select: {
-                            apellido: true,
-                            nombre: true,
-                            cuit: true,
-                        }
-                    },
-                    propiedad: {
-                        select: {
-                            calle: true,
-                            numero: true,
-                            piso: true,
-                            departamento: true,
-                        }
-                    },
-                }
-            }
-        }
-    });
-
-    if (!recibo) {
-        notFound()
-    }
-
-    return recibo;
-}
 
 export default async function ImprimirReciboPage({ params }: { params: { id: string } }) {
 
-    const { id } = await params; // Asegúrate de que params sea awaited si es necesario
+    // Actualizar fechaImpreso en la tabla recibos
 
-    const recibo = await getReciboById(+id)
+    if (!params.id || isNaN(Number(params.id))) {
+        return <div className="text-center py-10">ID inválido</div>;
+    }
 
-    return (
-        <>            
-            <ImprimirRecibo recibo={recibo} />
-        </>
+    try {
+        const recibo = await prisma.recibo.findFirst({
+            where: { id: Number(params.id) }
+        })
+        if (!recibo) {
+            return <div className="text-center py-10">Recibo no encontrado</div>;
+        }
+        if (recibo.estadoReciboId !== 3) {
+            const fechaImpreso = new Date().toISOString();
+            await prisma.recibo.update({
+                where: { id: Number(params.id) },
+                data: {
+                    fechaImpreso,
+                    estadoReciboId: 3 // Cambiar a "Impreso"
+                }
+            });
+        }
 
-    )
+    } catch (error) {
+        console.error("Error al actualizar la fecha de impresión:", error);
+    }
+    return <ImprimirRecibo reciboId={params.id} />;
 }

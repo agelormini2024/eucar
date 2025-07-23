@@ -1,36 +1,34 @@
 "use client";
-import { consultaRecibos } from "@/src/types";
-import { Prisma } from "@prisma/client";
-import jsPDF from "jspdf";
+import { useEffect, useState } from "react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import ButtonGoBack from "../ui/ButtonGoBack";
+import PDFRecibo from "./PDFRecibo";
+import { ReciboConRelaciones } from "@/src/types";
+import { formatCurrency, formatFecha } from "@/src/utils";
 
 type ImprimirReciboProps = {
-    recibo: Prisma.ReciboGetPayload<typeof consultaRecibos>
-}
+    reciboId: string;
+};
 
-export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
+export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
+    const [recibo, setRecibo] = useState<ReciboConRelaciones | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const generarPdf = async (id: number) => {
+    useEffect(() => {
+        async function fetchRecibo() {
+            setLoading(true);
+            const res = await fetch(`/api/recibos/imprimir/${reciboId}`);
+            const data = await res.json();
+            setRecibo(data);
+            setLoading(false);
+        }
+        fetchRecibo();
+    }, [reciboId]);
 
-        // TODO: Aquí modificar la fechaImpreso en la tabla Recibo
-
-        const pdfContent = new jsPDF()
-        pdfContent.text(`Recibo ID: ${recibo.id}`, 10, 10)
-        pdfContent.text(`Cliente: ${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre}`, 10, 20)
-        pdfContent.text(`Cuit: ${recibo.contrato.clienteInquilino.cuit}`, 10, 30)
-        pdfContent.text(`Propiedad: ${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`, 10, 40)
-        pdfContent.text(`Monto Total: ${recibo.montoTotal ? recibo.montoTotal : recibo.montoAnterior}`, 10, 50)
-        pdfContent.text(`Fecha Generado: ${recibo.fechaGenerado ? new Date(recibo.fechaGenerado).toLocaleDateString() : 'N/A'}`, 10, 60)
-        pdfContent.text(`Fecha Impreso: ${recibo.fechaImpreso ? new Date(recibo.fechaImpreso).toLocaleDateString() : 'N/A'}`, 10, 70)
-        // Mostrar el PDF en el navegador o descargarlo
-        pdfContent.save(`recibo-${recibo.id}.pdf`)
-
-        return recibo;
-    }
+    if (loading || !recibo) return <div className="text-center py-10">Cargando recibo...</div>;
 
     return (
         <>
-
 
             <div className="max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-lg p-10 flex flex-col space-y-4 mb-10">
 
@@ -42,30 +40,41 @@ export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
                 </section>
 
                 <section className="space-y-4 bg-white p-4 rounded-lg shadow-lg">
-                    <div className="text-2xl font-bold mt-4">
-                        {`${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre} ( ${recibo.contrato.clienteInquilino.cuit} )`}
+
+                    <div className="text-xl mt-4">
+                        Inquilino : <span className="text-2xl font-bold text-cyan-800">
+                            {`${recibo.contrato.clienteInquilino.apellido} ${recibo.contrato.clienteInquilino.nombre} ( ${recibo.contrato.clienteInquilino.cuit} )`}</span>
                     </div>
-                    <div className="text-2xl">
-                        Propiedad:  <span className="font-bold">{`${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`}</span>
+                    <div className="text-xl">
+                        Propiedad :  <span className="text-2xl font-bold text-cyan-800">{`${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`}</span>
                     </div>
-                    <div className="text-2xl">
-                        Monto Total: <span className="font-bold">{` $ ${recibo.montoTotal ? recibo.montoTotal : recibo.montoAnterior}`}</span>
+                    <div className="text-xl">
+                        Fecha Generado : <span className="text-2xl font-bold text-cyan-800">
+                            {recibo.fechaGenerado ? formatFecha(new Date(recibo.fechaGenerado)) : 'N/A'}
+                        </span>
                     </div>
-                    <div className="text-2xl">
-                        Fecha: <span className="font-bold">
-                            {recibo.fechaGenerado ? new Date(recibo.fechaGenerado).toLocaleDateString() : 'N/A'}
+                    <div className="text-xl">
+                        Fecha Impreso : <span className="text-2xl font-bold text-cyan-800">
+                            {recibo.fechaImpreso ? formatFecha(new Date(recibo.fechaImpreso)) : 'N/A'}
                         </span>
                     </div>
                     <div className="text-2xl">
-                        {recibo.fechaImpreso ? new Date(recibo.fechaImpreso).toLocaleDateString() : 'N/A'}
+                        Monto Total : <span className="font-bold text-3xl text-red-900">{`${recibo.montoTotal ? formatCurrency(recibo.montoTotal) : formatCurrency(recibo.montoAnterior)}`}</span>
                     </div>
+
                 </section>
 
-                <button className="mt-4 uppercase text-lg bg-red-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
-                    onClick={() => generarPdf(recibo.id)}
-                >
-                    Generar PDF
-                </button>
+                <div className="flex justify-between items-center">
+                    <PDFDownloadLink
+                        document={<PDFRecibo recibo={recibo} />}
+                        fileName={`recibo-${recibo.id}.pdf`}
+                        className="mt-4 uppercase bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400 cursor-pointer w-48"
+                    >
+                        {({ loading }) => (loading ? 'Cargando PDF...' : '   Descargar PDF')}
+                    </PDFDownloadLink>
+                    <ButtonGoBack />
+                </div>
+
             </div>
         </>
     )

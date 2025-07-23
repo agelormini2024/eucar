@@ -5,6 +5,9 @@ export async function getRecibos() {
 
     try {
         const recibos = await prisma.recibo.findMany({
+            orderBy: {
+                id: 'asc' 
+            },
             include: {
                 contrato: {
                     select: {

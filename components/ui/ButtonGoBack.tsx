@@ -12,7 +12,7 @@ export default function ButtonGoBack() {
             <div className="flex justify-end mt-5">
                 <button
                     onClick={() => router.back()}
-                    className="bg-red-800 hover:bg-red-600 text-white font-bold py-1 px-8 rounded"
+                    className="bg-red-800 hover:bg-red-600 text-white font-bold py-2 px-8 rounded"
                 >
                     Volver
                 </button>

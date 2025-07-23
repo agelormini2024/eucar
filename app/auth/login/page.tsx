@@ -62,14 +62,14 @@ export default function LoginPage() {
                     className="bg-red-700 text-white p-2 mt-4 rounded-md w-full font-bold text-xl hover:bg-red-500 transition-colors">
                     Iniciar Sesión
                 </button>
-                <p className="mt-4 text-center">
+                {/* <p className="mt-4 text-center">
                     ¿No tienes una cuenta? <a href="/auth/register"
                         className="text-red-900 text-sm font-bold hover:underline">Regístrate aquí</a>
                 </p>
                 <p className="mt-2 text-center">
                     <a href="/auth/forgot-password"
                         className="text-red-900 text-sm font-bold hover:underline">¿Olvidaste tu contraseña?</a>
-                </p>
+                </p> */}
             </form>
         </div>
     )

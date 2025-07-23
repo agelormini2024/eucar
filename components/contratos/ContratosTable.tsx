@@ -19,7 +19,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del contrato
-                        className="bg-slate-600 text-white px-4 py-2 font-bold rounded hover:bg-red-600 transition-colors duration-400"
+                        className="bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400"
                     >
                         Editar
                     </Link>
@@ -34,7 +34,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                     row.original.recibos.length > 0 ? null :
                         (<Link
                             href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
-                            className="bg-red-800 text-white px-4 py-2 font-bold rounded hover:bg-red-600 transition-colors duration-400"
+                            className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
                         >
                             Generar
                         </Link>

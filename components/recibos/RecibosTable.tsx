@@ -20,7 +20,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/imprimir`}
-                        className="bg-red-800 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400"
+                        className="bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400"
                     >
                         Imprimir
                     </Link>
@@ -35,7 +35,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                     row.original.montoTotal === 0 ? (
                         <Link
                             href={`../recibos/alta/${row.original.contratoId}`}
-                            className="bg-orange-400 text-white px-4 py-2 font-bold rounded hover:bg-orange-600 transition-colors duration-400"
+                            className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
                         >
                             Generar
                         </Link>
@@ -43,6 +43,14 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 ,
                 muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
+            {
+                id: "numeroRecibo", // ID único para la columna
+                header: "N° Recibo",
+                accessorFn: (row) => row.id.toString().padStart(8, '0'),
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
             },
             {
                 id: "cliente", // ID único para la columna
@@ -62,7 +70,6 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado
             },
-
             {
                 id: "montoTotal",
                 header: "Importe Alquiler",

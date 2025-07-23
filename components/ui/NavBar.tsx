@@ -26,12 +26,12 @@ export default async function NavBar() {
                                 Login
                             </Link>
                         </li>
-                        <li>
+                        {/* <li>
                             <Link href="/auth/register"
-                                className="text-red-900 font-bold hover:underline">
+                                className="text-red-900 font-bold hover:underline"                                >
                                 Registrarse
                             </Link>
-                        </li>
+                        </li> */}
                     </>
                 )
                 }
