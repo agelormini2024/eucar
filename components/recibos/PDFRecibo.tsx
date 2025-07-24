@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     },
     section: {
         margin: 10,
-        padding: 10,
+        padding: 30,
         flexGrow: 1
     }
 });

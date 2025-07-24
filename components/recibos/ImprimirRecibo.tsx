@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
 import ButtonGoBack from "../ui/ButtonGoBack";
 import PDFRecibo from "./PDFRecibo";
 import { ReciboConRelaciones } from "@/src/types";
@@ -27,10 +27,18 @@ export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
 
     if (loading || !recibo) return <div className="text-center py-10">Cargando recibo...</div>;
 
+    const handleOpenPdf = async () => {
+        if (!recibo) return;
+        const blob = await pdf(<PDFRecibo recibo={recibo} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+    };
+
+
     return (
         <>
 
-            <div className="max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-lg p-10 flex flex-col space-y-4 mb-10">
+            <div className="max-w-2xl mx-auto bg-orange-50 rounded-lg shadow-lg p-10 flex flex-col space-y-4 mb-10">
 
                 <section className="flex flex-row justify-between mb-8 bg-white p-4 rounded-lg shadow-lg">
                     <h1 className="text-2xl font-bold">
@@ -49,12 +57,12 @@ export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
                         Propiedad :  <span className="text-2xl font-bold text-cyan-800">{`${recibo.contrato.propiedad.calle} ${recibo.contrato.propiedad.numero} ${recibo.contrato.propiedad.piso} ${recibo.contrato.propiedad.departamento}`}</span>
                     </div>
                     <div className="text-xl">
-                        Fecha Generado : <span className="text-2xl font-bold text-cyan-800">
+                        Fecha Generado : <span className="text-xl font-bold text-cyan-800">
                             {recibo.fechaGenerado ? formatFecha(new Date(recibo.fechaGenerado)) : 'N/A'}
                         </span>
                     </div>
                     <div className="text-xl">
-                        Fecha Impreso : <span className="text-2xl font-bold text-cyan-800">
+                        Fecha Impreso : <span className="text-xl font-bold text-cyan-800">
                             {recibo.fechaImpreso ? formatFecha(new Date(recibo.fechaImpreso)) : 'N/A'}
                         </span>
                     </div>
@@ -65,13 +73,20 @@ export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
                 </section>
 
                 <div className="flex justify-between items-center">
-                    <PDFDownloadLink
+                    <button
+                        type="button"
+                        onClick={handleOpenPdf}
+                        className="mt-4 uppercase bg-slate-800 text-white px-4 py-2 font-bold rounded hover:bg-cyan-800 transition-colors duration-400 cursor-pointer w-48"
+                    >
+                        Imprimir PDF
+                    </button>
+                    {/* <PDFDownloadLink
                         document={<PDFRecibo recibo={recibo} />}
                         fileName={`recibo-${recibo.id}.pdf`}
-                        className="mt-4 uppercase bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-red-500 transition-colors duration-400 cursor-pointer w-48"
+                        className="mt-4 uppercase bg-slate-800 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 cursor-pointer w-48"
                     >
-                        {({ loading }) => (loading ? 'Cargando PDF...' : '   Descargar PDF')}
-                    </PDFDownloadLink>
+                        {({ loading }) => (loading ? 'Cargando PDF...' : 'Descargar PDF')}
+                    </PDFDownloadLink> */}
                     <ButtonGoBack />
                 </div>
 
