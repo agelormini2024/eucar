@@ -70,7 +70,7 @@ export async function createRecibo(data: unknown) {
                             mesesRestaActualizar: nuevoValorMeses,    // Decrementar "mesesRestaActualizar" y si es 0 se actualiza con lo que hay 
                             cantidadMesesDuracion: { decrement: 1 }  // en la tabla tipoContrato en "cantidadMesesActualizacion". 
                         }
-                    })                    
+                    })
                 }
                 await tx.recibo.create({ data: reciboData })
                 return { success: true };
@@ -91,24 +91,34 @@ export async function createRecibo(data: unknown) {
                     }
                 });
                 return { success: true };
+
             } else if (existeRecibo.estadoReciboId === 1 && reciboData.montoTotal === 0) { // "Pendiente"
 
                 return {
-                    errors: [{ message: "Todavía no están los Indices necesarios para generar el recibo." }]
+                    errors: [
+                        { message: "Todavía no están los Indices necesarios para generar el recibo." },
+                        { success: false }
+                    ]
+
                 }
 
             } else if (existeRecibo.estadoReciboId === 2) { // "GENERADO"
 
                 return {
-                    errors: [{ message: "Ya existe un recibo generado para este contrato." }]
+                    errors: [
+                        { message: "Ya existe un recibo generado para este contrato." }, 
+                        { success: false }
+                    ]
                 };
             }
-            return { success: false };
         });
 
         if (result?.errors) {
             return result;
         }
+        // Si todo sale bien, retornar el resultado exitoso
+        return result;
+
     } catch (error) {
         return {
             errors: [{ message: "Error en la transacción", detail: error }]

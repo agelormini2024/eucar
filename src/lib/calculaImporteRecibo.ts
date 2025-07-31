@@ -17,16 +17,16 @@ export function calculaImporteRecibo(contrato: Contrato) {
         return result
     }
 
-    // Si el contrato tiene meses restantes para actualizar, se calcula el monto del alquiler inicial o el último
+    // Si el contrato tiene meses restantes para actualizar, se toma el monto del último alquiler o el inicial en su defecto
     // Si no tiene meses restantes, se calcula el importe según el tipo de índice
     // Si el monto del alquiler último es 0, se usa el monto del alquiler inicial
+
     const { montoAlquilerInicial, montoAlquilerUltimo } = contrato
     const montoAlquiler = montoAlquilerUltimo === 0 ? montoAlquilerInicial : montoAlquilerUltimo
     let montoCalculado = 0
     if (contrato.mesesRestaActualizar !== 0) { // 
         montoCalculado = montoAlquiler // TODO: Crear una variable para el monto base
 
-        // montoCalculado = contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo
     } else {
         montoCalculado = importeCalculado(montoAlquiler)
     }

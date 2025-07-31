@@ -30,5 +30,6 @@ export default async function ImprimirReciboPage({ params }: { params: { id: str
     } catch (error) {
         console.error("Error al actualizar la fecha de impresión:", error);
     }
-    return <ImprimirRecibo reciboId={params.id} />;
+
+    return <ImprimirRecibo reciboId={await params.id} />;
 }

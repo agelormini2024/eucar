@@ -15,7 +15,7 @@ export async function buscarReciboMesActual(id: number) {
                 estadoReciboId: { not: 4 }, // Excluir "ANULADO"
                 fechaGenerado: {
                     gte: firstDay,
-                    lte: lastDay,
+                    lt: lastDay,
                 }
             },
             include: {
