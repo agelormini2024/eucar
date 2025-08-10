@@ -13,11 +13,20 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
     const params = useParams()
     const id = +params.id!
 
+    console.log("EditContratoForm - formValues:", formValues);
+
     useEffect(() => {
+        console.log("EditContratoForm montado");
         return () => {
-            resetForm() // // Limpia el estado global al desmontar el componente
+            console.log("EditContratoForm desmontado");
+            resetForm();
         }
-    }, [resetForm])
+    }, [resetForm]);
+
+    useEffect(() => {
+        console.log("EditContratoForm montado");
+    }, []);
+
 
     const handleSubmit = async (formData: FormData) => {
         const data = {
@@ -25,7 +34,7 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
             fechaInicio: formData.get('fechaInicio'),
             fechaVencimiento: formData.get('fechaVencimiento'),
             cantidadMesesDuracion: Number(formValues.cantidadMesesDuracion),
-            mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // *********
+            mesesRestaActualizar: Number(formValues.mesesRestaActualizar),
             diaMesVencimiento: Number(formValues.diaMesVencimiento),
             clienteIdPropietario: formValues.clienteIdPropietario,
             clienteIdInquilino: Number(formData.get('clienteIdInquilino')),
@@ -52,10 +61,10 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
             return
         }
 
-        const response = await updateContrato( result.data, id )
+        const response = await updateContrato(result.data, id)
 
-        if(response?.errors) {
-            response.errors.forEach( issue => {
+        if (response?.errors) {
+            response.errors.forEach(issue => {
                 toast.error(issue.message)
             })
             return

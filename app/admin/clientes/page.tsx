@@ -1,6 +1,6 @@
 import Headers from "@/components/ui/Headers";
 
-export default function ClientesPage() {
+export default async function ClientesPage() {
     return (
         <>
             <div className="flex justify-between">

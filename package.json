@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "jest"
+        "test": "jest",
+        "postinstall": "prisma generate"
     },
     "prisma": {
         "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -26,7 +27,7 @@
         "fs-extra": "^11.3.0",
         "jspdf": "^3.0.1",
         "material-react-table": "^3.2.1",
-        "next": "^15.2.4",
+        "next": "^15.4.6",
         "next-auth": "^4.24.11",
         "node-xlsx": "^0.24.0",
         "os": "^0.1.2",

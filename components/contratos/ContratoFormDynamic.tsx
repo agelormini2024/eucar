@@ -1,9 +1,9 @@
 "use client"
 import { getMesesRestanActualizar } from "@/src/lib/buscarMesesRestanActualizar";
-import { ClientePropietarioSchemaApi, ClienteSchema } from "@/src/schema";
+import { ClientePropietarioSchemaApi } from "@/src/schema";
 import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const DIA_MES_VENCIMIENTO = 10
 
@@ -19,13 +19,18 @@ type ContratoFormDynamicProps = {
 export default function ContratoFormDynamic({ clientes, propiedades, tiposContrato, tiposIndice, contrato }: ContratoFormDynamicProps) {
     const [propietario, setPropietario] = useState({ apellido: '', nombre: '', cuit: '' })
     const { formValues, setFormValues, resetForm } = useContratoFormStore()
+    const isEdicion = !!contrato;
+
     useEffect(() => {
         return () => {
-            resetForm();
+            resetForm()
         };
     }, [resetForm]);
 
     useEffect(() => {
+
+        console.log("ContratoFormDynamic - contrato recibido:", contrato);
+
         if (contrato) {
             setFormValues({
                 descripcion: contrato.descripcion || '',
@@ -55,48 +60,76 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     //-------------------------------------------------------------------------------------------//
     //              calcular la cantidad de meses de duración del contrato
     //-------------------------------------------------------------------------------------------//
-    const calcularCantidadMesesDuracion = () => {
+    // const calcularCantidadMesesDuracion = () => {
+    //     const fechaInicio = new Date(formValues.fechaInicio);
+    //     const fechaVencimiento = new Date(formValues.fechaVencimiento);
+
+    //     if (isNaN(fechaInicio.getTime()) || isNaN(fechaVencimiento.getTime())) {
+    //         // Si alguna de las fechas no es válida, no hacemos nada
+    //         return;
+    //     }
+
+    //     // Calcular la diferencia en años y meses
+    //     const diferenciaAnios = fechaVencimiento.getFullYear() - fechaInicio.getFullYear();
+    //     const diferenciaMeses = fechaVencimiento.getMonth() - fechaInicio.getMonth();
+    //     // Total de meses
+    //     const cantidadMeses = diferenciaAnios * 12 + diferenciaMeses;
+    //     if (
+    //         formValues.cantidadMesesDuracion !== cantidadMeses ||
+    //         formValues.diaMesVencimiento !== DIA_MES_VENCIMIENTO
+    //     ) {
+    //         setFormValues({
+    //             cantidadMesesDuracion: cantidadMeses,
+    //             diaMesVencimiento: DIA_MES_VENCIMIENTO
+    //         });
+    //     }
+    // }
+    const calcularCantidadMesesDuracion = useCallback(() => {
         const fechaInicio = new Date(formValues.fechaInicio);
         const fechaVencimiento = new Date(formValues.fechaVencimiento);
 
         if (isNaN(fechaInicio.getTime()) || isNaN(fechaVencimiento.getTime())) {
-            // Si alguna de las fechas no es válida, no hacemos nada
             return;
         }
 
-        // Calcular la diferencia en años y meses
         const diferenciaAnios = fechaVencimiento.getFullYear() - fechaInicio.getFullYear();
         const diferenciaMeses = fechaVencimiento.getMonth() - fechaInicio.getMonth();
-        // Total de meses
         const cantidadMeses = diferenciaAnios * 12 + diferenciaMeses;
 
-
-        setFormValues({
-            cantidadMesesDuracion: cantidadMeses,
-            diaMesVencimiento: DIA_MES_VENCIMIENTO
-        });
-    }
+        if (
+            formValues.cantidadMesesDuracion !== cantidadMeses ||
+            formValues.diaMesVencimiento !== DIA_MES_VENCIMIENTO
+        ) {
+            setFormValues({
+                cantidadMesesDuracion: cantidadMeses,
+                diaMesVencimiento: DIA_MES_VENCIMIENTO
+            });
+        }
+    }, [formValues.fechaInicio, formValues.fechaVencimiento, formValues.cantidadMesesDuracion, formValues.diaMesVencimiento, setFormValues]);
 
     useEffect(() => {
         if (formValues.fechaInicio && formValues.fechaVencimiento) {
             calcularCantidadMesesDuracion();
         }
-    }, [formValues.fechaInicio, formValues.fechaVencimiento]);
+    }, [formValues.fechaInicio, formValues.fechaVencimiento, calcularCantidadMesesDuracion]);
 
     //-------------------------------------------------------------------------------------------//
     //              Traer los meses de actualización del contrato
     //-------------------------------------------------------------------------------------------//
-    async function fetchMesesRestanActualizar() {
+    const fetchMesesRestanActualizar = useCallback(async () => {
         if (!formValues.tipoContratoId) return;
+
         const tipoContrato = await getMesesRestanActualizar(formValues.tipoContratoId);
         setFormValues({
             mesesRestaActualizar: tipoContrato?.cantidadMesesActualizacion ?? 0
         });
-    }
+    }, [formValues.tipoContratoId, setFormValues]);
 
     useEffect(() => {
+        if (!isEdicion) return;
+        if (!formValues.tipoContratoId) return;
         fetchMesesRestanActualizar()
-    }, [formValues.tipoContratoId])
+    }, [formValues.tipoContratoId, contrato])
 
     //-----------------------------------------------------------------------------------------//
     // Se busca el propietario de la propiedad del contrato 
@@ -120,7 +153,8 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     }
 
     useEffect(() => {
-        if (formValues.propiedadId) {
+        if (formValues.propiedadId && formValues.propiedadId !== 0) {
+            if (!isEdicion) return;
             buscarPropietario();
         }
     }, [formValues.propiedadId]);

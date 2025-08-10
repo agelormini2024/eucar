@@ -1,7 +1,7 @@
 import Headers from '@/components/ui/Headers'
 import React from 'react'
 
-export default function RecibosPage() {
+export default async function RecibosPage() {
       return (
           <>
               <div className="flex justify-between">

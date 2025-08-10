@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import ButtonGoBack from "../ui/ButtonGoBack";
 import PDFRecibo from "./PDFRecibo";
 import { ReciboConRelaciones } from "@/src/types";

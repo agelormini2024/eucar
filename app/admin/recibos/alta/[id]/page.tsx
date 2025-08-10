@@ -4,9 +4,13 @@ import ButtonGoBack from "@/components/ui/ButtonGoBack"
 import Headers from "@/components/ui/Headers"
 import { buscarReciboMesActual } from "@/src/lib/buscarRecibo"
 
-export default async function AddReciboPage({ params }: { params: { id: string } }) {
+interface SegmentParams {
+    id: string
+}
 
-    const { id } = await params // Asegúrate de que params sea awaited si es necesario
+export default async function AddReciboPage({ params }: { params: Promise<(SegmentParams)> }) {
+
+    const { id } = await params // Asegurarse de que params sea awaited si es necesario
     const contrato = Number(id)
     const recibo = await buscarReciboMesActual(contrato)
 

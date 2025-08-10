@@ -30,7 +30,7 @@ export default function MostrarIndices() {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
-                    {tipoContrato && tipoContrato.map((tipo: any) => (
+                    {tipoContrato && tipoContrato.map((tipo: TipoContrato) => (
                         <tr key={tipo.id}>
                             <td className="whitespace-nowrap py-4 pl-4 pr-20 text-sm font-bold text-gray-900 sm:pl-0 uppercase">
                                 {tipo.descripcion}

@@ -10,6 +10,8 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
     const router = useRouter();
     const { resetForm, formValues } = useContratoFormStore()
 
+    console.log("Valores del formulario:", formValues)
+    
     const handleSubmit = async (formData: FormData) => {
         // Creamos un objeto "data" para guardar los 
         // datos ingresados extrayendolos de FormData
@@ -34,10 +36,10 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             gas: formData.get('gas') === "on",
             otros: formData.get('otros') === "on"
         }
-        
+
         // Validar los datos con el esquema de contrato de Zod
         const result = ContratoSchema.safeParse(data)
-        
+
         if (!result.success) {
             result.error.issues.forEach(issue => {
                 toast.error(issue.message)
@@ -66,9 +68,9 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             <form
                 className="space-y-5"
                 onSubmit={(e) => {
-                    e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario                
+                    e.preventDefault()
                     const formData = new FormData(e.currentTarget); // Obtener los datos del formulario
-                    handleSubmit(formData); // Llamar a la función de envío
+                    handleSubmit(formData)
                 }}
             >
                 {children}

@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from 'next-auth/next'
 import ButtonLogout from "./ButtonLogout";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+import { authOptions } from "@/src/auth/options";
 
 export default async function NavBar() {
 

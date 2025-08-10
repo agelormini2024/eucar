@@ -1,4 +1,3 @@
-import ButtonGoBack from "@/components/ui/ButtonGoBack";
 import Logo from "@/components/ui/Logo";
 import UtilidadesSidebar from "@/components/utilidades/UtilidadesSidebar";
 

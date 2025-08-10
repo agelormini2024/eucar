@@ -1,5 +1,4 @@
 import IndicesForm from '@/components/utilidades/IndicesForm'
-import MostrarIndices from '@/components/utilidades/MostrarIndices'
 
 export default function IndicePage() {
     return (

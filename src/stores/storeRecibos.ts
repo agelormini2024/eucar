@@ -1,4 +1,3 @@
-import { estadoRecibo } from '@/prisma/data/estadoRecibo';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -60,7 +59,7 @@ export type RecibosFormState = {
 }
 
 const useRecibosFormStore = create<RecibosFormState>()(
-    devtools((set, get) => ({
+    devtools((set) => ({
         formValues: {
             contratoId: 0,
             estadoReciboId: 1, // 1 = Pendiente
@@ -87,12 +86,20 @@ const useRecibosFormStore = create<RecibosFormState>()(
             tipoIndice: "",
             mesesRestaActualizar: 0
         },
-        setFormValues: (values) => set((state) => ({
-            formValues: {
-                ...state.formValues,
-                ...values
-            }
-        })),
+        setFormValues: (values) => set((state) => {
+            const newFormValues = { ...state.formValues, ...values };
+            const isEqual = Object.entries(newFormValues).every(
+                ([key, value]) => state.formValues[key as keyof typeof state.formValues] === value
+            );
+            if (isEqual) return {};
+            return { formValues: newFormValues };
+        }),
+        // setFormValues: (values) => set((state) => ({
+        //     formValues: {
+        //         ...state.formValues,
+        //         ...values
+        //     }
+        // })),
         resetForm: () => set(() => ({
             formValues: {
                 contratoId: 0,

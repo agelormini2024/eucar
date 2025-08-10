@@ -92,7 +92,7 @@ console.log('Entramos a ICL .........', anno)
             datos , // Reemplaza por el valor real
         }, { status: 200 })
 
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    } catch (error) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 })
     }
 }

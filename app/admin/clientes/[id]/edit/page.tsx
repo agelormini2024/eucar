@@ -22,9 +22,13 @@ async function getClienteById(id: number) {
     return cliente
 }
 
-export default async function EditClientePage({ params }: { params: { id: string } }) {
+interface SegmentParams {
+    id: string
+}
 
-    const { id } = await params // Asegúrate de que params sea awaited si es necesario
+export default async function EditClientePage({ params }: { params: Promise<(SegmentParams)> }) {
+
+    const { id } = await params
 
     const cliente = await getClienteById(+id)
 
@@ -36,11 +40,11 @@ export default async function EditClientePage({ params }: { params: { id: string
                 </div>
             </div>
             <div>
-            <EditClienteForm>
-                <ClienteForm 
-                    cliente={cliente}
-                />
-            </EditClienteForm>
+                <EditClienteForm>
+                    <ClienteForm
+                        cliente={cliente}
+                    />
+                </EditClienteForm>
             </div>
         </>
     )

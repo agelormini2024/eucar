@@ -1,6 +1,5 @@
 import EditPropiedadForm from "@/components/propiedades/EditPropiedadForm"
 import PropiedadForm from "@/components/propiedades/PropiedadForm"
-import ButtonGoBack from "@/components/ui/ButtonGoBack"
 import Headers from "@/components/ui/Headers"
 import { prisma } from "@/src/lib/prisma"
 import { notFound } from "next/navigation"
@@ -24,10 +23,13 @@ async function getPropiedadById(id: number) {
 
     return propiedad
 }
+interface SegmentParams {
+    id: string
+}
 
-export default async function EditPropiedadPage({ params }: { params: { id: string } }) {
+export default async function EditPropiedadPage({ params }: { params: Promise<(SegmentParams)> }) {
     
-    const { id } = await params; // Asegúrate de que params sea awaited si es necesario
+    const { id } = await params
     const propiedad = await getPropiedadById(+id)
 
     return (

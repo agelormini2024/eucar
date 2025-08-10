@@ -23,7 +23,7 @@ export default function ContratosAlquilerPage() {
             params.delete("toast");
             router.replace(`?${params.toString()}`);
         }
-    }, [searchParams])
+    }, [searchParams, router])
 
     useEffect(() => {
         async function fetchContratos() {

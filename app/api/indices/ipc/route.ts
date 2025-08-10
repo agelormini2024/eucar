@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
             inflacionMensual,
             inflacionAcumulada,
         })
-    } catch (error: any) {
-        return NextResponse.json({ error: 'Error al obtener IPC mensual' }, { status: 500 })
+    } catch (error) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 })
     }
 }

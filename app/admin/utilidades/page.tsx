@@ -1,7 +1,7 @@
 import Headers from "@/components/ui/Headers";
 
 
-export default function UtilidadesPage() {
+export default async function UtilidadesPage() {
     
     return (
         <>

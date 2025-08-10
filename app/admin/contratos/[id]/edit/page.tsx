@@ -50,10 +50,13 @@ async function getContratoById({id}: getContratoByIdProps) {
 
     return contrato
 }
+interface SegmentParams {
+    id: string
+}
 
-export default async function EditContratoPage({ params }: { params: { id: string } }) {
+export default async function EditContratoPage({ params }: { params: Promise<(SegmentParams)> }) {
 
-    const { id } = await params // Asegúrate de que params sea awaited si es necesario
+    const { id } = await params 
 
     const contrato = await getContratoById({ id: +id })
 

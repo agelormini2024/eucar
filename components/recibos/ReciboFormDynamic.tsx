@@ -21,18 +21,13 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     const setHabilitarBoton = useRecibosFormStore((state) => state.setHabilitarBoton)
 
     async function cargarContrato() {
-
         setFormValues({
             expensas: false,
             abl: false,
             luz: false,
             gas: false,
             aysa: false,
-            otros: false
-        })
-
-        setSelectContrato(contrato)
-        setFormValues({
+            otros: false,
             contratoId: contrato.id,
             montoAnterior: contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo,
             tipoContratoId: contrato.tipoContratoId,
@@ -43,9 +38,10 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                 ? `${contrato.propiedad.calle || ""}  ${contrato.propiedad.numero || ""} - Piso: ${contrato.propiedad.piso || ""} - Dpto: ${contrato.propiedad.departamento || ""}`
                 : "",
             tipoIndice: contrato.tipoIndice.nombre,
-            mesesRestaActualizar: contrato.mesesRestaActualizar
-        })
+            mesesRestaActualizar: contrato.mesesRestaActualizar,
 
+        });
+        setSelectContrato(contrato);
     }
 
     async function checkMesHabilitado() {
@@ -70,13 +66,14 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     // Efectos
     useEffect(() => {
         cargarContrato();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [contrato]);
 
     useEffect(() => {
         if (formValues.tipoIndice) {
             checkMesHabilitado();
         }
-    }, [formValues.tipoIndice]);
+    }, [formValues.tipoIndice, checkMesHabilitado]);
 
     useEffect(() => {
         return () => {
@@ -119,29 +116,36 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             })
         }
         cargarEstadoRecibo()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    }, [recibo, setFormValues])
+    }, [recibo])
 
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
 
     useEffect(() => {
-        if (selectContrato?.abl !== formValues.abl ||
+        if (!selectContrato) return;
+        if (
+            selectContrato.abl !== formValues.abl ||
             selectContrato.aysa !== formValues.aysa ||
             selectContrato.expensas !== formValues.expensas ||
             selectContrato.luz !== formValues.luz ||
             selectContrato.gas !== formValues.gas ||
             selectContrato.otros !== formValues.otros
         ) {
-            setHabilitarBoton(false)
+            setHabilitarBoton(false);
         } else {
-            setHabilitarBoton(true)
+            setHabilitarBoton(true);
         }
-    }, [formValues.abl,
-    formValues.aysa,
-    formValues.expensas,
-    formValues.luz,
-    formValues.gas,
-    formValues.otros])
+    }, [
+        selectContrato,
+        formValues.abl,
+        formValues.aysa,
+        formValues.expensas,
+        formValues.luz,
+        formValues.gas,
+        formValues.otros,
+        setHabilitarBoton
+    ]);
     //------Fin de Efectos---------
 
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
