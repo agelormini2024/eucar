@@ -23,7 +23,7 @@ export default function AddContratoForm({ children }: { children: React.ReactNod
             mesesRestaActualizar: Number(formValues.mesesRestaActualizar), // Valores tomados del estado global "storeContratos"
             diaMesVencimiento: Number(formValues.diaMesVencimiento), // Valores tomados del estado global "storeContratos"
             clienteIdPropietario: formValues.clienteIdPropietario,
-            clienteIdInquilino: Number(formData.get('clienteIdInquilino')),
+            clienteIdInquilino: Number(formValues.clienteIdInquilino), // Cambiado para tomar del store
             propiedadId: Number(formValues.propiedadId), // Cambiado para tomar del store
             tipoContratoId: Number(formData.get('tipoContratoId')),
             tipoIndiceId: Number(formData.get('tipoIndiceId')),

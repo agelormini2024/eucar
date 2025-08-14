@@ -26,6 +26,10 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     const [showPropModal, setShowPropModal] = useState(false);
     const [searchProp, setSearchProp] = useState("");
     
+    // Estado para el modal y búsqueda de inquilino
+    const [showInquilinoModal, setShowInquilinoModal] = useState(false);
+    const [searchInquilino, setSearchInquilino] = useState("");
+    
     // Filtro de propiedades basado en la búsqueda
     const filteredPropiedades = useMemo(() => {
         if (!searchProp) return propiedades;
@@ -33,6 +37,16 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             p.descripcion.toLowerCase().includes(searchProp.toLowerCase())
         );
     }, [searchProp, propiedades]);
+
+    // Filtro de clientes (inquilinos) basado en la búsqueda
+    const filteredClientes = useMemo(() => {
+        if (!searchInquilino) return clientes;
+        return clientes.filter((c) =>
+            c.nombre.toLowerCase().includes(searchInquilino.toLowerCase()) ||
+            c.apellido.toLowerCase().includes(searchInquilino.toLowerCase()) ||
+            c.cuit.toLowerCase().includes(searchInquilino.toLowerCase())
+        );
+    }, [searchInquilino, clientes]);
 
     useEffect(() => {
         return () => {
@@ -338,27 +352,58 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
 
                 {/* ------------------------------------------------------------------------ */}
                 <div className="space-y-2">
-                    <label className="text-slate-800 font-bold"
-                        htmlFor="clienteIdInquilino">
+                    <label className="text-slate-800 font-bold" htmlFor="clienteIdInquilino">
                         Inquilino :
                     </label>
-                    <select
-                        className="block w-full p-3 bg-slate-200"
-                        id="clienteIdInquilino"
-                        name="clienteIdInquilino"
-                        onChange={handleInputChange}
-                        value={formValues.clienteIdInquilino}
+                    <button
+                        type="button"
+                        className="block w-full p-3 bg-slate-200 text-left rounded hover:bg-slate-300 transition-colors"
+                        onClick={() => setShowInquilinoModal(true)}
                     >
-                        <option value="">-- Seleccione --</option>
-                        {clientes.map((cliente) => (
-                            <option
-                                key={cliente.id}
-                                value={cliente.id}
-                            >
-                                {cliente.cuit} ----- {cliente.nombre} {cliente.apellido}
-                            </option>
-                        ))}
-                    </select>
+                        {formValues.clienteIdInquilino
+                            ? (() => {
+                                const cliente = clientes.find((c) => c.id === formValues.clienteIdInquilino);
+                                return cliente ? `${cliente.cuit} ----- ${cliente.nombre} ${cliente.apellido}` : 'Seleccionar inquilino';
+                            })()
+                            : 'Seleccionar inquilino'}
+                    </button>
+                    
+                    {/* Modal de selección de inquilino */}
+                    <Modal isOpen={showInquilinoModal} onClose={() => setShowInquilinoModal(false)}>
+                        <h3 className="text-lg font-bold mb-4 text-slate-800">Seleccionar Inquilino</h3>
+                        <div className="mb-4">
+                            <input
+                                type="text"
+                                placeholder="Buscar por nombre, apellido o CUIT..."
+                                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+                                value={searchInquilino}
+                                onChange={(e) => setSearchInquilino(e.target.value)}
+                            />
+                        </div>
+                        <div className="max-h-60 overflow-y-auto">
+                            {filteredClientes.length === 0 && (
+                                <div className="text-gray-500 text-center py-4">
+                                    No se encontraron clientes.
+                                </div>
+                            )}
+                            {filteredClientes.map((cliente) => (
+                                <div
+                                    key={cliente.id}
+                                    className={`p-3 cursor-pointer hover:bg-slate-100 rounded border-b last:border-b-0 transition-colors ${
+                                        formValues.clienteIdInquilino === cliente.id ? 'bg-slate-200 font-bold' : ''
+                                    }`}
+                                    onClick={() => {
+                                        setFormValues({ clienteIdInquilino: cliente.id });
+                                        setShowInquilinoModal(false);
+                                        setSearchInquilino(""); // Limpiar búsqueda al seleccionar
+                                    }}
+                                >
+                                    <div className="font-medium">{cliente.nombre} {cliente.apellido}</div>
+                                    <div className="text-sm text-gray-600">CUIT: {cliente.cuit}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </Modal>
                 </div>
                 <div className="space-y-2">
                     <label className="text-slate-800 font-bold"

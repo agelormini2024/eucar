@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 export default function AddPropiedadForm({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { resetForm } = usePropiedadFormStore()
+    const { resetForm, formValues } = usePropiedadFormStore()
 
     const handleSubmit = async (formData: FormData) => {
         const data = {
@@ -33,7 +33,7 @@ export default function AddPropiedadForm({ children }: { children: React.ReactNo
             imagen: '', //formData.get('imagen'),
             tipoPropiedadId: Number(formData.get('tipoPropiedadId')),
             observaciones: formData.get('observaciones'),
-            clienteId: Number(formData.get('clienteId')),
+            clienteId: Number(formValues.clienteId), // Cambiado para tomar del store
             activo: formData.get('activo') === 'on' ? true : false,
         }
         // Validar el formulario

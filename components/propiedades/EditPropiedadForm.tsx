@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 export default function EditPropiedadForm({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { resetForm } = usePropiedadFormStore()
+    const { resetForm, formValues } = usePropiedadFormStore()
     const params = useParams();
     const id = +params.id! // Asegúrate de que params sea awaited si es necesario
 
@@ -43,7 +43,7 @@ export default function EditPropiedadForm({ children }: { children: React.ReactN
             imagen: '', //formData.get('imagen'),
             tipoPropiedadId: Number(formData.get('tipoPropiedadId')),
             observaciones: formData.get('observaciones'),
-            clienteId: Number(formData.get('clienteId')),
+            clienteId: Number(formValues.clienteId), // Cambiado para tomar del store
             activo: formData.get('activo') === 'on' ? true : false,
         }
         // Validar el formulario
