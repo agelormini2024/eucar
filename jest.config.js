@@ -14,4 +14,11 @@ module.exports = {
         "^@/(.*)$": "<rootDir>/$1",
     },
     moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+    watchPathIgnorePatterns: [
+        "<rootDir>/\\.next/",
+        "<rootDir>/public/",
+        "<rootDir>/prisma/migrations/",
+        "<rootDir>/backup.sql",
+        "<rootDir>/node_modules/"
+    ]
 };

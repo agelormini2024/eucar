@@ -32,8 +32,7 @@ export default function IndicesForm() {
 
     async function handleSubmit() {
         try {
-            await ipc()
-            await icl()
+            await Promise.all([ipc(), icl()]); // Ejecutar ambas en paralelo
             refresh() // <-- refresca la tabla automáticamente
         } catch (error) {
             console.error(error)

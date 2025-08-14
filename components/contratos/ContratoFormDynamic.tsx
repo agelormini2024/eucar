@@ -3,7 +3,8 @@ import { getMesesRestanActualizar } from "@/src/lib/buscarMesesRestanActualizar"
 import { ClientePropietarioSchemaApi } from "@/src/schema";
 import { useContratoFormStore } from "@/src/stores/storeContratos";
 import { Cliente, Contrato, Propiedad, TipoContrato, TipoIndice } from '@prisma/client'
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import Modal from "../ui/Modal";
 
 const DIA_MES_VENCIMIENTO = 10
 
@@ -20,6 +21,18 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     const [propietario, setPropietario] = useState({ apellido: '', nombre: '', cuit: '' })
     const { formValues, setFormValues, resetForm } = useContratoFormStore()
     const isEdicion = !!contrato;
+
+    // Estado para el modal y búsqueda de propiedad
+    const [showPropModal, setShowPropModal] = useState(false);
+    const [searchProp, setSearchProp] = useState("");
+    
+    // Filtro de propiedades basado en la búsqueda
+    const filteredPropiedades = useMemo(() => {
+        if (!searchProp) return propiedades;
+        return propiedades.filter((p) =>
+            p.descripcion.toLowerCase().includes(searchProp.toLowerCase())
+        );
+    }, [searchProp, propiedades]);
 
     useEffect(() => {
         return () => {
@@ -126,17 +139,23 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     }, [formValues.tipoContratoId, setFormValues]);
 
     useEffect(() => {
-        if (!isEdicion) return;
         if (!formValues.tipoContratoId) return;
         fetchMesesRestanActualizar()
-    }, [formValues.tipoContratoId, contrato])
+    }, [formValues.tipoContratoId, fetchMesesRestanActualizar])
 
     //-----------------------------------------------------------------------------------------//
     // Se busca el propietario de la propiedad del contrato 
     //-----------------------------------------------------------------------------------------//
     async function buscarPropietario() {
+        console.log("Buscando propietario para propiedad:", formValues.propiedadId);
         const result = await fetch(`/api/contratos/propiedad/${formValues.propiedadId}`).then(res => res.json())
-        const { data: clientePropietario } = ClientePropietarioSchemaApi.safeParse(result) // Validar contrato con zod
+        console.log("Respuesta de la API:", result);
+        const parsed = ClientePropietarioSchemaApi.safeParse(result);
+        console.log("Resultado del safeParse:", parsed);
+
+        const { data: clientePropietario } = parsed;
+
+        // const { data: clientePropietario } = ClientePropietarioSchemaApi.safeParse(result) // Validar contrato con zod
 
         if (clientePropietario) {
             setFormValues({
@@ -154,7 +173,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
 
     useEffect(() => {
         if (formValues.propiedadId && formValues.propiedadId !== 0) {
-            if (!isEdicion) return;
+            // if (!isEdicion) return;
             buscarPropietario();
         }
     }, [formValues.propiedadId]);
@@ -200,27 +219,54 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             </div>
 
             <div className="space-y-2">
-                <label className="text-slate-800 font-bold"
-                    htmlFor="propiedadId">
+                <label className="text-slate-800 font-bold" htmlFor="propiedadId">
                     Propiedad :
                 </label>
-                <select
-                    className="block w-full p-3 bg-slate-200"
-                    id="propiedadId"
-                    name="propiedadId"
-                    onChange={handleInputChange}
-                    value={formValues.propiedadId}
+                <button
+                    type="button"
+                    className="block w-full p-3 bg-slate-200 text-left rounded hover:bg-slate-300 transition-colors"
+                    onClick={() => setShowPropModal(true)}
                 >
-                    <option value="">-- Seleccione --</option>
-                    {propiedades.map((propiedad) => (
-                        <option
-                            key={propiedad.id}
-                            value={propiedad.id}
-                        >
-                            {propiedad.descripcion}
-                        </option>
-                    ))}
-                </select>
+                    {formValues.propiedadId
+                        ? propiedades.find((p) => p.id === formValues.propiedadId)?.descripcion || 'Seleccionar propiedad'
+                        : 'Seleccionar propiedad'}
+                </button>
+                
+                {/* Modal de selección de propiedad */}
+                <Modal isOpen={showPropModal} onClose={() => setShowPropModal(false)}>
+                    <h3 className="text-lg font-bold mb-4 text-slate-800">Seleccionar Propiedad</h3>
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            placeholder="Buscar propiedad..."
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+                            value={searchProp}
+                            onChange={(e) => setSearchProp(e.target.value)}
+                        />
+                    </div>
+                    <div className="max-h-60 overflow-y-auto">
+                        {filteredPropiedades.length === 0 && (
+                            <div className="text-gray-500 text-center py-4">
+                                No se encontraron propiedades.
+                            </div>
+                        )}
+                        {filteredPropiedades.map((propiedad) => (
+                            <div
+                                key={propiedad.id}
+                                className={`p-3 cursor-pointer hover:bg-slate-100 rounded border-b last:border-b-0 transition-colors ${
+                                    formValues.propiedadId === propiedad.id ? 'bg-slate-200 font-bold' : ''
+                                }`}
+                                onClick={() => {
+                                    setFormValues({ propiedadId: propiedad.id });
+                                    setShowPropModal(false);
+                                    setSearchProp(""); // Limpiar búsqueda al seleccionar
+                                }}
+                            >
+                                {propiedad.descripcion}
+                            </div>
+                        ))}
+                    </div>
+                </Modal>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
@@ -274,31 +320,6 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                {/* ------------------------------------------------------------------------ */}
-                {/* <div className="space-y-2">
-                    <label className="text-slate-800 font-bold"
-                        htmlFor="clienteIdPropietario">
-                        Propiedatrio :
-                    </label>
-                    <select
-                        className="block w-full p-3 bg-slate-200"
-                        id="clienteIdPropietario"
-                        name="clienteIdPropietario"
-                        onChange={handleInputChange}
-                        value={formValues.clienteIdPropietario}
-                    >
-                        <option value="">-- Seleccione --</option>
-                        {clientes.map((cliente) => (
-                            <option
-                                key={cliente.id}
-                                value={cliente.id}
-                            >
-                                {cliente.cuit} ----- {cliente.nombre} {cliente.apellido}
-                            </option>
-                        ))}
-                    </select>
-                </div> */}
-
 
                 <div className="space-y-2">
                     <label className="text-slate-800 font-bold"
