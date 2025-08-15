@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from 'next-auth/next'
 import ButtonLogout from "./ButtonLogout";
 import { authOptions } from "@/src/auth/options";
+import ButtonGoHome from "./ButtonGoHome";
 
 export default async function NavBar() {
 
@@ -13,9 +14,9 @@ export default async function NavBar() {
                 {session?.user ? (
                     <>
                         <li>
+                            <ButtonGoHome />
                             <ButtonLogout />
                         </li>
-
                     </>
                 ) : (
                     <>

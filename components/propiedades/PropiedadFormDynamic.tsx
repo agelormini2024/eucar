@@ -370,7 +370,7 @@ export default function PropiedadFormDynamic({ paises, provincias, tiposPropieda
                     {formValues.clienteId
                         ? (() => {
                             const cliente = clientes.find((c) => c.id === formValues.clienteId);
-                            return cliente ? `${cliente.nombre} ${cliente.apellido} ------ ${cliente.cuit}` : 'Seleccionar propietario';
+                            return cliente ? `${cliente.nombre} ${cliente.apellido} |-| ${cliente.cuit}` : 'Seleccionar propietario';
                         })()
                         : 'Seleccionar propietario'}
                 </button>

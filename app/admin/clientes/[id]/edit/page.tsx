@@ -36,7 +36,7 @@ export default async function EditClientePage({ params }: { params: Promise<(Seg
         <>
             <div className='flex justify-between'>
                 <div>
-                    <Headers>Editar Cliente: {cliente.apellido + ' ' + cliente.nombre}</Headers>
+                    <Headers>Editando el Cliente: {cliente.apellido + ' ' + cliente.nombre}</Headers>
                 </div>
             </div>
             <div>

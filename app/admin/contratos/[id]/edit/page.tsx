@@ -64,7 +64,7 @@ export default async function EditContratoPage({ params }: { params: Promise<(Se
         <>
             <div className="flex justify-between">
                 <div>
-                    <Headers>Editar Contrato: {contrato?.descripcion}</Headers>
+                    <Headers>Editando el Contrato: {contrato?.descripcion}</Headers>
                 </div>
             </div>
             <div>

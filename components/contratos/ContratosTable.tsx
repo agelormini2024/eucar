@@ -138,12 +138,21 @@ export default function ContratosTable({ data }: ContratosTableProps) {
         muiTablePaperProps: {
             elevation: 5, //change the mui box shadow
             //customize paper styles
+            // sx: {
+            //     '& tr:nth-of-type(odd) > td': {
+            //         backgroundColor: '#f5f5f5',
+            //     },
+            // },
+        },
+        muiTableBodyRowProps: ({ row }) => ({
             sx: {
-                '& tr:nth-of-type(odd) > td': {
-                    backgroundColor: '#f5f5f5',
+                backgroundColor: row.original.mesesRestaActualizar === 0 ? '#f5f5f5' : 'inherit',
+                '& td': {
+                    color: row.original.mesesRestaActualizar === 0 ? '#991b1b' : 'inherit',
+                    fontWeight: row.original.mesesRestaActualizar === 0 ? 'bold' : 'normal',
                 },
             },
-        },
+        }),
         enableColumnResizing: true,
         enableColumnOrdering: true,
         enableRowNumbers: true,

@@ -37,7 +37,7 @@ export default async function EditPropiedadPage({ params }: { params: Promise<(S
             <div className='flex justify-between'>
 
                 <div>
-                    <Headers>Editar Propiedad: {propiedad.descripcion}</Headers>
+                    <Headers>Editarndo la Propiedad: {propiedad.descripcion}</Headers>
                 </div>
             </div>
             <div>

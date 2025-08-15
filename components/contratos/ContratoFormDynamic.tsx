@@ -344,7 +344,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                         id="clienteIdPropietario"
                         type="text"
                         name="clienteIdPropietario"
-                        value={`${propietario.nombre} ${propietario.apellido} - ${propietario.cuit}`}
+                        value={`${propietario.nombre} ${propietario.apellido} |-| ${propietario.cuit}`}
                         className="block w-full p-3 bg-slate-200"
                         disabled
                     />
@@ -363,7 +363,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                         {formValues.clienteIdInquilino
                             ? (() => {
                                 const cliente = clientes.find((c) => c.id === formValues.clienteIdInquilino);
-                                return cliente ? `${cliente.cuit} ----- ${cliente.nombre} ${cliente.apellido}` : 'Seleccionar inquilino';
+                                return cliente ? `${cliente.nombre} ${cliente.apellido} |-| ${cliente.cuit}` : 'Seleccionar inquilino';
                             })()
                             : 'Seleccionar inquilino'}
                     </button>
