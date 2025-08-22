@@ -20,7 +20,6 @@ type ContratoFormDynamicProps = {
 export default function ContratoFormDynamic({ clientes, propiedades, tiposContrato, tiposIndice, contrato }: ContratoFormDynamicProps) {
     const [propietario, setPropietario] = useState({ apellido: '', nombre: '', cuit: '' })
     const { formValues, setFormValues, resetForm } = useContratoFormStore()
-    // const isEdicion = !!contrato;
 
     // Estado para el modal y búsqueda de propiedad
     const [showPropModal, setShowPropModal] = useState(false);
@@ -187,7 +186,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
 
     useEffect(() => {
         if (formValues.propiedadId && formValues.propiedadId !== 0) {
-            // if (!isEdicion) return;
+
             buscarPropietario();
         }
     }, [formValues.propiedadId]);
