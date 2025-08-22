@@ -15,7 +15,10 @@ export async function updateContrato(data: unknown, id: number) {
 
     const existingPropiedad = await prisma.contrato.findFirst({
         where: {
-            propiedadId: result.data.propiedadId
+            AND: [
+                { propiedadId: result.data.propiedadId },
+                { clienteIdPropietario: { not: result.data.clienteIdPropietario } } // Excluir el contrato actual de la búsqueda
+            ]
         }
     });
 
