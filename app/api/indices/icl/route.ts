@@ -19,25 +19,28 @@ export async function GET(req: NextRequest) {
     const rutaTemp = path.join(os.tmpdir(), `icl_${anno}.xls`)
     const agent = new https.Agent({ rejectUnauthorized: false })
 
-    // Descarga el archivo solo si no existe
-    if (!fs.existsSync(rutaTemp)) {
-        await new Promise((resolve, reject) => {
-            const file = fs.createWriteStream(rutaTemp)
-            https.get(url, { agent }, (response) => {
-                response.pipe(file)
-                file.on('finish', () => {
-                    file.close()
-                    resolve(true)
-                })
-            }).on('error', (err) => {
-                fs.unlink(rutaTemp, () => { })
-                file.close()
-                reject(err)
-            })
-        })
-    } else {
-        console.log("Archivo ya existe:", rutaTemp);
+    // Elimina el archivo si existe para descargarlo nuevamente
+    if (fs.existsSync(rutaTemp)) {
+        fs.unlinkSync(rutaTemp)
+        console.log("Archivo existente eliminado:", rutaTemp);
     }
+
+    // Descarga el archivo siempre
+    await new Promise((resolve, reject) => {
+        const file = fs.createWriteStream(rutaTemp)
+        https.get(url, { agent }, (response) => {
+            response.pipe(file)
+            file.on('finish', () => {
+                file.close()
+                console.log("Archivo descargado exitosamente:", rutaTemp);
+                resolve(true)
+            })
+        }).on('error', (err) => {
+            fs.unlink(rutaTemp, () => { })
+            file.close()
+            reject(err)
+        })
+    })
 
     try {
         // Procesar el archivo descargado
