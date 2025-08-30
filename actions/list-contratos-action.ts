@@ -7,6 +7,9 @@ export async function getContratos() {
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
     const contratos = await prisma.contrato.findMany({
+        where: {
+            cantidadMesesDuracion: { gt: 0 }
+        },
         orderBy: {
             id: 'asc'
         },

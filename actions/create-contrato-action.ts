@@ -15,7 +15,10 @@ export async function createContrato(data: unknown) {
 
     const existingPropiedad = await prisma.contrato.findFirst({
         where: {
-            propiedadId: result.data.propiedadId
+            AND: [
+                { propiedadId: result.data.propiedadId },
+                { cantidadMesesDuracion: { gt: 0 } }
+            ]
         }
     });
 

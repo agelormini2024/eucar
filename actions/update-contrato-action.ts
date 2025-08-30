@@ -17,7 +17,8 @@ export async function updateContrato(data: unknown, id: number) {
         where: {
             AND: [
                 { propiedadId: result.data.propiedadId },
-                { clienteIdPropietario: { not: result.data.clienteIdPropietario } } // Excluir el contrato actual de la búsqueda
+                { clienteIdPropietario: { not: result.data.clienteIdPropietario } }, // Excluir el contrato actual de la búsqueda
+                { cantidadMesesDuracion: { gt: 0 } }
             ]
         }
     });
