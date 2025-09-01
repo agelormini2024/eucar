@@ -148,7 +148,7 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             sx: {
                 backgroundColor: row.original.mesesRestaActualizar === 0 ? '#f5f5f5' : 'inherit',
                 '& td': {
-                    color: row.original.mesesRestaActualizar === 0 ? '#991b1b' : 'inherit',
+                    color: row.original.mesesRestaActualizar === 0 ? '#F30000' : 'inherit',
                     fontWeight: row.original.mesesRestaActualizar === 0 ? 'bold' : 'normal',
                 },
             },

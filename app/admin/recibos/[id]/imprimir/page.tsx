@@ -21,7 +21,7 @@ export default async function ImprimirReciboPage({ params }: { params: Promise<(
         if (!recibo) {
             return <div className="text-center py-10">Recibo no encontrado</div>;
         }
-        if (recibo.estadoReciboId !== 3) {
+        if (recibo.estadoReciboId === 2) {
             const fechaImpreso = new Date().toISOString();
             await prisma.recibo.update({
                 where: { id: Number(id) },
