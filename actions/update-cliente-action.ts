@@ -17,7 +17,7 @@ export async function updateCliente(data: unknown, id: number) {
     // Se usa la transacción para asegurar que ambas operaciones se realicen de manera atómica
     // Si una falla, la otra no se ejecuta
     await prisma.$transaction(async (tx) => {
-        const existingCliente = await prisma.cliente.findFirst({
+        const existingCliente = await tx.cliente.findFirst({
             where: {
                 AND: [
                     { cuit: result.data.cuit },
@@ -33,7 +33,7 @@ export async function updateCliente(data: unknown, id: number) {
             };
         }
 
-        await prisma.cliente.update({
+        await tx.cliente.update({
             where: {
                 id
             },
