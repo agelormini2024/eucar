@@ -196,6 +196,7 @@ model Recibo {
     fechaAnulado   DateTime?
     montoAnterior  Float
     montoTotal     Float
+    montoPagado    Float       
     observaciones  String?
     createdAt      DateTime     @default(now())
     updatedAt      DateTime     @updatedAt

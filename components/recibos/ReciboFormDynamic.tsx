@@ -6,6 +6,7 @@ import { Contrato, EstadoReciboSchema } from "@/src/schema";
 import useRecibosFormStore from "@/src/stores/storeRecibos";
 import { formatCurrency } from "@/src/utils";
 import { Recibo } from "@prisma/client";
+import ItemsSection from "./ItemsSection";
 
 type ReciboFormDynamicProps = {
     contrato: Contrato
@@ -20,6 +21,8 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     const setHabilitarBoton = useRecibosFormStore((state) => state.setHabilitarBoton)
 
     async function cargarContrato() {
+        const montoAlquiler = contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo;
+
         setFormValues({
             expensas: false,
             abl: false,
@@ -28,7 +31,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             aysa: false,
             otros: false,
             contratoId: contrato.id,
-            montoAnterior: contrato.montoAlquilerUltimo === 0 ? contrato.montoAlquilerInicial : contrato.montoAlquilerUltimo,
+            montoAnterior: montoAlquiler,
             tipoContratoId: contrato.tipoContratoId,
             tipoContrato: contrato.tipoContrato.descripcion,
             clientePropietario: `${contrato.clientePropietario.apellido} ${contrato.clientePropietario.nombre}`,
@@ -38,7 +41,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                 : "",
             tipoIndice: contrato.tipoIndice.nombre,
             mesesRestaActualizar: contrato.mesesRestaActualizar,
-
+            items: [{ descripcion: "Alquiler", monto: montoAlquiler }] // Ítem inicial con el monto del alquiler
         });
         setSelectContrato(contrato);
     }
@@ -283,7 +286,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 w-full max-w-md text-center">
+                <div className="space-y-2 w-full max-w-lg text-center">
                     <label
                         className="text-slate-800 font-bold"
                         htmlFor="montoAnterior"
@@ -299,7 +302,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                     />
                 </div>
 
-                <div className="space-y-2 w-full max-w-md">
+                <div className="space-y-2 w-full max-w-lg text-center">
                     <label
                         className="text-slate-800 font-bold"
                         htmlFor="montoTotal"
@@ -310,7 +313,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                         name="montoTotal"
                         onChange={handleInputChange}
                         value={formatCurrency(formValues.montoTotal)}
-                        className="block w-full p-3 bg-slate-200 text-3xl font-black"
+                        className="block w-full p-3 bg-slate-200 text-3xl font-black text-center"
                     />
                 </div>
 
@@ -407,26 +410,32 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                     </div>
 
                 </div>
+                <div className="grid lg:grid-cols-1 gap-4">
+                    <div>
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="observaciones"
+                        >Observaciones :</label>
+                        <textarea
+                            id="observaciones"
+                            name="observaciones"
+                            onChange={handleInputChange}
+                            value={formValues.observaciones}
+                            className="block w-full p-6 bg-slate-200 mt-2"
+                            placeholder="Observaciones del Recibo"
+                        />
+                    </div>
+                </div>
 
             </div>
             {/* ------------------------------------------------------------- */}
-            <div className="grid lg:grid-cols-2 gap-4">
 
-                <div>
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="observaciones"
-                    >Observaciones :</label>
-                    <textarea
-                        id="observaciones"
-                        name="observaciones"
-                        onChange={handleInputChange}
-                        value={formValues.observaciones}
-                        className="block w-full p-4 bg-slate-200 mt-2"
-                        placeholder="Observaciones del Recibo"
-                    />
-                </div>
+            {/* Sección de Ítems del Recibo */}
+            <div className="border-t pt-6">
+                <ItemsSection />
             </div>
+
+            {/* ------------------------------------------------------------- */}
 
         </>
     )

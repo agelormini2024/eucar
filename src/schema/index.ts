@@ -147,6 +147,13 @@ export const IclFinal = z.array(
 // Schemas para las APIs de Recibos 
 //-------------------------------------------------
 
+export const ItemReciboSchema = z.object({
+    descripcion: z.string().min(1, { message: "La descripción es obligatoria" }),
+    monto: z.number().refine((val) => val !== 0, { 
+        message: "El monto no puede ser cero" 
+    })
+})
+
 export const ReciboSchema = z.object({
     contratoId: z.number().min(1, { message: "Debe selecionar un contrato...." }),
     estadoReciboId: z.number().min(1, { message: "Es obligatorio un estado" }),
@@ -156,6 +163,7 @@ export const ReciboSchema = z.object({
     fechaAnulado: z.string().optional(),
     montoAnterior: z.number().min(1, { message: "Es obligatorio el Monto Anterior" }),
     montoTotal: z.number(),
+    montoPagado: z.number(),
     expensas: z.boolean().default(false),
     abl: z.boolean().default(false),
     aysa: z.boolean().default(false),
@@ -165,6 +173,9 @@ export const ReciboSchema = z.object({
     observaciones: z.string()
         .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
         .optional(),
+    items: z.array(ItemReciboSchema).min(1, { 
+        message: "Debe tener al menos un ítem (el alquiler)" 
+    })
 
 }).refine((data) => {
         // Solo validar si estadoReciboId !== 1
@@ -177,7 +188,15 @@ export const ReciboSchema = z.object({
         message: "El Monto Total es obligatorio",
         path: ["montoTotal"],
     }
-);
+).refine((data) => {
+    // Validar que si hay descripción, debe haber monto no vacío
+    return data.items.every(item => 
+        item.descripcion.trim() === "" || item.monto !== 0
+    );
+}, {
+    message: "Si la descripción no está vacía, el monto tampoco puede estar vacío",
+    path: ["items"]
+});
 
 export const EstadoReciboSchema = z.object({
     id: z.number(),

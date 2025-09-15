@@ -24,14 +24,15 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
             fechaAnulado: formValues.fechaAnulado,
             montoAnterior: formValues.montoAnterior,
             montoTotal: formValues.montoTotal,
+            montoPagado: formValues.montoPagado,
             observaciones: formData.get('observaciones'),
             expensas: formData.get('expensas') === "on",
             abl: formData.get('abl') === "on",
             aysa: formData.get('aysa') === "on",
             luz: formData.get('luz') === "on",
             gas: formData.get('gas') === "on",
-            otros: formData.get('otros') === "on"
-
+            otros: formData.get('otros') === "on",
+            items: formValues.items // Incluir los ítems del recibo
         }
 
         const result = ReciboSchema.safeParse(data) // Validarl con Zod

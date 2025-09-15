@@ -14,10 +14,16 @@ export async function createRecibo(data: unknown) {
     }
 
     // Convertir las fechas a objetos Date
-    const { fechaPendiente, ...rest } = result.data;
+    const { fechaPendiente, items, ...rest } = result.data;
+
+    // Calcular montoTotal (original) y montoPagado (suma de ítems)
+    const montoTotal = rest.montoTotal; // El monto que debería pagar
+    const montoPagado = items.reduce((sum, item) => sum + item.monto, 0); // Suma de todos los ítems
 
     const reciboData = {
         ...rest,
+        montoTotal, // Monto original que debería pagar
+        montoPagado, // Suma de todos los ítems
         fechaPendiente: new Date(fechaPendiente), // Convertir fechaInicio a Date
         fechaImpreso: null,
         fechaAnulado: null
@@ -39,7 +45,7 @@ export async function createRecibo(data: unknown) {
             }
         }
     })
-    console.log("🚀 ~ createRecibo ~ mesesActual:", meses)
+    // console.log("🚀 ~ createRecibo ~ mesesActual:", meses)
 
     const mesesActual = meses?.mesesRestaActualizar
     const mesesReset = meses?.tipoContrato.cantidadMesesActualizacion
@@ -66,26 +72,53 @@ export async function createRecibo(data: unknown) {
                     await tx.contrato.update({
                         where: { id: reciboData.contratoId },
                         data: {
-                            montoAlquilerUltimo: reciboData.montoTotal,
+                            montoAlquilerUltimo: reciboData.montoPagado, // Usar montoPagado (suma de ítems)
                             mesesRestaActualizar: nuevoValorMeses,    // Decrementar "mesesRestaActualizar" y si es 0 se actualiza con lo que hay 
                             cantidadMesesDuracion: { decrement: 1 }  // en la tabla tipoContrato en "cantidadMesesActualizacion". 
                         }
                     })
                 }
-                await tx.recibo.create({ data: reciboData })
+                
+                // Crear el recibo
+                const nuevoRecibo = await tx.recibo.create({ data: reciboData });
+                
+                // Crear los ítems del recibo
+                await tx.itemRecibo.createMany({
+                    data: items.map(item => ({
+                        reciboId: nuevoRecibo.id,
+                        descripcion: item.descripcion,
+                        monto: item.monto
+                    }))
+                });
+                
                 return { success: true };
 
             } else if (existeRecibo.estadoReciboId === 1 && reciboData.montoTotal !== 0) { // "Pendiente"
                 // Solo actualizar contrato y pasar el estado del recibo a "GENERADO"
 
+                // Actualizar el recibo
                 await tx.recibo.update({
                     where: { id: existeRecibo.id },
                     data: reciboData
                 });
+
+                // Eliminar ítems existentes y crear los nuevos
+                await tx.itemRecibo.deleteMany({
+                    where: { reciboId: existeRecibo.id }
+                });
+
+                await tx.itemRecibo.createMany({
+                    data: items.map(item => ({
+                        reciboId: existeRecibo.id,
+                        descripcion: item.descripcion,
+                        monto: item.monto
+                    }))
+                });
+
                 await tx.contrato.update({
                     where: { id: reciboData.contratoId },
                     data: {
-                        montoAlquilerUltimo: reciboData.montoTotal,
+                        montoAlquilerUltimo: reciboData.montoPagado, // Usar montoPagado (suma de ítems)
                         mesesRestaActualizar: nuevoValorMeses,
                         cantidadMesesDuracion: { decrement: 1 }
                     }

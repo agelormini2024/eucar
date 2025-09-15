@@ -2,12 +2,16 @@ let reciboCreateMock: jest.Mock;
 let reciboUpdateMock: jest.Mock;
 let contratoUpdateMock: jest.Mock;
 let contratoFindUniqueMock: jest.Mock;
+let itemReciboCreateManyMock: jest.Mock;
+let itemReciboDeleteManyMock: jest.Mock;
 
 jest.mock("@/src/lib/prisma", () => {
     reciboCreateMock = jest.fn();
     reciboUpdateMock = jest.fn();
     contratoFindUniqueMock = jest.fn();
     contratoUpdateMock = jest.fn();
+    itemReciboCreateManyMock = jest.fn();
+    itemReciboDeleteManyMock = jest.fn();
     return {
         prisma: {
             contrato: {
@@ -18,6 +22,10 @@ jest.mock("@/src/lib/prisma", () => {
                 create: reciboCreateMock,
                 update: jest.fn(),
             },
+            itemRecibo: {
+                createMany: itemReciboCreateManyMock,
+                deleteMany: itemReciboDeleteManyMock,
+            },
             $transaction: jest.fn((cb) =>
                 cb({
                     contrato: {
@@ -26,6 +34,10 @@ jest.mock("@/src/lib/prisma", () => {
                     recibo: {
                         create: reciboCreateMock,
                         update: reciboUpdateMock,
+                    },
+                    itemRecibo: {
+                        createMany: itemReciboCreateManyMock,
+                        deleteMany: itemReciboDeleteManyMock,
                     },
                 })
             ),
@@ -62,6 +74,7 @@ describe("createRecibo", () => {
             fechaAnulado: null,
             montoAnterior: 100,
             montoTotal: 150,
+            montoPagado: 150,
             expensas: true,
             abl: false,
             aysa: false,
@@ -69,6 +82,9 @@ describe("createRecibo", () => {
             gas: false,
             otros: false,
             observaciones: "Observaciones",
+            items: [
+                { descripcion: "Alquiler", monto: 150 }
+            ]
         };
 
         // Arrange
@@ -81,7 +97,7 @@ describe("createRecibo", () => {
                 cantidadMesesActualizacion: 6,
             },
         }));
-        (reciboCreateMock.mockResolvedValue({ id: 456, ...input }));
+        (reciboCreateMock.mockResolvedValue({ id: 456, contratoId: 1 }));
 
         // Act
         const result = await createRecibo(input);
@@ -89,16 +105,41 @@ describe("createRecibo", () => {
         // Assert
         expect(result).toEqual({ success: true });
         expect(buscarReciboMesActual).toHaveBeenCalledWith(input.contratoId);
+        
+        // Verificar que se llamó reciboCreate con los datos correctos (sin items)
         expect(reciboCreateMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 data: expect.objectContaining({
-                    ...input,
+                    contratoId: input.contratoId,
                     estadoReciboId: 2, // "GENERADO"
-                    fechaGenerado: expect.any(String), // o expect.any(Date) según cómo lo guardes
-                    fechaPendiente: expect.any(Date), // si la función convierte a Date
+                    fechaGenerado: expect.any(String),
+                    fechaPendiente: expect.any(Date),
+                    montoAnterior: input.montoAnterior,
+                    montoTotal: input.montoTotal,
+                    montoPagado: input.montoPagado,
+                    expensas: input.expensas,
+                    abl: input.abl,
+                    aysa: input.aysa,
+                    luz: input.luz,
+                    gas: input.gas,
+                    otros: input.otros,
+                    observaciones: input.observaciones,
+                    fechaImpreso: null,
+                    fechaAnulado: null
                 }),
             })
         );
+
+        // Verificar que se llamó itemReciboCreateMany con los ítems
+        expect(itemReciboCreateManyMock).toHaveBeenCalledWith({
+            data: expect.arrayContaining([
+                expect.objectContaining({
+                    reciboId: expect.any(Number),
+                    descripcion: "Alquiler",
+                    monto: 150
+                })
+            ])
+        });
     });
     //----------------------------------------------------------------------------------------------------------
     it("Debería modificar estadoReciboId a 2 y montoTotal cuando el recibo ya existe", async () => {
@@ -111,6 +152,7 @@ describe("createRecibo", () => {
             fechaAnulado: null,
             montoAnterior: 100,
             montoTotal: 150,
+            montoPagado: 150,
             expensas: true,
             abl: false,
             aysa: false,
@@ -118,6 +160,9 @@ describe("createRecibo", () => {
             gas: false,
             otros: false,
             observaciones: "Observaciones",
+            items: [
+                { descripcion: "Alquiler", monto: 150 }
+            ]
         };
         // Arrange
         (ReciboSchema.safeParse as jest.Mock).mockReturnValue({ success: true, data: input });
@@ -133,18 +178,46 @@ describe("createRecibo", () => {
             expect.objectContaining({
                 where: { id: 3 }, // ID del recibo que se está actualizando
                 data: expect.objectContaining({
-                    ...input,
+                    contratoId: input.contratoId,
                     estadoReciboId: 2, // "GENERADO"
                     fechaGenerado: expect.any(String),
                     fechaPendiente: expect.any(Date),
+                    montoAnterior: input.montoAnterior,
+                    montoTotal: input.montoTotal,
+                    montoPagado: input.montoPagado,
+                    expensas: input.expensas,
+                    abl: input.abl,
+                    aysa: input.aysa,
+                    luz: input.luz,
+                    gas: input.gas,
+                    otros: input.otros,
+                    observaciones: input.observaciones,
+                    fechaImpreso: null,
+                    fechaAnulado: null
                 }),
             })
         );
+        
+        // Verificar que se eliminen y creen los ítems
+        expect(itemReciboDeleteManyMock).toHaveBeenCalledWith({
+            where: { reciboId: 3 }
+        });
+        
+        expect(itemReciboCreateManyMock).toHaveBeenCalledWith({
+            data: expect.arrayContaining([
+                expect.objectContaining({
+                    reciboId: 3,
+                    descripcion: "Alquiler",
+                    monto: 150
+                })
+            ])
+        });
+        
         expect(contratoUpdateMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 where: { id: input.contratoId },
                 data: expect.objectContaining({
-                    montoAlquilerUltimo: input.montoTotal,
+                    montoAlquilerUltimo: input.montoPagado, // Ahora usa montoPagado (suma de ítems)
                     mesesRestaActualizar: { decrement: 1 },
                     cantidadMesesDuracion: { decrement: 1 },
                 }),
@@ -163,6 +236,7 @@ describe("createRecibo", () => {
             fechaAnulado: null,
             montoAnterior: 100,
             montoTotal: 150,
+            montoPagado: 150,
             expensas: true,
             abl: false,
             aysa: false,
@@ -170,6 +244,9 @@ describe("createRecibo", () => {
             gas: false,
             otros: false,
             observaciones: "Observaciones",
+            items: [
+                { descripcion: "Alquiler", monto: 150 }
+            ]
         };
 
         // Arrange
@@ -198,6 +275,7 @@ describe("createRecibo", () => {
             fechaAnulado: null,
             montoAnterior: 100,
             montoTotal: 0,
+            montoPagado: 0,
             expensas: true,
             abl: false,
             aysa: false,
@@ -205,6 +283,9 @@ describe("createRecibo", () => {
             gas: false,
             otros: false,
             observaciones: "Observaciones",
+            items: [
+                { descripcion: "Alquiler", monto: 0 }
+            ]
         };
         // Arrange
         (ReciboSchema.safeParse as jest.Mock).mockReturnValue({ success: true, data: input });
