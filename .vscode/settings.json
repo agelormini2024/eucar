@@ -9,8 +9,9 @@
         "scss": true,
         "html": true,
         "typescriptreact": true,
+        "http": true,
         "typescript": true,
-        "prisma": false
+        "prisma": true
     },
     "editor.fontSize": 14
 }

@@ -13,7 +13,8 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
 
     const handleSubmit = async (formData: FormData) => {
         // Creamos un objeto "data" para guardar los 
-        // datos ingresados extrayendolos de FormData
+        // datos ingresados extrayendolos de FormData/formValues
+        
         const data = {
             contratoId: formValues.contratoId,
             estadoReciboId: Number(formValues.estadoReciboId),
@@ -33,7 +34,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
 
         }
 
-        const result = ReciboSchema.safeParse(data)
+        const result = ReciboSchema.safeParse(data) // Validarl con Zod
 
 
         if (!result.success) {
@@ -63,7 +64,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
             <form
                 className="space-y-5"
                 onSubmit={(e) => {
-                    e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario                
+                    e.preventDefault();              
                     const formData = new FormData(e.currentTarget); // Obtener los datos del formulario
                     handleSubmit(formData); // Llamar a la función de envío
                 }}

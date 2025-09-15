@@ -7,6 +7,9 @@ import { tiposPropiedad } from './data/tiposPropiedad'
 import { tiposIndice } from './data/tiposIndice'
 import { tiposContrato } from './data/tiposContrato'
 import { estadoRecibo } from './data/estadoRecibo'
+import { ipc } from './data/ipc'
+import { icl } from './data/icl'
+import { usuarios } from './data/usuarios'
 
 const prisma = new PrismaClient()
 
@@ -21,7 +24,10 @@ async function main() {
         await prisma.$executeRaw`TRUNCATE TABLE "TipoIndice" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "TipoContrato" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "EstadoRecibo" RESTART IDENTITY CASCADE;`
-        
+        await prisma.$executeRaw`TRUNCATE TABLE "Ipc" RESTART IDENTITY CASCADE;`
+        await prisma.$executeRaw`TRUNCATE TABLE "Icl" RESTART IDENTITY CASCADE;`
+        await prisma.$executeRaw`TRUNCATE TABLE "Usuario" RESTART IDENTITY CASCADE;`
+
         // Insertar datos
         await prisma.pais.createMany({
             data: paises
@@ -44,23 +50,31 @@ async function main() {
         await prisma.tipoContrato.createMany({
             data: tiposContrato
         })
-        await prisma.estadoRecibo.createMany ({
+        await prisma.estadoRecibo.createMany({
             data: estadoRecibo
         })
-        
+        await prisma.ipc.createMany({
+            data: ipc
+        })
+        await prisma.icl.createMany({
+            data: icl
+        })
+        await prisma.usuario.createMany({
+            data: usuarios
+        })
+
     } catch (error) {
         console.error(error)
     }
 }
 
 main()
-    .then( async() => {
+    .then(async () => {
         console.log('Seed completado')
         await prisma.$disconnect()
     })
-    .catch( async(error) => {
+    .catch(async (error) => {
         console.error(error)
         await prisma.$disconnect()
         process.exit(1)
     })
-    

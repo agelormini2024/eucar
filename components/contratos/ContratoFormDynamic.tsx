@@ -407,7 +407,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                 <div className="space-y-2">
                     <label className="text-slate-800 font-bold"
                         htmlFor="tipoContratoId">
-                        Tipo de Contrato :
+                        Actualización :
                     </label>
                     <select
                         className="block w-full p-3 bg-slate-200"

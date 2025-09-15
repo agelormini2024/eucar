@@ -20,10 +20,11 @@ export async function GET(req: NextRequest) {
 
     const apiUrl =
         'https://apis.datos.gob.ar/series/api/series/?ids=148.3_INIVELNAL_DICI_M_26&limit=5000&format=json'
-
+// 'https://api.argentinadatos.com/v1/finanzas/indices/inflacion'
     try {
         const response = await axios.get(apiUrl)
         const result = IpcSchema.parse(response.data)
+        
         const { data: valores } = result
 
         if (!valores || !Array.isArray(valores)) {

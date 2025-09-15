@@ -8,7 +8,6 @@ import { formatCurrency } from "@/src/utils";
 import { Recibo } from "@prisma/client";
 
 type ReciboFormDynamicProps = {
-
     contrato: Contrato
     recibo?: Recibo
 }
@@ -44,25 +43,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
         setSelectContrato(contrato);
     }
 
-    async function checkMesHabilitado() {
-
-        let mesHabilitado = true
-        if (formValues.mesesRestaActualizar === 0 && formValues.tipoIndice === 'IPC') { // TODO: verificar si es necesario tipoIndice ICL
-            mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
-        }
-        if (mesHabilitado) {
-            const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
-            setFormValues({
-                montoTotal: montoCalculado,
-            })
-        } else {
-            setFormValues({
-                montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC 
-                estadoReciboId: 1   // correspondiente al mes a cobrar 
-            })
-        }
-    }
-
     // Efectos
     useEffect(() => {
         cargarContrato();
@@ -70,10 +50,27 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     }, [contrato]);
 
     useEffect(() => {
-        if (formValues.tipoIndice) {
-            checkMesHabilitado();
+        async function checkMesHabilitado() {
+
+            let mesHabilitado = true
+            if (formValues.mesesRestaActualizar === 0 && formValues.tipoIndice === 'IPC') { // TODO: verificar si es necesario tipoIndice ICL
+                mesHabilitado = await verificaIpcActual(formValues.fechaPendiente)
+            }
+            if (mesHabilitado) {
+                const { montoCalculado } = calculaImporteRecibo(contrato)  // Calcular el importe del Recibo
+                setFormValues({
+                    montoTotal: montoCalculado,
+                })
+            } else {
+                setFormValues({
+                    montoTotal: 0,      // Seteamos el "estado" como PENDIENTE porque todavía no está el IPC correspondiente al mes a cobrar 
+                    estadoReciboId: 1   // PENDIENTE
+                })
+            }
         }
-    }, [formValues.tipoIndice, checkMesHabilitado]);
+
+        checkMesHabilitado();
+    }, [formValues.tipoIndice, formValues.mesesRestaActualizar, formValues.fechaPendiente, contrato, setFormValues]);
 
     useEffect(() => {
         return () => {
@@ -83,19 +80,18 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
 
     //--------------------- Traer el estado del Recibo -------------------
 
-    async function cargarEstadoRecibo() {
-        const formValuesEstadoRecibo = formValues.estadoReciboId // Por defecto, si no hay estado, se usa el ID 1 (PENDIENTE)
-        const result = await fetch(`/api/recibos/estadoRecibo/${formValuesEstadoRecibo}`).then(res => res.json())
-        const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
-        if (estadoRecibo) {
-            setFormValues({ estadoRecibo: estadoRecibo.descripcion })
-        } else {
-            console.log('No se encontró el Estado para el recibo  !!!')
-        }
-    }
-    // ---------------------------------------------------------------------
-
     useEffect(() => {
+        async function cargarEstadoRecibo() {
+            const formValuesEstadoRecibo = formValues.estadoReciboId // Por defecto, si no hay estado, se usa el ID 1 (PENDIENTE)
+            const result = await fetch(`/api/recibos/estadoRecibo/${formValuesEstadoRecibo}`).then(res => res.json())
+            const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
+            if (estadoRecibo) {
+                setFormValues({ estadoRecibo: estadoRecibo.descripcion })
+            } else {
+                console.log('No se encontró el Estado para el recibo  !!!')
+            }
+        }
+
         if (recibo) {
             setFormValues({
                 contratoId: recibo.contratoId || contrato.id,
@@ -116,9 +112,8 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             })
         }
         cargarEstadoRecibo()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    }, [recibo])
+    }, [recibo, contrato.id, setFormValues, formValues.estadoReciboId])
 
     /* ---------------Validación para permitir la GENERACION  del Recibo------------- */
 
@@ -179,7 +174,6 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
                     className="block w-full p-3 bg-slate-200"
                     id="contratoId"
                     name="contratoId"
-
                     value={contrato.descripcion}
                     disabled
                 />
@@ -323,115 +317,115 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             </div>
 
             {/* ------------------------------------------------------------- */}
-            <div className="grid lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="expensas"
-                    >Expensas :</label>
-                    <input
-                        id="expensas"
-                        type="checkbox"
-                        name="expensas"
-                        className="align-middle ml-2"
-                        onChange={handleInputChange}
-                        checked={formValues.expensas}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="abl"
-                    >ABL :</label>
-                    <input
-                        id="abl"
-                        type="checkbox"
-                        name="abl"
-                        className="align-middle ml-2"
-                        onChange={handleInputChange}
-                        checked={formValues.abl}
-                    />
-                </div>
+            <div className="grid lg:grid-cols-2 gap-4 mt-4 mb-4">
+                <div className="grid lg:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="expensas"
+                        >Expensas :</label>
+                        <input
+                            id="expensas"
+                            type="checkbox"
+                            name="expensas"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.expensas}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="abl"
+                        >ABL :</label>
+                        <input
+                            id="abl"
+                            type="checkbox"
+                            name="abl"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.abl}
+                        />
+                    </div>
 
-                <div className="space-y-2">
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="aysa"
-                    >AYSA :</label>
-                    <input
-                        id="aysa"
-                        type="checkbox"
-                        name="aysa"
-                        className="align-middle ml-2"
-                        onChange={handleInputChange}
-                        checked={formValues.aysa}
-                    />
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="aysa"
+                        >AYSA :</label>
+                        <input
+                            id="aysa"
+                            type="checkbox"
+                            name="aysa"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.aysa}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="luz"
+                        >Luz :</label>
+                        <input
+                            id="luz"
+                            type="checkbox"
+                            name="luz"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.luz}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="gas"
+                        >Gas :</label>
+                        <input
+                            id="gas"
+                            type="checkbox"
+                            name="gas"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.gas}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label
+                            className="text-slate-800 font-bold"
+                            htmlFor="otros"
+                        >Otros :</label>
+                        <input
+                            id="otros"
+                            type="checkbox"
+                            name="otros"
+                            className="align-middle ml-2"
+                            onChange={handleInputChange}
+                            checked={formValues.otros}
+                        />
+                    </div>
+
                 </div>
 
             </div>
             {/* ------------------------------------------------------------- */}
-            <div className="grid lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
+            <div className="grid lg:grid-cols-2 gap-4">
+
+                <div>
                     <label
                         className="text-slate-800 font-bold"
-                        htmlFor="luz"
-                    >Luz :</label>
-                    <input
-                        id="luz"
-                        type="checkbox"
-                        name="luz"
-                        className="align-middle ml-2"
+                        htmlFor="observaciones"
+                    >Observaciones :</label>
+                    <textarea
+                        id="observaciones"
+                        name="observaciones"
                         onChange={handleInputChange}
-                        checked={formValues.luz}
+                        value={formValues.observaciones}
+                        className="block w-full p-4 bg-slate-200 mt-2"
+                        placeholder="Observaciones del Recibo"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="gas"
-                    >Gas :</label>
-                    <input
-                        id="gas"
-                        type="checkbox"
-                        name="gas"
-                        className="align-middle ml-2"
-                        onChange={handleInputChange}
-                        checked={formValues.gas}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label
-                        className="text-slate-800 font-bold"
-                        htmlFor="otros"
-                    >Otros :</label>
-                    <input
-                        id="otros"
-                        type="checkbox"
-                        name="otros"
-                        className="align-middle ml-2"
-                        onChange={handleInputChange}
-                        checked={formValues.otros}
-                    />
-                </div>
-
-            </div>
-
-            {/* ------------------------------------------------------------- */}
-
-            <div>
-                <label
-                    className="text-slate-800 font-bold"
-                    htmlFor="observaciones"
-                >Observaciones :</label>
-                <textarea
-                    id="observaciones"
-                    name="observaciones"
-                    onChange={handleInputChange}
-                    value={formValues.observaciones}
-                    className="block w-full p-3 bg-slate-200"
-                    placeholder="Observaciones del contrato"
-                />
             </div>
 
         </>

@@ -14,7 +14,7 @@ export async function createRecibo(data: unknown) {
     }
 
     // Convertir las fechas a objetos Date
-    const { fechaPendiente, fechaImpreso, fechaAnulado, ...rest } = result.data;
+    const { fechaPendiente, ...rest } = result.data;
 
     const reciboData = {
         ...rest,

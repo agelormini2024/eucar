@@ -17,10 +17,10 @@ datasource db {
 // Usuarios
 
 model Usuario {
-    id Int @id @default(autoincrement())
-    email String
-    password String
-    nombre String
+    id         Int     @id @default(autoincrement())
+    email      String
+    password   String
+    nombre     String
     confirmado Boolean @default(false)
 }
 
@@ -205,5 +205,13 @@ model Recibo {
     luz            Boolean
     gas            Boolean
     otros          Boolean
+    itemsRecibo    ItemRecibo[]
 }
 
+model ItemRecibo {
+    id          Int    @id @default(autoincrement())
+    descripcion String
+    monto       Float
+    reciboId    Int
+    recibo      Recibo @relation(fields: [reciboId], references: [id])
+}

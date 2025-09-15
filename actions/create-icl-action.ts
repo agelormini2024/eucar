@@ -1,7 +1,7 @@
 "use server"
 import { prisma } from "@/src/lib/prisma"
 import { IclFinal } from "@/src/schema"
-import { formatFechaIcl, formatFechaIpc } from "@/src/utils"
+import { formatFechaIpc } from "@/src/utils"
 
 // Almacenar en una constante la fecha actual para usarla en el cálculo del ICL acumulado
 
@@ -58,7 +58,7 @@ export async function getIcl(data: unknown) {
             const iclFinal = indicesIniFin.length > 1 ? indicesIniFin[1].indice : null
 
             // Calculo del Indice para guardarlo en el campo icl de tipoContrato
-
+            
             if (iclInicial && iclFinal) {
                 const iclAGuardar = (iclFinal / iclInicial)
                 await prisma.tipoContrato.update({
