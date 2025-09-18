@@ -1,4 +1,4 @@
-import { consultaContratos } from "@/src/types";
+import { consultaContratos } from "@/src/types/contrato";
 import { Prisma } from "@prisma/client";
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
 import Link from "next/link"; // Importar Link de Next.js

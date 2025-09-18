@@ -1,6 +1,6 @@
 "use client"
 import { useMemo } from "react"
-import { RecibosConRelaciones } from "@/src/types"
+import { RecibosConRelaciones } from "@/src/types/recibo"
 import { formatCurrency, formatFecha } from "@/src/utils"
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table"
 import Link from "next/link"

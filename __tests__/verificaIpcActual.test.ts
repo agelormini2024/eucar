@@ -15,7 +15,7 @@ jest.mock("@/src/lib/prisma", () => {
 //----------------------------- Fin del mock -----------------------------------------------
 import { verificaIpcActual } from "../src/lib/verificaIpcActual";
 
-const fechaPendiente = new Date().toISOString().split('T')[0]
+// const fechaPendiente = new Date().toISOString().split('T')[0]
 
 describe("verificaIpcActual", () => {
 

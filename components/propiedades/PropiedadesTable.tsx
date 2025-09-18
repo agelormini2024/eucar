@@ -2,11 +2,11 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
-import { PropiedadesConRelaciones } from "@/src/types";
+import { PropiedadesConRelaciones } from "@/src/types/propiedad";
 
 
 type PropiedadesTableProps = {
-    data: PropiedadesConRelaciones[]; // Cambia el tipo de datos según tu modelo
+    data: PropiedadesConRelaciones[]; 
 }
 
 export default function PropiedadesTable({ data }: PropiedadesTableProps) {

@@ -1,8 +1,12 @@
 "use server"
 import { prisma } from "@/src/lib/prisma"
 
+/**
+ * Obtiene la lista de recibos con información de contratos y estado
+ * Incluye transformación de campos null a strings vacíos para consistencia en frontend
+ * @returns Array de recibos con relaciones o array vacío en caso de error
+ */
 export async function getRecibos() {
-
     try {
         const recibos = await prisma.recibo.findMany({
             orderBy: {

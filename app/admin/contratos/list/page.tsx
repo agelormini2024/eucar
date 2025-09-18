@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { getContratos } from '@/actions/list-contratos-action';
 import ContratosTable from '@/components/contratos/ContratosTable';
 import Headers from '@/components/ui/Headers'
-import { consultaContratos } from '@/src/types';
+import { consultaContratos } from '@/src/types/contrato';
 
 type ContratoConRelaciones = Prisma.ContratoGetPayload<typeof consultaContratos>;
 

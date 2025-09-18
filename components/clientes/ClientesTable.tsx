@@ -1,6 +1,6 @@
 "use client";
 
-import { ClientesConProvinciaPais } from "@/src/types";
+import { ClientesConProvinciaPais } from "@/src/types/cliente";
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
 import Link from "next/link"; // Importar Link de Next.js
 import { useMemo } from "react";

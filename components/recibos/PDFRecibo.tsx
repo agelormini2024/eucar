@@ -1,5 +1,5 @@
 "use client";
-import { ReciboConRelaciones } from '@/src/types';
+import { ReciboConRelaciones } from '@/src/types/recibo';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({

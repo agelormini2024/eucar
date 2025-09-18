@@ -1,7 +1,7 @@
 "use client"
 import { getIcl } from "@/actions/create-icl-action"
 import { getIpc } from "@/actions/create-ipc-action"
-import { IclDiario, IpcMensual } from "@/src/types"
+import { IclDiario, IpcMensual } from "@/src/types/indices"
 import axios from "axios"
 import { useState } from "react"
 import Loading from "../ui/Loading"

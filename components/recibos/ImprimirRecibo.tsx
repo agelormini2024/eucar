@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import ButtonGoBack from "../ui/ButtonGoBack";
 import PDFRecibo from "./PDFRecibo";
-import { ReciboConRelaciones } from "@/src/types";
+import { ReciboConRelaciones } from "@/src/types/recibo";
 import { formatCurrency, formatFecha } from "@/src/utils";
 
 type ImprimirReciboProps = {

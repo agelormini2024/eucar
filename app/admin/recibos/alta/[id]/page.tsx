@@ -31,6 +31,7 @@ export default async function AddReciboPage({ params }: { params: Promise<(Segme
                     <AddReciboForm>
                         <ReciboForm
                             contrato={contrato}
+                            recibo={recibo}
                         />
                     </AddReciboForm>
                 )}
