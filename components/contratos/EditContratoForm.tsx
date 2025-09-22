@@ -13,20 +13,11 @@ export default function EditContratoForm({ children }: { children: React.ReactNo
     const params = useParams()
     const id = +params.id!
 
-    console.log("EditContratoForm - formValues:", formValues);
-
     useEffect(() => {
-        console.log("EditContratoForm montado");
         return () => {
-            console.log("EditContratoForm desmontado");
             resetForm();
         }
     }, [resetForm]);
-
-    useEffect(() => {
-        console.log("EditContratoForm montado");
-    }, []);
-
 
     const handleSubmit = async (formData: FormData) => {
         const data = {

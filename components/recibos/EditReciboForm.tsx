@@ -1,15 +1,24 @@
 "use client"
-import { createRecibo } from "@/actions/create-recibo-action";
-import { ReciboSchema } from "@/src/schema";
-import useRecibosFormStore from "@/src/stores/storeRecibos";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { updateRecibo } from "@/actions/update-recibo-action"
+import { ReciboSchema } from "@/src/schema"
+import useRecibosFormStore from "@/src/stores/storeRecibos"
+import { useParams, useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { toast } from "react-toastify"
 
-export default function AddReciboForm({ children }: { children: React.ReactNode }) {
 
+export default function EditReciboForm({ children }: { children: React.ReactNode }) {
     const router = useRouter()
-    const formValues = useRecibosFormStore((state) => state.formValues)
-    // const resetForm = useRecibosFormStore((state) => state.resetForm)
+    const { resetForm, formValues } = useRecibosFormStore()
+    const params = useParams()
+    const id = +params.id!
+
+
+    useEffect(() => {
+        return () => {
+            resetForm();
+        }
+    }, [resetForm]);
 
     const handleSubmit = async (formData: FormData) => {
         try {
@@ -46,45 +55,34 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
                 return;
             }
 
-            /**-------------------- Aqui generar el recibo -------------------*/
-            const response = await createRecibo(result.data);
+            /**-------------------- Aqui actualizar el recibo -------------------*/
+            const response = await updateRecibo(id, result.data);
 
             // Verificar que recibimos una respuesta
             if (!response) {
-                toast.error("Error de conexión al generar el recibo");
-                return;
-            }
-            
-            if (!response.success) {
-                // Mostrar errores específicos si existen
-                if (response.errors && response.errors.length > 0) {
-                    response.errors.forEach(error => {
-                        const message = error.message || "Error desconocido";
-                        toast.error(message);
-                    });
-                } else {
-                    toast.error("Error inesperado al generar el recibo");
-                }
+                toast.error("Error de conexión al actualizar el recibo");
                 return;
             }
 
-            // Éxito confirmado - proceder con navegación
-            toast.success("Recibo generado correctamente");
-            router.push('/admin/contratos/list?toast=success');
-            /**--------------------------------------------------------------*/
+            if (!response.success) {        
+                toast.error("Error al actualizar el recibo");
+                return;
+            }
+            toast.success("Recibo actualizado correctamente");
+            router.push('/admin/recibos/list') // Redirigir a la lista de recibos
 
         } catch (error) {
-            console.error("Error inesperado en handleSubmit:", error);
-            toast.error("Error inesperado. Por favor, intenta nuevamente.");
+            console.error("Error al actualizar el recibo:", error);
+            toast.error("Error inesperado al actualizar el recibo");
         }
-    };
+    }
 
     return (
         <div className='bg-white shadow-xl mt-10 px-5 py-10 rounded-md max-w-5xl mx-auto'>
             <form
                 className="space-y-5"
                 onSubmit={(e) => {
-                    e.preventDefault();              
+                    e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario                
                     const formData = new FormData(e.currentTarget); // Obtener los datos del formulario
                     handleSubmit(formData); // Llamar a la función de envío
                 }}
@@ -95,11 +93,10 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
                     type="submit"
                     className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
                     cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
-                    value="Generar Recibo"
+                    value="Guardar Recibo"
                     disabled={!formValues.habilitarBoton}
                 />
             </form>
         </div>
-
     )
 }

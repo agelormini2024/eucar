@@ -11,7 +11,7 @@ export const authOptions = {
                 password: { label: "Password", type: "password", placeholder: "*******" },
             },
             async authorize(credentials) {
-                console.log("Credentials:", credentials);
+
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("El email y el password son requiridos");
                 }
@@ -24,7 +24,7 @@ export const authOptions = {
                 if (!user) {
                     throw new Error("No se encontró un usuario con este email");
                 }
-                console.log("User found:", user);
+
                 const isValidPassword = await bcrypt.compare(credentials.password, user.password);
                 if (!isValidPassword) {
                     throw new Error("Password Inválido");

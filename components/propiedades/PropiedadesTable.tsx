@@ -6,7 +6,7 @@ import { PropiedadesConRelaciones } from "@/src/types/propiedad";
 
 
 type PropiedadesTableProps = {
-    data: PropiedadesConRelaciones[]; 
+    data: PropiedadesConRelaciones[];
 }
 
 export default function PropiedadesTable({ data }: PropiedadesTableProps) {
@@ -16,13 +16,28 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
         () => [
             {
                 id: "acciones", // ID único para la columna
-                header: "Acciones",
+                header: "",
+                size: 80,
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del cliente
                         className="bg-slate-700 text-white font-bold px-4 py-2 rounded hover:bg-red-600 transition-colors duration-400"
+                        title="Editar propiedad"
                     >
-                        Editar
+                        <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                        </svg>
+
                     </Link>
                 ),
                 muiTableHeadCellProps: { style: { textAlign: "center" } },
@@ -35,7 +50,7 @@ export default function PropiedadesTable({ data }: PropiedadesTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                
+
                 accessorKey: "tipoPropiedad.descripcion",
                 header: "Tipo de Propiedad",
                 muiTableHeadCellProps: { style: { color: "darkred" } },

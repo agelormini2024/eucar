@@ -15,27 +15,70 @@ export default function RecibosTable({ data }: RecibosTableProps) {
         () => [
 
             {
-                id: "imprimirRecibo", // ID único para la columna
-                header: "Acciones",
+                id: "imprimirRecibo", 
+                header: "",
+                size: 80,
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/imprimir`}
-                        className="bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400"
+                        className="bg-slate-700 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        title="Imprimir recibo"
                     >
-                        Imprimir
+                        <svg 
+                            className="h-5 w-5" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" 
+                            />
+                        </svg>
                     </Link>
                 ),
                 muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
             {
+                id: "editarRecibo", // ID único para la columna
+                header: "",
+                size: 80,
+                Cell: ({ row }) => (
+                    <Link
+                        href={`${row.original.id}/edit`}
+                        className="bg-red-700 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        title="Editar recibo"
+                    >
+                        <svg 
+                            className="h-5 w-5" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
+                            />
+                        </svg>
+                    </Link>
+                ),
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
+
+            {
                 id: "generarRecibo", // ID único para la columna
-                header: "Recibos",
+                header: "Pendientes",
                 Cell: ({ row }) =>
                     row.original.montoTotal === 0 ? (
                         <Link
                             href={`../recibos/alta/${row.original.contratoId}`}
-                            className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
+                            className="bg-orange-200 px-2 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
                         >
                             Generar
                         </Link>
@@ -103,9 +146,8 @@ export default function RecibosTable({ data }: RecibosTableProps) {
         data,
         enableStickyHeader: true,
         muiTablePaperProps: {
-            elevation: 5, //change the mui box shadow
-            //customize paper styles
-            sx: {
+            elevation: 5, // Cambiar la sombra del cuadro mui
+            sx: { // Personalizar estilos de papel
                 '& tr:nth-of-type(odd) > td': {
                     backgroundColor: '#f5f5f5',
                 },

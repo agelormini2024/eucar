@@ -70,6 +70,7 @@ export default function ReciboAmounts({ formValues, handleInputChange, setFormVa
                         onChange={handleInputChange}
                         value={formatCurrency(formValues.montoTotal)}
                         className="block w-full p-3 bg-slate-200 text-3xl font-black text-center"
+                        disabled
                     />
                 </div>
             </div>

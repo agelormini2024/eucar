@@ -93,7 +93,7 @@ return (
 │   ├─ 📝 Input: Estado Recibo (disabled)
 │   ├─ 📅 Input: Fecha (disabled)
 │   ├─ 💰 Input: Monto Anterior (disabled)
-│   └─ 💰 Input: Monto Total
+│   └─ 💰 Input: Monto Total (disabled) 
 │
 ├─ 🧩 <ReciboServices formValues handleInputChange />
 │   ├─ ☑️ Checkboxes: expensas, abl, aysa, luz, gas, otros

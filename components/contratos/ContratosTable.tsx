@@ -15,25 +15,40 @@ export default function ContratosTable({ data }: ContratosTableProps) {
         () => [
             {
                 id: "acciones", // ID único para la columna
-                header: "Contratos",
+                header: "",
+                size: 80,
                 Cell: ({ row }) => (
                     <Link
-                        href={`${row.original.id}/edit`} // Ruta dinámica basada en el ID del contrato
+                        href={`${row.original.id}/edit`} 
                         className="bg-slate-700 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400"
+                        title="Editar contrato"
                     >
-                        Editar
+                        <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                        </svg>
+
                     </Link>
                 ),
                 muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
             {
-                id: "generarRecibo", // ID único para la columna
+                id: "generarRecibo",
                 header: "Recibos",
                 Cell: ({ row }) =>
                     row.original.recibos.length > 0 ? null :
                         (<Link
-                            href={`../recibos/alta/${row.original.id}`} // Ruta dinámica basada en el ID del contrato
+                            href={`../recibos/${row.original.id}/alta`} 
                             className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
                         >
                             Generar
@@ -54,8 +69,8 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
-                id: "clientePropietario", // ID único para la columna
-                header: "Propietario", // Título de la columna
+                id: "clientePropietario", 
+                header: "Propietario", 
                 accessorFn: (row) => `${row.clientePropietario.apellido} ${row.clientePropietario.nombre}`, // Combina los valores de calle y número
                 Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
@@ -63,54 +78,54 @@ export default function ContratosTable({ data }: ContratosTableProps) {
                 enableColumnFilter: true, // Habilita el filtrado
             },
             {
-                id: "clienteInquilino", // ID único para la columna
-                header: "Inquilino", // Título de la columna
+                id: "clienteInquilino", 
+                header: "Inquilino",
                 accessorFn: (row) => `${row.clienteInquilino.apellido} ${row.clienteInquilino.nombre}`, // Combina los valores de calle y número
                 Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
-                id: "direccion", // ID único para la columna
-                header: "Propiedad", // Título de la columna
+                id: "direccion", 
+                header: "Propiedad", 
                 accessorFn: (row) => `${row.propiedad.calle} ${row.propiedad.numero} - ${row.propiedad.piso} "${row.propiedad.departamento}"`, // Combina los valores de calle y número
                 Cell: ({ cell }) => <span>{cell.getValue<string>()}</span>, // Renderiza el valor combinado
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
                 id: "montoAlquilerInicial",
                 header: "Alquiler  /  Inicial",
                 accessorFn: (row) => formatCurrency(row.montoAlquilerInicial ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
                 id: "montoAlquilerUltimo",
                 header: "Ultimo.  /  Alquiler",
                 accessorFn: (row) => formatCurrency(row.montoAlquilerUltimo ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
                 id: "fechaInicio",
                 header: "Fecha     /  inicial",
                 accessorFn: (row) => formatFecha(row.fechaInicio),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
                 id: "fechaVencimiento",
                 header: "Fecha  /  Vencimiento",
                 accessorFn: (row) => formatFecha(row.fechaVencimiento),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
-                enableSorting: true, // Habilita el ordenamiento
-                enableColumnFilter: true, // Habilita el filtrado
+                enableSorting: true, 
+                enableColumnFilter: true, 
             },
             {
                 accessorKey: "tipoContrato.descripcion",
