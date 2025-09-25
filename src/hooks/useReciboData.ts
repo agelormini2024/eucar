@@ -1,23 +1,23 @@
 import { useEffect } from 'react'
 import { Contrato, EstadoReciboSchema } from '@/src/schema'
 import useRecibosFormStore from '@/src/stores/storeRecibos'
-import { Recibo } from '@prisma/client'
+// import { Recibo } from '@prisma/client'
 import { formatDateForInput, formatPropiedadAddress, formatFullName } from '@/src/utils/recibo/formatters'
+import { RecibosConRelaciones } from '../types'
 
 /**
  * Custom hook para manejar la carga de datos del recibo
  * Maneja tanto la carga inicial del contrato como la carga de recibos existentes
  */
-export function useReciboData(contrato: Contrato, recibo?: Recibo | null) {
+export function useReciboData(contrato: Contrato, recibo?: RecibosConRelaciones | null) {
     const setFormValues = useRecibosFormStore((state) => state.setFormValues)
-    const formValues = useRecibosFormStore((state) => state.formValues)
 
     // Función para cargar datos del contrato
     const cargarContrato = async () => {
-        const montoAlquiler = contrato.montoAlquilerUltimo === 0 
-            ? contrato.montoAlquilerInicial 
+        const montoAlquiler = contrato.montoAlquilerUltimo === 0
+            ? contrato.montoAlquilerInicial
             : contrato.montoAlquilerUltimo;
-        
+
         setFormValues({
             expensas: false,
             abl: false,
@@ -40,24 +40,31 @@ export function useReciboData(contrato: Contrato, recibo?: Recibo | null) {
     }
 
     // Función para cargar estado del recibo
-    const cargarEstadoRecibo = async () => {
-        const formValuesEstadoRecibo = formValues.estadoReciboId // Por defecto, si no hay estado, se usa el ID 1 (PENDIENTE)
-        const result = await fetch(`/api/recibos/estadoRecibo/${formValuesEstadoRecibo}`).then(res => res.json())
-        const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result) // Validar contrato con zod
-        if (estadoRecibo) {
-            setFormValues({ estadoRecibo: estadoRecibo.descripcion })
-        } else {
-            console.log('No se encontró el Estado para el recibo  !!!')
+    const cargarEstadoRecibo = async (estadoReciboId: number) => {
+        if (!estadoReciboId) return;
+        try {
+            const result = await fetch(`/api/recibos/estadoRecibo/${estadoReciboId}`).then(res => res.json())
+            const { data: estadoRecibo } = EstadoReciboSchema.safeParse(result)
+            if (estadoRecibo) {
+                setFormValues({ estadoRecibo: estadoRecibo.descripcion })
+            } else {
+                console.log('No se encontró el Estado para el recibo !!!')
+            }
+        } catch (error) {
+            console.error('Error al cargar estado del recibo:', error)
         }
     }
 
     // Función para cargar datos de recibo existente
-    const cargarReciboExistente = () => {
+    const cargarReciboExistente = async () => {
         if (!recibo) return
+
+        const estadoReciboId = recibo.estadoReciboId || 1;
 
         setFormValues({
             contratoId: recibo.contratoId || contrato.id,
-            estadoReciboId: recibo.estadoReciboId || 1,
+            estadoReciboId: estadoReciboId,
+            estadoRecibo: recibo.estadoRecibo?.descripcion || '', // <-- agrega esto si tienes la relación
             fechaPendiente: formatDateForInput(recibo.fechaPendiente),
             fechaGenerado: formatDateForInput(recibo.fechaGenerado),
             fechaImpreso: formatDateForInput(recibo.fechaImpreso),
@@ -73,6 +80,9 @@ export function useReciboData(contrato: Contrato, recibo?: Recibo | null) {
             expensas: recibo.expensas || false,
             observaciones: recibo.observaciones || ''
         })
+
+        // Cargar el estado del recibo con el ID correcto
+        await cargarEstadoRecibo(estadoReciboId);
 
         // Cargar ítems existentes del recibo
         fetch(`/api/recibos/items/${recibo.id}`)
@@ -98,9 +108,12 @@ export function useReciboData(contrato: Contrato, recibo?: Recibo | null) {
     // Effect para cargar datos del recibo existente y estado
     useEffect(() => {
         cargarReciboExistente()
-        cargarEstadoRecibo()
+        // Solo cargar estado por defecto si NO hay recibo (nuevo recibo)
+        if (!recibo) {
+            cargarEstadoRecibo(1) // Estado PENDIENTE por defecto para recibos nuevos
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [recibo, contrato.id, formValues.estadoReciboId])
+    }, [recibo, contrato.id])
 
     return {
         // Si necesitamos exponer algún estado o función en el futuro

@@ -10,6 +10,7 @@ import ReciboHeader from "./ReciboHeader";
 import ReciboAmounts from "./ReciboAmounts";
 import ReciboServices from "./ReciboServices";
 import ItemsSection from "./ItemsSection";
+import { RecibosConRelaciones } from "@/src/types";
 
 type ReciboFormDynamicProps = {
     contrato: Contrato
@@ -22,7 +23,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
     const resetForm = useRecibosFormStore((state) => state.resetForm)
 
     // Usar los custom hooks para manejar la lógica
-    useReciboData(contrato, recibo)
+    useReciboData(contrato, recibo as RecibosConRelaciones | null)
     useReciboValidation(contrato)
 
     useEffect(() => {

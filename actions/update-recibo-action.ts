@@ -13,9 +13,7 @@ export async function updateRecibo(id: number, data: unknown) {
 
     try {
         // 1. Validar los datos
-        const result = ReciboSchema.safeParse(data)
-        console.log("🚀 ~ updateRecibo ~ result:", result)
-        
+        const result = ReciboSchema.safeParse(data)        
 
         if (!result.success) {
             return {
@@ -61,22 +59,16 @@ export async function updateRecibo(id: number, data: unknown) {
                     : null,
             };
 
-            console.log("🚀 ~ updateRecibo ~ updateData:", updateData);
-
             // 5. Actualizar el recibo (sin contratoId ni items)
             const reciboActualizado = await tx.recibo.update({
                 where: { id: id },
                 data: updateData
             });
 
-            console.log("Recibo actualizado:", reciboActualizado);
-
             // 6. Eliminar ítems existentes y crear los nuevos
             await tx.itemRecibo.deleteMany({
                 where: { reciboId: id } // Corregir: usar reciboId en lugar de id
             });
-
-            console.log("Ítems existentes eliminados para recibo ID:", id);
 
             // 7. Crear nuevos ítems
             if (items && items.length > 0) {
@@ -88,7 +80,6 @@ export async function updateRecibo(id: number, data: unknown) {
                     }))
                 });
 
-                console.log("Nuevos ítems creados para recibo ID:", id);
             }
 
             return {

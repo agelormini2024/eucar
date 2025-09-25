@@ -1,24 +1,24 @@
-import EditReciboForm from "@/components/recibos/EditReciboForm"
+import DeleteReciboForm from "@/components/recibos/DeleteReciboForm"
 import ReciboForm from "@/components/recibos/ReciboForm"
 import ButtonGoBack from "@/components/ui/ButtonGoBack"
 import Headers from "@/components/ui/Headers"
-import { buscarReciboMesActual } from "@/src/lib/buscarRecibo"
+import { buscarReciboById } from "@/src/lib/buscarReciboById"
 
 interface SegmentParams {
     id: string
 }
 
-export default async function EditReciboPage({ params }: { params: Promise<(SegmentParams)> }) {
+export default async function EliminarReciboPage({ params }: { params: Promise<(SegmentParams)> }) {
 
     const { id } = await params // Asegurarse de que params sea awaited si es necesario
     const reciboId = Number(id)
-    const recibo = await buscarReciboMesActual(reciboId ? reciboId : 0)
+    const recibo = await buscarReciboById(reciboId)
 
     return (
         <>
             <div className="flex justify-between">
                 <div>
-                    <Headers>Editar Recibo</Headers>
+                    <Headers>Eliminar Recibo !!!</Headers>
                 </div>
             </div>
             <div>
@@ -28,12 +28,12 @@ export default async function EditReciboPage({ params }: { params: Promise<(Segm
                         <ButtonGoBack />
                     </div>
                 ) : (
-                    <EditReciboForm>
+                    <DeleteReciboForm>
                         <ReciboForm
                             contrato={recibo.contratoId}
                             recibo={recibo}
                         />
-                    </EditReciboForm>
+                    </DeleteReciboForm>
                 )}
             </div>
 

@@ -1,9 +1,9 @@
 "use client"
 import { useMemo } from "react"
+import Link from "next/link"
 import { RecibosConRelaciones } from "@/src/types/recibo"
 import { formatCurrency, formatFecha } from "@/src/utils"
 import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from "material-react-table"
-import Link from "next/link"
 
 
 type RecibosTableProps = {
@@ -49,7 +49,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/edit`}
-                        className="bg-red-700 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        className="bg-orange-400 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
                         title="Editar recibo"
                     >
                         <svg 
@@ -70,7 +70,34 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
-
+            {
+                id: "eliminarRecibo", // ID único para la columna
+                header: "",
+                size: 80,
+                Cell: ({ row }) => (
+                    <Link
+                        href={`${row.original.id}/borrar`}
+                        className="bg-red-600 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        title="Eliminar recibo"
+                    >
+                            <svg
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m5 0H4"
+                                />
+                            </svg>
+                    </Link>
+                ),
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
             {
                 id: "generarRecibo", // ID único para la columna
                 header: "Pendientes",
@@ -114,9 +141,25 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 enableColumnFilter: true, // Habilita el filtrado
             },
             {
+                id: "montoAnterior",
+                header: "Anterior",
+                accessorFn: (row) => formatCurrency(row.montoAnterior ?? 0),
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
+            },
+            {
                 id: "montoTotal",
-                header: "Importe Alquiler",
+                header: "Actual",
                 accessorFn: (row) => formatCurrency(row.montoTotal ?? 0),
+                muiTableHeadCellProps: { style: { color: "darkred" } },
+                enableSorting: true, // Habilita el ordenamiento
+                enableColumnFilter: true, // Habilita el filtrado
+            },
+            {
+                id: "montoPagado",
+                header: "Pagado",
+                accessorFn: (row) => formatCurrency(row.montoPagado ?? 0),
                 muiTableHeadCellProps: { style: { color: "darkred" } },
                 enableSorting: true, // Habilita el ordenamiento
                 enableColumnFilter: true, // Habilita el filtrado

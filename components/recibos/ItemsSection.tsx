@@ -70,7 +70,7 @@ export default function ItemsSection() {
 
             <div className="bg-gray-100 p-3 rounded">
                 <div className="flex justify-between items-center font-bold">
-                    <span>Total a Pagar:</span>
+                    <span>Total a Cobrar:</span>
                     <span className={`text-3xl ${totalItems >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         ${totalItems.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </span>

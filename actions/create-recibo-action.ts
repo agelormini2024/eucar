@@ -84,9 +84,9 @@ export async function createRecibo(data: unknown) {
         if (!contratoInfo) {
             return {
                 success: false,
-                errors: [{ 
-                    path: ['contratoId'], 
-                    message: "El contrato especificado no existe" 
+                errors: [{
+                    path: ['contratoId'],
+                    message: "El contrato especificado no existe"
                 }]
             };
         }
@@ -95,8 +95,8 @@ export async function createRecibo(data: unknown) {
         const mesesActual = contratoInfo.mesesRestaActualizar;
         const mesesReset = contratoInfo.tipoContrato.cantidadMesesActualizacion;
 
-        const nuevoValorMeses = (typeof mesesActual === "number" && mesesActual > 0) 
-            ? { decrement: 1 } 
+        const nuevoValorMeses = (typeof mesesActual === "number" && mesesActual > 0)
+            ? { decrement: 1 }
             : mesesReset;
 
         // 6. Ejecutar transacción atómica
@@ -109,28 +109,28 @@ export async function createRecibo(data: unknown) {
                 // Caso: No existe recibo para este mes
                 await crearNuevoRecibo(tx, reciboData, items, nuevoValorMeses);
                 return { success: true };
-                
+
             } else if (existeRecibo.estadoReciboId === 1) {
                 // Caso: Existe recibo "PENDIENTE"
                 if (reciboData.montoTotal === 0) {
                     return {
-                        errors: [{ 
-                            message: "Todavía no están los Indices necesarios para generar el recibo." 
-                        }, { 
-                            success: false 
+                        errors: [{
+                            message: "Todavía no están los Indices necesarios para generar el recibo."
+                        }, {
+                            success: false
                         }]
                     };
                 }
                 await actualizarReciboPendiente(tx, existeRecibo.id, reciboData, items, nuevoValorMeses);
                 return { success: true };
-                
+
             } else if (existeRecibo.estadoReciboId === 2) {
                 // Caso: Ya existe recibo "GENERADO"
                 return {
-                    errors: [{ 
-                        message: "Ya existe un recibo generado para este contrato." 
-                    }, { 
-                        success: false 
+                    errors: [{
+                        message: "Ya existe un recibo generado para este contrato."
+                    }, {
+                        success: false
                     }]
                 };
             }
@@ -138,9 +138,9 @@ export async function createRecibo(data: unknown) {
             // Caso no contemplado
             return {
                 success: false,
-                errors: [{ 
-                    path: ['estadoRecibo'], 
-                    message: "Estado de recibo no válido" 
+                errors: [{
+                    path: ['estadoRecibo'],
+                    message: "Estado de recibo no válido"
                 }]
             };
         });
@@ -151,9 +151,9 @@ export async function createRecibo(data: unknown) {
         console.error("Error al crear/actualizar recibo:", error)
         return {
             success: false,
-            errors: [{ 
-                path: ['general'], 
-                message: "Error interno del servidor. Intente nuevamente." 
+            errors: [{
+                path: ['general'],
+                message: "Error interno del servidor. Intente nuevamente."
             }]
         }
     }
@@ -163,9 +163,9 @@ export async function createRecibo(data: unknown) {
  * Crea un nuevo recibo y actualiza el contrato si es necesario
  */
 async function crearNuevoRecibo(
-    tx: TransactionClient, 
-    reciboData: ReciboData, 
-    items: ItemData[], 
+    tx: TransactionClient,
+    reciboData: ReciboData,
+    items: ItemData[],
     nuevoValorMeses: NuevoValorMeses
 ) {
     try {
@@ -177,16 +177,16 @@ async function crearNuevoRecibo(
             await tx.contrato.update({
                 where: { id: reciboData.contratoId },
                 data: {
-                    montoAlquilerUltimo: reciboData.montoPagado,
+                    montoAlquilerUltimo: reciboData.montoTotal,
                     mesesRestaActualizar: nuevoValorMeses,
                     cantidadMesesDuracion: { decrement: 1 }
                 }
             });
         }
-        
+
         // Crear el recibo
         const nuevoRecibo = await tx.recibo.create({ data: reciboData });
-        
+
         // Crear los ítems del recibo
         await tx.itemRecibo.createMany({
             data: items.map(item => ({
@@ -195,12 +195,12 @@ async function crearNuevoRecibo(
                 monto: item.monto
             }))
         });
-        
-        return { 
-            success: true, 
-            data: nuevoRecibo 
+
+        return {
+            success: true,
+            data: nuevoRecibo
         };
-        
+
     } catch (error) {
         throw new Error(`Error al crear nuevo recibo: ${error}`);
     }
@@ -210,10 +210,10 @@ async function crearNuevoRecibo(
  * Actualiza un recibo pendiente y el contrato asociado
  */
 async function actualizarReciboPendiente(
-    tx: TransactionClient, 
-    reciboId: number, 
-    reciboData: ReciboData, 
-    items: ItemData[], 
+    tx: TransactionClient,
+    reciboId: number,
+    reciboData: ReciboData,
+    items: ItemData[],
     nuevoValorMeses: NuevoValorMeses
 ) {
     try {
@@ -240,17 +240,17 @@ async function actualizarReciboPendiente(
         await tx.contrato.update({
             where: { id: reciboData.contratoId },
             data: {
-                montoAlquilerUltimo: reciboData.montoPagado,
+                montoAlquilerUltimo: reciboData.montoTotal,
                 mesesRestaActualizar: nuevoValorMeses,
                 cantidadMesesDuracion: { decrement: 1 }
             }
         });
-        
-        return { 
-            success: true, 
-            data: reciboActualizado 
+
+        return {
+            success: true,
+            data: reciboActualizado
         };
-        
+
     } catch (error) {
         throw new Error(`Error al actualizar recibo pendiente: ${error}`);
     }
