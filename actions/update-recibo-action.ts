@@ -27,7 +27,7 @@ export async function updateRecibo(id: number, data: unknown) {
             const existingRecibo = await tx.recibo.findUnique({
                 where: { id }
             });
-
+            
             if (!existingRecibo) {
                 return {
                     success: false,
@@ -39,7 +39,15 @@ export async function updateRecibo(id: number, data: unknown) {
             }
 
             // 3. Validaciones de negocio para actualización
-            // Ejemplo: verificar que no se duplique con otros registros
+            if (existingRecibo.estadoReciboId === 3 || existingRecibo.estadoReciboId === 4) { //  3 es "Pagado" y 4 es "Impreso"
+                return {
+                    success: false,
+                    errors: [{
+                        path: ['estadoReciboId'],
+                        message: "No se puede modificar un recibo en estado 'Pagado' o 'Impreso'"
+                    }]
+                };
+            }
 
             // 4. Preparar datos para actualización (excluir campos de relación e items)
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

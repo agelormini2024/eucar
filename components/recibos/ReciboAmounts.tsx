@@ -6,8 +6,8 @@ type ReciboAmountsProps = {
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     setFormValues: ReciboFormSetValues;
 };
-
 export default function ReciboAmounts({ formValues, handleInputChange, setFormValues }: ReciboAmountsProps) {
+
     return (
         <div className="space-y-4">
             {/* Estado y Fecha */}

@@ -65,7 +65,7 @@ export default function EditReciboForm({ children }: { children: React.ReactNode
             }
 
             if (!response.success) {        
-                toast.error("Error al actualizar el recibo");
+                toast.error(` Error al actualizar el recibo: ${response.errors!.map(e => e.message).join(', ')}`);
                 return;
             }
             toast.success("Recibo actualizado correctamente");
