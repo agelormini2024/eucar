@@ -5,8 +5,7 @@ import { IclDiario, IpcMensual } from "@/src/types/indices"
 import axios from "axios"
 import { useState } from "react"
 import Loading from "../ui/Loading"
-import { useIndicesStore } from "@/src/stores/storeIndices"
-import MostrarIndices from "./MostrarIndices"
+import MostrarIndices, { useTipoContratoData } from "./MostrarIndices"
 
 const ANIO = new Date().getFullYear().toString();
 
@@ -26,14 +25,24 @@ async function icl() {
 }
 
 export default function IndicesForm() {
-// export default function IndicesForm({ children }: { children: React.ReactNode }) {
     const [procesando, setProcesando] = useState(false)
-    const refresh = useIndicesStore(state => state.refresh)
+    
+    // 🎯 Usar el mismo hook que MostrarIndices para compartir cache
+    const { mutate: refreshTipoContrato } = useTipoContratoData()
 
     async function handleSubmit() {
         try {
-            await Promise.all([ipc(), icl()]); // Ejecutar ambas en paralelo
-            refresh() // <-- refresca la tabla automáticamente
+            setProcesando(true)
+            
+            // 1. Ejecutar ambas operaciones y ESPERAR que terminen completamente
+            await Promise.all([ipc(), icl()]);
+            
+            // 2. Esperar un poquito para asegurar que la DB se actualizó
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // 3. Refrescar usando la misma instancia de SWR que MostrarIndices
+            await refreshTipoContrato();
+            
         } catch (error) {
             console.error(error)
         } finally {
@@ -45,22 +54,24 @@ export default function IndicesForm() {
         <>
             <div className="flex flex-col justify-center shadow-2xl p-10 mt-20">
                 <form
-                    className="flex flex-col bg-white space-y-2 "
+                    className="flex flex-col bg-white space-y-2"
                     onSubmit={async (e) => {
                         e.preventDefault()
-                        setProcesando(true)
                         await handleSubmit()
                     }}
                 >
-                   {!procesando ?
-                        <MostrarIndices /> :
+                   {!procesando ? (
+                        <MostrarIndices />
+                    ) : (
                         <Loading />
-                    }
+                    )}
                     
-                    <input type="submit"
+                    <input 
+                        type="submit"
                         id="fetchIndices"
                         className="bg-red-800 hover:bg-red-600 mt-2 py-2 px-10 rounded-md text-white font-bold text-lg"
                         value="Refrescar Indices"
+                        disabled={procesando}
                     />
                 </form>
             </div>

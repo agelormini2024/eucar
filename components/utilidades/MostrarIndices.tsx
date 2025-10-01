@@ -1,19 +1,17 @@
 "use client"
 import useSWR from "swr"
 import axios from "axios"
-import { useEffect } from "react"
-import { useIndicesStore } from "@/src/stores/storeIndices"
 import { TipoContrato } from "@prisma/client"
 
 const fetcher = (url: string) => axios.get(url).then(res => res.data)
 
-export default function MostrarIndices() {
-    const { data: tipoContrato, error, isLoading, mutate } = useSWR<TipoContrato[]>('/api/indices/tipoContrato', fetcher)
-    const setRefresh = useIndicesStore(state => state.setRefresh)
+// Hook compartido para que otros componentes puedan usar los mismos datos
+export function useTipoContratoData() {
+    return useSWR<TipoContrato[]>('/api/indices/tipoContrato', fetcher)
+}
 
-    useEffect(() => {
-        setRefresh(() => mutate)
-    }, [mutate, setRefresh])
+export default function MostrarIndices() {
+    const { data: tipoContrato, error, isLoading } = useTipoContratoData()
 
     if (isLoading) return <div>Cargando...</div>
     if (error) return <div>Error al cargar los datos</div>
