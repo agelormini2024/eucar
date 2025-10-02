@@ -6,17 +6,19 @@ import { UsuarioSchema } from "@/src/schema";
 export async function POST(request: Request) {
 
     const data = await request.json()
-    const { email, nombre, password } = data
+    const { email, nombre, password, confirmarPassword } = data
 
-    const result = UsuarioSchema.safeParse(data); // Validar los datos con Zod
+    // Validar que todos los campos estén presentes
+    if (!email || !nombre || !password || !confirmarPassword) {
+        return NextResponse.json({ error: "Todos los campos son obligatorios" }, { status: 400 });
+    }
+
+    // Validar con Zod (incluye validación de contraseñas coincidentes)
+    const result = UsuarioSchema.safeParse(data);
     if (!result.success) {
         return NextResponse.json({ 
             error: result.error.issues.map(issue => issue.message).join(", ") }, 
             { status: 400 });
-    }
-
-    if (!email || !nombre || !password) {
-        return NextResponse.json({ error: "Todos los campos son obligatorios" }, { status: 400 });
     }
 
     try {

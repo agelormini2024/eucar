@@ -26,7 +26,7 @@ export default function LoginPage() {
         }
     })
     return (
-        <div className="h-[clac(100vh - 7rem)] flex items-center justify-center">
+        <div className="h-[calc(100vh - 7rem)] flex items-center justify-center">
             <form onSubmit={onSubmit} className="mt-20 w-1/4 bg-white p-5 rounded-lg shadow-lg">
 
                 {error && <p className="bg-red-700 text-center p-2 text-white font-black mb-4">{error}</p>}

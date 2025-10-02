@@ -32,7 +32,7 @@ export const authOptions = {
                 return {
                     id: String(user.id),
                     email: user.email,
-                    nombre: user.nombre,
+                    name: user.nombre, // NextAuth espera 'name' no 'nombre'
                     confirmado: user.confirmado
                 }
             }
@@ -41,5 +41,28 @@ export const authOptions = {
     pages: {
         signIn: "/auth/login",
         error: "/auth/login", // Error page
-    }
+    },
+    session: {
+        strategy: "jwt" as const, // Usar JWT para sesiones
+    },
+    callbacks: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async jwt({ token, user }: any) {
+            // Incluir datos adicionales en el token
+            if (user) {
+                token.confirmado = user.confirmado;
+            }
+            return token;
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async session({ session, token }: any) {
+            // Pasar datos del token a la sesión
+            if (token && session.user) {
+                session.user.id = token.sub || "";
+                session.user.confirmado = token.confirmado;
+            }
+            return session;
+        },
+    },
+    secret: process.env.NEXTAUTH_SECRET, // Importante para producción
 }

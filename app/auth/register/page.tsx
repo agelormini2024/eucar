@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
     })
     return (
-        <div className="h-[clac(100vh - 7rem)] flex items-center justify-center">
+        <div className="h-[calc(100vh - 7rem)] flex items-center justify-center">
             <form onSubmit={onSubmit} className="mt-20 w-1/4 bg-white p-5 rounded-lg shadow-lg">
 
                 {error && <p className="bg-red-700 text-center p-2 text-white font-black mb-4">{error}</p>}
@@ -44,7 +44,7 @@ export default function RegisterPage() {
                     className="block mb-2 text-sm font-bold text-gray-700"
                     htmlFor="nombre">
                     Nombre de Usuario
-                    {errors.usuario && <span className="text-red-500"> - El nombre de usuario es obligatorio y debe tener al menos 3 caracteres</span>}
+                    {errors.nombre && <span className="text-red-500"> - El nombre de usuario es obligatorio y debe tener al menos 3 caracteres</span>}
                 </label>
                 <input
                     id="nombre"
