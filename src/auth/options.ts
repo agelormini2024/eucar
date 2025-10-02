@@ -33,7 +33,8 @@ export const authOptions = {
                     id: String(user.id),
                     email: user.email,
                     name: user.nombre, // NextAuth espera 'name' no 'nombre'
-                    confirmado: user.confirmado
+                    confirmado: user.confirmado,
+                    rol: user.rol || "usuario" // Valor por defecto si no existe
                 }
             }
         })
@@ -51,6 +52,7 @@ export const authOptions = {
             // Incluir datos adicionales en el token
             if (user) {
                 token.confirmado = user.confirmado;
+                token.rol = user.rol;
             }
             return token;
         },
@@ -60,6 +62,7 @@ export const authOptions = {
             if (token && session.user) {
                 session.user.id = token.sub || "";
                 session.user.confirmado = token.confirmado;
+                session.user.rol = token.rol;
             }
             return session;
         },

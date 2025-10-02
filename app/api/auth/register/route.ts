@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/src/lib/prisma";
-import { UsuarioSchema } from "@/src/schema";
+import { UsuarioRegistroConInvitacionSchema } from "@/src/schema";
 
 export async function POST(request: Request) {
 
     const data = await request.json()
-    const { email, nombre, password, confirmarPassword } = data
+    const { email, nombre, password, confirmarPassword, codigoInvitacion } = data
 
     // Validar que todos los campos estén presentes
-    if (!email || !nombre || !password || !confirmarPassword) {
-        return NextResponse.json({ error: "Todos los campos son obligatorios" }, { status: 400 });
+    if (!email || !nombre || !password || !confirmarPassword || !codigoInvitacion) {
+        return NextResponse.json({ error: "Todos los campos son obligatorios, incluyendo el código de invitación" }, { status: 400 });
     }
 
     // Validar con Zod (incluye validación de contraseñas coincidentes)
-    const result = UsuarioSchema.safeParse(data);
+    const result = UsuarioRegistroConInvitacionSchema.safeParse(data);
     if (!result.success) {
         return NextResponse.json({ 
             error: result.error.issues.map(issue => issue.message).join(", ") }, 
@@ -22,6 +22,32 @@ export async function POST(request: Request) {
     }
 
     try {
+        // Verificar código de invitación
+        const invitacion = await prisma.invitacion.findUnique({
+            where: {
+                codigo: codigoInvitacion
+            }
+        });
+
+        if (!invitacion) {
+            return NextResponse.json({ error: "Código de invitación inválido" }, { status: 400 });
+        }
+
+        // Verificar que no esté usado
+        if (invitacion.usado) {
+            return NextResponse.json({ error: "Este código de invitación ya ha sido utilizado" }, { status: 400 });
+        }
+
+        // Verificar que no esté expirado
+        if (invitacion.expiresAt < new Date()) {
+            return NextResponse.json({ error: "Este código de invitación ha expirado" }, { status: 400 });
+        }
+
+        // Verificar que el email coincida con la invitación
+        if (invitacion.email !== email) {
+            return NextResponse.json({ error: "El email no coincide con la invitación" }, { status: 400 });
+        }
+
         const usuarioExistente = await prisma.usuario.findFirst({
             where: {
                 nombre: data.nombre
@@ -46,15 +72,28 @@ export async function POST(request: Request) {
                 email: email,
                 password: hashedPassword,
                 nombre: nombre,
+                rol: "usuario" // Usuarios invitados son usuarios normales por defecto
             }
         })
+
+        // Marcar invitación como usada
+        await prisma.invitacion.update({
+            where: {
+                id: invitacion.id
+            },
+            data: {
+                usado: true,
+                usadoAt: new Date()
+            }
+        });
 
         return new Response(JSON.stringify({
             message: "Usuario registrado correctamente",
             nuevoUsuario: {
                 id: nuevoUsuario.id,
                 email: nuevoUsuario.email,
-                nombre: nuevoUsuario.nombre
+                nombre: nuevoUsuario.nombre,
+                rol: nuevoUsuario.rol
             }
         }), {
             status: 201,

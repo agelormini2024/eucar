@@ -7,6 +7,7 @@ declare module "next-auth" {
         email: string;
         name: string;
         confirmado?: boolean;
+        rol?: string;
     }
 
     interface Session {
@@ -15,6 +16,7 @@ declare module "next-auth" {
             email: string;
             name: string;
             confirmado?: boolean;
+            rol?: string;
         };
     }
 }
@@ -22,5 +24,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     interface JWT {
         confirmado?: boolean;
+        rol?: string;
     }
 }

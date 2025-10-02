@@ -17,11 +17,30 @@ datasource db {
 // Usuarios
 
 model Usuario {
-    id         Int     @id @default(autoincrement())
-    email      String
-    password   String
-    nombre     String
-    confirmado Boolean @default(false)
+    id              Int           @id @default(autoincrement())
+    email           String        @unique
+    password        String
+    nombre          String
+    confirmado      Boolean       @default(false)
+    rol             String        @default("usuario") // "admin", "usuario"
+    createdAt       DateTime      @default(now())
+    
+    // Relaciones
+    invitacionesEnviadas Invitacion[] @relation("UsuarioInvitador")
+}
+
+model Invitacion {
+    id          Int      @id @default(autoincrement())
+    email       String   @unique
+    codigo      String   @unique
+    creadoPor   Int
+    createdAt   DateTime @default(now())
+    expiresAt   DateTime
+    usado       Boolean  @default(false)
+    usadoAt     DateTime?
+    
+    // Relaciones
+    creador     Usuario  @relation("UsuarioInvitador", fields: [creadoPor], references: [id])
 }
 
 // Clientes

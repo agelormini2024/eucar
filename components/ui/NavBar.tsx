@@ -1,40 +1,34 @@
-import Link from "next/link";
 import { getServerSession } from 'next-auth/next'
 import ButtonLogout from "./ButtonLogout";
 import { authOptions } from "@/src/auth/options";
 import ButtonGoHome from "./ButtonGoHome";
+import ButtonInvitaciones from "./ButtonInvitaciones";
 
 export default async function NavBar() {
 
-    const session = await getServerSession(authOptions)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const session = await getServerSession(authOptions) as any // Casting temporal
 
     return (
         <nav className="flex justify-between p-4">
             <ul className="flex space-x-4">
                 {session?.user ? (
                     <>
-                        <li>
+                        <li className="flex space-x-2">
                             <ButtonGoHome />
+                            {session.user.rol === "admin" && (
+                                <ButtonInvitaciones />
+                            )}
                             <ButtonLogout />
                         </li>
                     </>
                 ) : (
                     <>
                         <li>
-                            <Link href="/auth/login"
-                                className="text-red-900 font-bold hover:underline">
-                                Login
-                            </Link>
-                        </li>
+                            <p className="text-sm font-bold">Soares Parente Propiedades</p>                        </li>
                         <li>
                             <p className="text-sm">v.1.0.1</p>
                         </li>
-                        {/* <li>
-                            <Link href="/auth/register"
-                                className="text-red-900 font-bold hover:underline"                                >
-                                Registrarse
-                            </Link>
-                        </li> */}
                     </>
                 )
                 }

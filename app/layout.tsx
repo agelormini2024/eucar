@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/ui/NavBar";
 import SessionGuard from "@/components/ui/SessionGuard";
+import SessionWrapper from "@/components/ui/SessionWrapper";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,11 +28,13 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-100`}>
-                <div className="flex justify-end items-center bg-gradient-to-t from-slate-100 via-slate-300 to-slate-500 p-0.5">
-                    <SessionGuard />
-                    <NavBar />
-                </div>
-                {children}
+                <SessionWrapper>
+                    <div className="flex justify-end items-center bg-gradient-to-t from-slate-100 via-slate-300 to-slate-500 p-0.5">
+                        <SessionGuard />
+                        <NavBar />
+                    </div>
+                    {children}
+                </SessionWrapper>
             </body>
         </html>
     );

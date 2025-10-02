@@ -1,12 +1,21 @@
 "use client"
 import { useForm } from "react-hook-form"
-import { useRouter } from "next/navigation"
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react";
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const searchParams = useSearchParams();
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm();
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Si hay un código en la URL, prellenarlo
+        const codigo = searchParams.get('codigo');
+        if (codigo) {
+            setValue('codigoInvitacion', codigo);
+        }
+    }, [searchParams, setValue]);
 
     const onSubmit = handleSubmit(async data => {
 
@@ -22,12 +31,12 @@ export default function RegisterPage() {
                 'Content-Type': 'application/json',
             },
         })
-        
+
         if (!res.ok) {
             const resJSON = await res.json();
             setError(resJSON.error)
             return;
-        }if (res.ok && res.status === 201) {
+        } if (res.ok && res.status === 201) {
             router.push('/auth/login'); // Redirigir al login después del registro
             return;
         }
@@ -40,6 +49,21 @@ export default function RegisterPage() {
                 {error && <p className="bg-red-700 text-center p-2 text-white font-black mb-4">{error}</p>}
 
                 <h1 className="text-2xl font-bold mb-4">Registrarse</h1>
+
+                <label
+                    className="block mb-2 text-sm font-bold text-gray-700"
+                    htmlFor="codigoInvitacion">
+                    Código de Invitación
+                    {errors.codigoInvitacion && <span className="text-red-500"> - El código de invitación es obligatorio</span>}
+                </label>
+                <input
+                    id="codigoInvitacion"
+                    type="text"
+                    className="p-3 rounded block w-full mb-2 bg-red-50"
+                    placeholder="Código de invitación"
+                    {...register("codigoInvitacion", { required: true })}
+                />
+
                 <label
                     className="block mb-2 text-sm font-bold text-gray-700"
                     htmlFor="nombre">
@@ -97,6 +121,13 @@ export default function RegisterPage() {
                     className="bg-red-700 text-white p-2 mt-4 rounded-md w-full font-bold text-xl hover:bg-red-500 transition-colors">
                     Registrarse
                 </button>
+                <div className="flex items-center justify-between mt-4">
+                    <p className="text-sm text-gray-600 font-bold">¿Ya tienes una cuenta? </p>
+                    <a href="/auth/login"
+                        className="text-red-900 text-sm font-bold hover:underline">
+                        Inicia sesión aquí
+                    </a>
+                </div>
             </form>
         </div>
     )

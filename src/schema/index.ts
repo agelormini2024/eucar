@@ -5,6 +5,21 @@ export const UsuarioSchema = z.object({
     password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }),
     nombre: z.string().min(3, { message: "El nombre de usuario es obligatorio" }),
     confirmarPassword: z.string().min(6, { "message": "La confirmación de contraseña debe tener al menos 6 caracteres" }),
+    codigoInvitacion: z.string().min(1, { message: "El código de invitación es obligatorio" }),
+}).refine((data) => data.password === data.confirmarPassword, {
+    message: "Las contraseñas no coinciden",    
+})
+
+export const InvitacionSchema = z.object({
+    email: z.string().email({ message: "El email no es válido" }),
+})
+
+export const UsuarioRegistroConInvitacionSchema = z.object({
+    email: z.string().email({ message: "El email no es válido" }),
+    password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }),
+    nombre: z.string().min(3, { message: "El nombre de usuario es obligatorio" }),
+    confirmarPassword: z.string().min(6, { "message": "La confirmación de contraseña debe tener al menos 6 caracteres" }),
+    codigoInvitacion: z.string().min(1, { message: "El código de invitación es obligatorio" }),
 }).refine((data) => data.password === data.confirmarPassword, {
     message: "Las contraseñas no coinciden",    
 })
