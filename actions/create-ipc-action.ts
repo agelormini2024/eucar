@@ -70,9 +70,8 @@ export async function getIpc(inflacionMensual: unknown) {
                 })
                 
                 tiposContratoActualizados++;
-                console.log(`Tipo Contrato ${tipo.id}: IPC actualizado (${tipo.cantidadMesesActualizacion} meses) = ${ipcTotal.toFixed(4)}`)
             } else {
-                console.warn(`Tipo Contrato ${tipo.id}: Datos insuficientes para calcular IPC. Requeridos: ${tipo.cantidadMesesActualizacion}, Disponibles: ${ipcAcumulado.length}`)
+                // Datos insuficientes para calcular IPC
             }
         }
 
@@ -85,8 +84,7 @@ export async function getIpc(inflacionMensual: unknown) {
             }
         }
 
-    } catch (error) {
-        console.error("Error al procesar datos de IPC:", error)
+    } catch {
         return {
             success: false,
             errors: [{ 

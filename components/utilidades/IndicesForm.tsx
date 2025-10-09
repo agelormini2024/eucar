@@ -13,7 +13,7 @@ async function ipc() {
     const urlIpc = '/api/indices/ipc'
     const { data }: { data: { inflacionMensual: IpcMensual } } = await axios.get(urlIpc)
     const { inflacionMensual } = data
-    getIpc(inflacionMensual)
+    await getIpc(inflacionMensual)
 }
 
 async function icl() {
@@ -21,7 +21,7 @@ async function icl() {
     const urlIcl = `/api/indices/icl?fecha=${anno}-01-01`
     const { data }: { data: { datos: IclDiario } } = await axios.get(urlIcl)
     const { datos } = data
-    getIcl(datos)
+    await getIcl(datos)  // ✅ TAMBIÉN asegurar que ICL espere
 }
 
 export default function IndicesForm() {
@@ -35,16 +35,32 @@ export default function IndicesForm() {
             setProcesando(true)
             
             // 1. Ejecutar ambas operaciones y ESPERAR que terminen completamente
-            await Promise.all([ipc(), icl()]);
+            const [ipcResult, iclResult] = await Promise.allSettled([ipc(), icl()]);
             
-            // 2. Esperar un poquito para asegurar que la DB se actualizó
+            // Verificar si hubo errores
+            if (ipcResult.status === 'rejected') {
+                console.error('Error en IPC:', ipcResult.reason);
+                alert('Error al actualizar IPC: ' + (ipcResult.reason?.message || 'Error desconocido'));
+                return;
+            }
+            
+            if (iclResult.status === 'rejected') {
+                console.error('Error en ICL:', iclResult.reason);
+                alert('Error al actualizar ICL: ' + (iclResult.reason?.message || 'Error desconocido'));
+                return;
+            }
+            
+            // 2. Esperar un momento para asegurar que la DB se actualizó
             await new Promise(resolve => setTimeout(resolve, 200));
             
-            // 3. Refrescar usando la misma instancia de SWR que MostrarIndices
+            // 3. Forzar revalidación completa del cache SWR
             await refreshTipoContrato();
             
+            console.log('✅ Índices actualizados correctamente');
+            
         } catch (error) {
-            console.error(error)
+            console.error('❌ Error general:', error)
+            alert('Error al actualizar índices: ' + (error instanceof Error ? error.message : 'Error desconocido'));
         } finally {
             setProcesando(false)
         }

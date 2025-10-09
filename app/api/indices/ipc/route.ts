@@ -1,93 +1,66 @@
 "use server"
 import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
-import { IpcSchema } from '@/src/schema'
 
 type IPCDato = {
     fecha: string
     inflacion: number
 }
 
-type ItemDato = [
-    fecha: string,
-    inflacion: number
-][]
-
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const desde = searchParams.get('desde')
     const hasta = searchParams.get('hasta')
 
-    const apiUrl =
-        'https://apis.datos.gob.ar/series/api/series/?ids=148.3_INIVELNAL_DICI_M_26&limit=5000&format=json'
-// 'https://api.argentinadatos.com/v1/finanzas/indices/inflacion'
+    // Solo API 2: Más limpia y confiable
+    const apiUrl = 'https://api.argentinadatos.com/v1/finanzas/indices/inflacion'
+
+    console.log('🔍 Obteniendo datos de IPC...')
+    
     try {
-        const response = await axios.get(apiUrl)
-        const result = IpcSchema.parse(response.data)
+        const response = await axios.get(apiUrl, { timeout: 30000 })
+        console.log('✅ API respondió correctamente')
         
-        const { data: valores } = result
-
-        if (!valores || !Array.isArray(valores)) {
-            return NextResponse.json({ error: 'No se pudo obtener la serie de datos del IPC' }, { status: 500 })
-        }
-
-        const datos: {
-            date: string;
-            value: number
-        }[] = (valores as ItemDato)
-            .filter((item) => Array.isArray(item) && item[0] && item[1] != null)
-            .map(([date, value]) => ({
-                date: (date as string).substring(0, 10),
-                value: value as number,
-            }))
-
-        // Fechas disponibles para debug
-
-        const fechasDisponibles = datos.map(d => d.date)
+        // Los datos ya vienen limpios: [{fecha: "YYYY-MM-DD", valor: number}]
+        const datosApi = response.data as Array<{fecha: string, valor: number}>
+        
+        // Convertir al formato que espera getIpc()
+        const inflacionMensual: IPCDato[] = datosApi
+            .filter(item => item.fecha && item.valor != null && isFinite(item.valor))
+            .map(item => {
+                // Convertir fecha de "YYYY-MM-DD" a "YYYY-MM-01" (primer día del mes)
+                const fechaOriginal = new Date(item.fecha)
+                const fechaPrimerDia = `${fechaOriginal.getFullYear()}-${String(fechaOriginal.getMonth() + 1).padStart(2, '0')}-01`
+                
+                return {
+                    fecha: fechaPrimerDia,
+                    inflacion: item.valor // Ya es la inflación directa, no necesita cálculo
+                }
+            })
 
         // Filtrar por fechas si se especifican
-        const datosFiltrados = datos.filter((item) => {
-            const añoMes = item.date.substring(0, 7)
-            const dentroDesde = !desde || añoMes >= desde
-            const dentroHasta = !hasta || añoMes <= hasta
-            return dentroDesde && dentroHasta
-        })
-        // Fechas fechas Filtradas para debug
+        const datosFiltrados = desde || hasta ? 
+            inflacionMensual.filter((item) => {
+                const añoMes = item.fecha.substring(0, 7)
+                const dentroDesde = !desde || añoMes >= desde
+                const dentroHasta = !hasta || añoMes <= hasta
+                return dentroDesde && dentroHasta
+            }) : inflacionMensual
 
-        const fechasFiltradas = datosFiltrados.map(d => d.date)
+        console.log('✅ Datos procesados:', datosFiltrados.length, 'registros válidos')
 
-        if (datosFiltrados.length < 2) {
-            return NextResponse.json({
-                error: 'Se necesitan al menos dos registros para calcular la inflación',
-                desde,
-                hasta,
-                fechasFiltradas,
-                fechasDisponibles,
-            }, { status: 400 })
-        }
-
-        // Calcular inflación mensual
-        const inflacionMensual: IPCDato[] = datosFiltrados.slice(1).map((item, i) => {
-            const actual = item.value
-            const anterior = datosFiltrados[i].value
-            const variacion = ((actual - anterior) / anterior) * 100
-
-            return {
-                fecha: item.date,
-                inflacion: parseFloat(variacion.toFixed(2)),
-            }
-        })
-
-        // Calcular inflación acumulada
-        const valorInicial = datosFiltrados[0].value
-        const valorFinal = datosFiltrados[datosFiltrados.length - 1].value
-        const inflacionAcumulada = parseFloat(((valorFinal - valorInicial) / valorInicial * 100).toFixed(2))
+        // Calcular inflación acumulada (opcional para compatibilidad)
+        const inflacionAcumulada = datosFiltrados.reduce((acc, item) => acc + item.inflacion, 0)
 
         return NextResponse.json({
-            inflacionMensual,
-            inflacionAcumulada,
+            inflacionMensual: datosFiltrados,
+            inflacionAcumulada: parseFloat(inflacionAcumulada.toFixed(2))
         })
+        
     } catch (error) {
-        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 })
+        console.error('❌ Error al obtener datos de IPC:', error)
+        return NextResponse.json({ 
+            error: error instanceof Error ? error.message : String(error)
+        }, { status: 500 })
     }
 }

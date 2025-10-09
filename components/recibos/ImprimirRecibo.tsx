@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import ButtonGoBack from "../ui/ButtonGoBack";
 import PDFRecibo from "./PDFRecibo";
@@ -7,37 +6,24 @@ import { ReciboConRelaciones } from "@/src/types/recibo";
 import { formatCurrency, formatFecha } from "@/src/utils";
 
 type ImprimirReciboProps = {
-    reciboId: string;
+    recibo: ReciboConRelaciones;
 };
 
-export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
-    const [recibo, setRecibo] = useState<ReciboConRelaciones | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchRecibo() {
-            setLoading(true);
-            const res = await fetch(`/api/recibos/imprimir/${reciboId}`);
-            const data = await res.json();
-            setRecibo(data);
-            setLoading(false);
-        }
-        fetchRecibo();
-    }, [reciboId]);
-
-    if (loading || !recibo) return <div className="text-center py-10">Cargando recibo...</div>;
+export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
 
     const handleOpenPdf = async () => {
-        if (!recibo) return;
-        const blob = await pdf(<PDFRecibo recibo={recibo} />).toBlob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
+        try {
+            const blob = await pdf(<PDFRecibo recibo={recibo} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
+        } catch (error) {
+            console.error("Error al generar PDF:", error);
+            alert("Error al generar el PDF. Intente nuevamente.");
+        }
     };
-
 
     return (
         <>
-
             <div className="max-w-2xl mx-auto bg-orange-50 rounded-lg shadow-lg p-10 flex flex-col space-y-4 mb-10">
 
                 <section className="flex flex-row justify-between mb-8 bg-white p-4 rounded-lg shadow-lg">
@@ -80,13 +66,6 @@ export default function ImprimirRecibo({ reciboId }: ImprimirReciboProps) {
                     >
                         Imprimir PDF
                     </button>
-                    {/* <PDFDownloadLink
-                        document={<PDFRecibo recibo={recibo} />}
-                        fileName={`recibo-${recibo.id}.pdf`}
-                        className="mt-4 uppercase bg-slate-800 text-white px-4 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 cursor-pointer w-48"
-                    >
-                        {({ loading }) => (loading ? 'Cargando PDF...' : 'Descargar PDF')}
-                    </PDFDownloadLink> */}
                     <ButtonGoBack />
                 </div>
 
