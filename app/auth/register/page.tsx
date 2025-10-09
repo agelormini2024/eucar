@@ -1,9 +1,9 @@
 "use client"
 import { useForm } from "react-hook-form"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-export default function RegisterPage() {
+function RegisterForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { register, handleSubmit, formState: { errors }, setValue } = useForm();
@@ -131,4 +131,12 @@ export default function RegisterPage() {
             </form>
         </div>
     )
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<div className="text-center py-10">Cargando...</div>}>
+            <RegisterForm />
+        </Suspense>
+    );
 }

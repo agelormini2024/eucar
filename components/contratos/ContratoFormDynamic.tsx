@@ -159,7 +159,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     //-----------------------------------------------------------------------------------------//
     // Se busca el propietario de la propiedad del contrato 
     //-----------------------------------------------------------------------------------------//
-    async function buscarPropietario() {
+    const buscarPropietario = useCallback(async () => {
         console.log("Buscando propietario para propiedad:", formValues.propiedadId);
         const result = await fetch(`/api/contratos/propiedad/${formValues.propiedadId}`).then(res => res.json())
         console.log("Respuesta de la API:", result);
@@ -182,14 +182,13 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
         } else {
             console.log('No se encontró el Propietario  !!!')
         }
-    }
+    }, [formValues.propiedadId, setFormValues]);
 
     useEffect(() => {
         if (formValues.propiedadId && formValues.propiedadId !== 0) {
-
             buscarPropietario();
         }
-    }, [formValues.propiedadId]);
+    }, [formValues.propiedadId, buscarPropietario]);
     //-------------------------------------------------------------------------------------------//
 
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
