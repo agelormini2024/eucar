@@ -39,8 +39,6 @@ type contratoFormProps = {
 }
 
 export default async function ContratoForm({ contrato }: contratoFormProps) {
-    
-    console.log("ContratoForm - contrato:", contrato);
 
     const clientes = await getClientes();
     const propiedades = await getPropiedades();
