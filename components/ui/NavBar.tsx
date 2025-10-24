@@ -3,6 +3,7 @@ import ButtonLogout from "./ButtonLogout";
 import { authOptions } from "@/src/auth/options";
 import ButtonGoHome from "./ButtonGoHome";
 import ButtonInvitaciones from "./ButtonInvitaciones";
+import ButtonProfile from "./ButtonProfile";
 
 export default async function NavBar() {
 
@@ -19,6 +20,7 @@ export default async function NavBar() {
                             {session.user.rol === "admin" && (
                                 <ButtonInvitaciones />
                             )}
+                            <ButtonProfile />
                             <ButtonLogout />
                         </li>
                     </>

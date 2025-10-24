@@ -16,6 +16,20 @@ model Usuario {
   createdAt  DateTime     @default(now())
   rol        String       @default("usuario")
   Invitacion Invitacion[]
+  PasswordResetToken PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String   
+  token     String   @unique
+  expiresAt DateTime
+  usado     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  usuario   Usuario  @relation(fields: [email], references: [email])
+  
+  @@index([email])
+  @@index([token])
 }
 
 model Pais {

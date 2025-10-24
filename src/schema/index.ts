@@ -14,6 +14,28 @@ export const InvitacionSchema = z.object({
     email: z.string().email({ message: "El email no es válido" }),
 })
 
+export const CambiarPasswordSchema = z.object({
+    currentPassword: z.string().min(1, { message: "La contraseña actual es obligatoria" }),
+    newPassword: z.string().min(6, { message: "La nueva contraseña debe tener al menos 6 caracteres" }),
+    confirmPassword: z.string().min(6, { message: "La confirmación de contraseña debe tener al menos 6 caracteres" }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"]
+})
+
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email({ message: "El email no es válido" }),
+})
+
+export const ResetPasswordSchema = z.object({
+    token: z.string().min(1, { message: "El token es obligatorio" }),
+    newPassword: z.string().min(6, { message: "La nueva contraseña debe tener al menos 6 caracteres" }),
+    confirmPassword: z.string().min(6, { message: "La confirmación de contraseña debe tener al menos 6 caracteres" }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"]
+})
+
 export const UsuarioRegistroConInvitacionSchema = z.object({
     email: z.string().email({ message: "El email no es válido" }),
     password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }),
