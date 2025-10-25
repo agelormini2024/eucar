@@ -151,7 +151,7 @@ export default function InvitacionesPage() {
 
                 <div className="mt-6">
                     <button
-                        onClick={() => router.push('/admin')}
+                        onClick={() => router.push('/')}
                         className="text-red-700 hover:text-red-900 font-medium"
                     >
                         ← Volver al Panel de Administración
