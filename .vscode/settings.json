@@ -2,7 +2,7 @@
     "github.copilot.enable": {
         "*": true,
         "plaintext": false,
-        "markdown": false,
+        "markdown": true,
         "scminput": false,
         "javascript": true,
         "javascriptreact": false,
@@ -10,6 +10,7 @@
         "html": true,
         "typescriptreact": true,
         "http": true,
+        "python": true,
         "typescript": true,
         "prisma": true
     },
