@@ -95,6 +95,26 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
+        // Verificar si existe una invitación previa que haya expirado
+        const invitacionExpirada = await prisma.invitacion.findFirst({
+            where: {
+                email,
+                usado: false,
+                expiresAt: {
+                    lte: new Date()
+                }
+            }
+        });
+
+        // Eliminar esta invitación expirada antes de crear una nueva
+        if (invitacionExpirada) {
+            await prisma.invitacion.delete({
+                where: {
+                    id: invitacionExpirada.id
+                }
+            });
+        }
+
         // Crear nueva invitación
         const codigo = randomUUID();
         const expiresAt = new Date();
