@@ -203,7 +203,7 @@ Para consultas o reportar problemas:
 
 ## 👥 Equipo
 
-Desarrollado por el equipo de EUCAR.
+Desarrollado por Alejandro Gelormini.
 
 ---
 
