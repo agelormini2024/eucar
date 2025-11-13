@@ -37,14 +37,6 @@ export const consultaContratos = {
                 nombre: true,
                 cuit: true,
             }
-        },
-        recibos: {
-            select: {
-                id: true,
-                montoTotal: true,
-                fechaGenerado: true,
-                fechaImpreso: true,
-            }
         }
     }
 } as const

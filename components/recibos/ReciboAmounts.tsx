@@ -53,7 +53,8 @@ export default function ReciboAmounts({ formValues, handleInputChange, setFormVa
                         type="text"
                         name="montoAnterior"
                         onChange={handleInputChange}
-                        value={formatCurrency(formValues.montoAnterior)}
+                        value={formValues.montoAnterior > 0 ? formatCurrency(formValues.montoAnterior) : "---"}
+                        placeholder="Pendiente"
                         className="block w-full p-3 bg-slate-200 text-3xl font-black text-center text-slate-500"
                         disabled
                     />
@@ -68,8 +69,9 @@ export default function ReciboAmounts({ formValues, handleInputChange, setFormVa
                         type="text"
                         name="montoTotal"
                         onChange={handleInputChange}
-                        value={formatCurrency(formValues.montoTotal)}
-                        className="block w-full p-3 bg-slate-200 text-3xl font-black text-center"
+                        value={formValues.montoTotal > 0 ? formatCurrency(formValues.montoTotal) : "Calculando..."}
+                        placeholder="Se calculará automáticamente"
+                        className="block w-full p-3 bg-slate-200 text-3xl font-black text-center text-slate-400"
                         disabled
                     />
                 </div>

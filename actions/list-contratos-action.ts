@@ -14,7 +14,32 @@ export async function getContratos() {
 
         const contratos = await prisma.contrato.findMany({
             where: {
-                cantidadMesesDuracion: { gt: 0 }
+                cantidadMesesDuracion: { gt: 0 },
+                // Solo contratos que NO tienen recibos del mes actual (excepto anulados)
+                NOT: {
+                    recibos: {
+                        some: {
+                            estadoReciboId: { not: 5 }, // Excluir ANULADOS
+                            OR: [
+                                {
+                                    // Recibos con fechaGenerado del mes actual
+                                    fechaGenerado: {
+                                        gte: firstDay,
+                                        lte: lastDay,
+                                    }
+                                },
+                                {
+                                    // Recibos PENDIENTES (fechaGenerado es null) con fechaPendiente del mes actual
+                                    fechaGenerado: null,
+                                    fechaPendiente: {
+                                        gte: firstDay,
+                                        lte: lastDay,
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
             },
             orderBy: {
                 id: 'asc'
@@ -42,20 +67,6 @@ export async function getContratos() {
                         apellido: true,
                         nombre: true,
                         cuit: true,
-                    }
-                },
-                recibos: {
-                    where: {
-                        fechaGenerado: {
-                            gte: firstDay,
-                            lte: lastDay,
-                        }
-                    },
-                    select: {
-                        id: true,
-                        montoTotal: true,
-                        fechaGenerado: true,
-                        fechaImpreso: true,
                     }
                 }
             }

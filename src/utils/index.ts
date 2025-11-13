@@ -89,3 +89,116 @@ export function restarUnMes(fecha: string): string {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+/**
+ * Convierte un número a su representación en letras en español
+ * @param numero - El número a convertir (hasta 999,999,999.99)
+ * @returns String con el número escrito en letras
+ * @example
+ * numeroALetras(123.45) // Returns: "ciento veintitrés pesos con cuarenta y cinco centavos"
+ * numeroALetras(1000000) // Returns: "un millón de pesos"
+ */
+export function numeroALetras(numero: number): string {
+    const unidades = [
+        '', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'
+    ];
+    
+    const especiales = [
+        'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 
+        'diecisiete', 'dieciocho', 'diecinueve'
+    ];
+    
+    const decenas = [
+        '', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 
+        'setenta', 'ochenta', 'noventa'
+    ];
+    
+    const centenas = [
+        '', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos',
+        'seiscientos', 'setecientos', 'ochocientos', 'novecientos'
+    ];
+
+    function convertirGrupo(num: number): string {
+        if (num === 0) return '';
+        
+        let resultado = '';
+        const c = Math.floor(num / 100);
+        const d = Math.floor((num % 100) / 10);
+        const u = num % 10;
+        
+        if (c > 0) {
+            if (num === 100) {
+                resultado += 'cien';
+            } else {
+                resultado += centenas[c];
+            }
+        }
+        
+        if (d === 1 && u > 0) {
+            resultado += (resultado ? ' ' : '') + especiales[u];
+        } else {
+            if (d === 2 && u > 0) {
+                resultado += (resultado ? ' ' : '') + 'veinti' + unidades[u];
+            } else {
+                if (d > 0) {
+                    resultado += (resultado ? ' ' : '') + decenas[d];
+                }
+                if (u > 0) {
+                    resultado += (resultado && d > 0 ? ' y ' : (resultado ? ' ' : '')) + unidades[u];
+                }
+            }
+        }
+        
+        return resultado;
+    }
+
+    // Separar parte entera y decimal
+    const partes = numero.toString().split('.');
+    const entero = parseInt(partes[0]);
+    const decimal = partes[1] ? parseInt(partes[1].padEnd(2, '0').substring(0, 2)) : 0;
+
+    if (entero === 0) {
+        const centavosTexto = decimal > 0 ? numeroALetras(decimal) + ' centavo' + (decimal !== 1 ? 's' : '') : '';
+        return centavosTexto || 'cero pesos';
+    }
+
+    let resultado = '';
+
+    // Millones
+    const millones = Math.floor(entero / 1000000);
+    if (millones > 0) {
+        if (millones === 1) {
+            resultado += 'un millón';
+        } else {
+            resultado += convertirGrupo(millones) + ' millones';
+        }
+    }
+
+    // Miles
+    const miles = Math.floor((entero % 1000000) / 1000);
+    if (miles > 0) {
+        if (resultado) resultado += ' ';
+        if (miles === 1) {
+            resultado += 'mil';
+        } else {
+            resultado += convertirGrupo(miles) + ' mil';
+        }
+    }
+
+    // Unidades
+    const unidadesNum = entero % 1000;
+    if (unidadesNum > 0) {
+        if (resultado) resultado += ' ';
+        resultado += convertirGrupo(unidadesNum);
+    }
+
+    // Agregar "pesos"
+    resultado += ' peso' + (entero !== 1 ? 's' : '');
+
+    // Agregar centavos si los hay
+    if (decimal > 0) {
+        resultado += ' con ' + convertirGrupo(decimal) + ' centavo' + (decimal !== 1 ? 's' : '');
+    }
+
+    return resultado;
+}
+

@@ -10,6 +10,7 @@ import { estadoRecibo } from './data/estadoRecibo'
 import { ipc } from './data/ipc'
 import { icl } from './data/icl'
 import { usuarios } from './data/usuarios'
+import { tiposItem } from './data/tiposItem'
 
 const prisma = new PrismaClient()
 
@@ -24,6 +25,7 @@ async function main() {
         await prisma.$executeRaw`TRUNCATE TABLE "TipoIndice" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "TipoContrato" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "EstadoRecibo" RESTART IDENTITY CASCADE;`
+        await prisma.$executeRaw`TRUNCATE TABLE "TipoItem" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "Ipc" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "Icl" RESTART IDENTITY CASCADE;`
         await prisma.$executeRaw`TRUNCATE TABLE "Usuario" RESTART IDENTITY CASCADE;`
@@ -52,6 +54,9 @@ async function main() {
         })
         await prisma.estadoRecibo.createMany({
             data: estadoRecibo
+        })
+        await prisma.tipoItem.createMany({
+            data: tiposItem
         })
         await prisma.ipc.createMany({
             data: ipc

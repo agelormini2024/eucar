@@ -9,14 +9,27 @@ export async function buscarReciboById(id: number) {
         const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-        const recibo = await prisma.recibo.findUnique({
+        const recibo = await prisma.recibo.findFirst({
             where: {
-                id: id,
-                estadoReciboId: { not: 4 }, // Excluir "ANULADO"
-                fechaGenerado: {
-                    gte: firstDay,
-                    lt: lastDay,
-                }
+                id,
+                estadoReciboId: { not: 5 }, // Excluir "ANULADO"
+                OR: [
+                    {
+                        // Recibos con fechaGenerado del mes actual
+                        fechaGenerado: {
+                            gte: firstDay,
+                            lte: lastDay,
+                        }
+                    },
+                    {
+                        // Recibos PENDIENTES (fechaGenerado es null) con fechaPendiente del mes actual
+                        fechaGenerado: null,
+                        fechaPendiente: {
+                            gte: firstDay,
+                            lte: lastDay,
+                        }
+                    }
+                ]
             },
             include: {
                 contrato: {

@@ -20,19 +20,37 @@ export async function getRecibos(mes?: number, año?: number) {
             // Crear fecha fin (primer día del mes siguiente)
             const fechaFin = new Date(año, mes, 1);
             
+            // Filtrar por fechaGenerado O por fechaPendiente si está PENDIENTE
+            // Esto permite ver tanto recibos generados como pendientes del mes
             dateFilter = {
-                fechaGenerado: {
-                    gte: fechaInicio,
-                    lt: fechaFin
-                }
+                OR: [
+                    {
+                        // Recibos ya generados en este mes
+                        fechaGenerado: {
+                            gte: fechaInicio,
+                            lt: fechaFin
+                        }
+                    },
+                    {
+                        // Recibos pendientes de este mes (esperando índices)
+                        fechaPendiente: {
+                            gte: fechaInicio,
+                            lt: fechaFin
+                        },
+                        estadoReciboId: 1 // Solo pendientes
+                    }
+                ]
             };
         }
 
         const recibos = await prisma.recibo.findMany({
             where: dateFilter,
-            orderBy: {
-                fechaGenerado: 'desc' // Ordenar por fecha más reciente primero
-            },
+            orderBy: [
+                // Primero ordenar por estado (pendientes primero para que sean visibles)
+                { estadoReciboId: 'asc' },
+                // Luego por fecha pendiente descendente (más reciente primero)
+                { fechaPendiente: 'desc' }
+            ],
             include: {
                 contrato: {
                     select: {

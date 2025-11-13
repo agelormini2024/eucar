@@ -210,9 +210,8 @@ export const ReciboSchema = z.object({
     observaciones: z.string()
         .max(200, { message: "Las observaciones no pueden tener más de 200 caracteres" })
         .optional(),
-    items: z.array(ItemReciboSchema).min(1, { 
-        message: "Debe tener al menos un ítem (el alquiler)" 
-    })
+    items: z.array(ItemReciboSchema)
+    // No requerir mínimo de 1 ítem porque el backend crea "Alquiler" automáticamente si está vacío
 
 }).refine((data) => {
         // Solo validar si estadoReciboId !== 1

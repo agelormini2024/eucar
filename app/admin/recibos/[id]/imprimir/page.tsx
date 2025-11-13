@@ -41,6 +41,11 @@ export default async function ImprimirReciboPage({ params }: { params: Promise<(
                                 numero: true,
                                 piso: true,
                                 departamento: true,
+                                tipoPropiedad: {
+                                    select: {
+                                        descripcion: true,
+                                    }
+                                }
                             }
                         },
                     }

@@ -84,6 +84,7 @@ export type ReciboConRelaciones = {
     fechaAnulado: string | null;
     montoAnterior: number;
     montoTotal: number;
+    montoPagado: number;
     observaciones?: string | null;
     createdAt: string;
     updatedAt: string;
@@ -109,6 +110,9 @@ export type ReciboConRelaciones = {
             numero: number;
             piso: string | null;
             departamento: string | null;
+            tipoPropiedad?: {
+                descripcion: string;
+            };
         };
     };
 };

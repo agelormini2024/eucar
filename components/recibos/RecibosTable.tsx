@@ -99,15 +99,16 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
             },
             {
-                id: "generarRecibo", // ID único para la columna
+                id: "regenerarRecibo", // ID único para la columna
                 header: "Pendientes",
                 Cell: ({ row }) =>
-                    row.original.montoTotal === 0 ? (
+                    row.original.estadoReciboId === 1 ? (
                         <Link
-                            href={`../recibos/alta/${row.original.contratoId}`}
+                            href={`/admin/recibos/alta/${row.original.contratoId}`}
                             className="bg-orange-200 px-2 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
+                            title="Regenerar recibo pendiente"
                         >
-                            Generar
+                            Regenerar
                         </Link>
                     ) : null
                 ,

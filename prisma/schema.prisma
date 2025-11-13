@@ -209,12 +209,39 @@ model Recibo {
   estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
 }
 
+model TipoItem {
+  id              Int          @id @default(autoincrement())
+  codigo          String       @unique
+  nombre          String
+  descripcion     String?
+  esModificable   Boolean      @default(true)
+  esEliminable    Boolean      @default(true)
+  permiteNegativo Boolean      @default(false)
+  esObligatorio   Boolean      @default(false)
+  orden           Int          @default(0)
+  color           String?      @default("#6B7280")
+  activo          Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  itemsRecibo     ItemRecibo[]
+
+  @@index([codigo])
+  @@index([activo])
+}
+
 model ItemRecibo {
-  id          Int    @id @default(autoincrement())
-  descripcion String
-  monto       Float
-  reciboId    Int
-  recibo      Recibo @relation(fields: [reciboId], references: [id])
+  id            Int       @id @default(autoincrement())
+  descripcion   String
+  monto         Float
+  reciboId      Int
+  tipoItemId    Int
+  observaciones String?
+  createdAt     DateTime  @default(now())
+  recibo        Recibo    @relation(fields: [reciboId], references: [id], onDelete: Cascade)
+  tipoItem      TipoItem  @relation(fields: [tipoItemId], references: [id])
+
+  @@index([reciboId])
+  @@index([tipoItemId])
 }
 
 model Invitacion {

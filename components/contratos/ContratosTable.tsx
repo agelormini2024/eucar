@@ -45,18 +45,23 @@ export default function ContratosTable({ data }: ContratosTableProps) {
             {
                 id: "generarRecibo",
                 header: "Recibos",
-                Cell: ({ row }) =>
-                    row.original.recibos.length > 0 ? null :
-                        (<Link
-                            href={`../recibos/${row.original.id}/alta`} 
-                            className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
-                        >
-                            Generar
-                        </Link>
-                        ),
+                Cell: ({ row }) => (
+                    <Link
+                        href={`/admin/recibos/alta/${row.original.id}`}
+                        className="bg-orange-200 px-4 py-2 font-bold rounded hover:bg-orange-300 transition-colors duration-400"
+                        title="Generar recibo para este contrato"
+                    >
+                        Generar
+                    </Link>
+                ),
                 muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
                 muiTableBodyCellProps: { style: { textAlign: "center" } },
 
+            },
+            {
+                accessorKey: "id",
+                header: "Contrato N°",
+                muiTableHeadCellProps: { style: { color: "darkred" } },
             },
             {
                 accessorKey: "mesesRestaActualizar",

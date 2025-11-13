@@ -1,39 +1,215 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EUCAR - Sistema de Gestión de Alquileres
 
-## Getting Started
+Sistema integral para la administración de contratos de alquiler con cálculo automático de ajustes por índices económicos (IPC/ICL) y generación de recibos.
 
-First, run the development server:
+---
+
+## 🎯 Características Principales
+
+- **Gestión de Contratos**: Administración completa de contratos de alquiler con propietarios e inquilinos
+- **Cálculo Automático**: Ajustes de alquiler según índices IPC (Índice de Precios al Consumidor) o ICL (Índice de Contratos de Locación)
+- **Generación de Recibos**: Sistema inteligente de recibos con estados y validaciones
+- **Items Tipificados**: Sistema flexible de items con comportamiento configurable
+- **Gestión de Propiedades**: Control de inmuebles bajo administración
+- **Auditoría Completa**: Seguimiento de cambios y estados históricos
+
+---
+
+## � Inicio Rápido
+
+### Prerrequisitos
+
+- Node.js 18 o superior
+- PostgreSQL 14 o superior
+- npm/yarn/pnpm
+
+### Instalación
 
 ```bash
+# Clonar repositorio
+git clone <repository-url>
+cd eucar
+
+# Instalar dependencias
+npm install
+
+# Configurar base de datos
+cp .env.example .env
+# Editar .env con tus credenciales
+
+# Ejecutar migraciones
+npx prisma migrate dev
+
+# Cargar datos iniciales
+npx prisma db seed
+
+# Iniciar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## � Documentación
 
-## Learn More
+### Guías Técnicas
 
-To learn more about Next.js, take a look at the following resources:
+- **[🔧 Instalación y Configuración](./docs/INSTALLATION.md)** - Guía completa de setup
+- **[🗄️ Base de Datos](./docs/DATABASE.md)** - Schema, relaciones y migraciones
+- **[🧮 Cálculos de Índices](./docs/INDICES.md)** - Fórmulas IPC e ICL explicadas
+- **[📝 Sistema de Recibos](./docs/RECIBOS.md)** - Lógica de negocio y estados
+- **[🏷️ TipoItem](./docs/TIPO_ITEM.md)** - Sistema de tipos de items (nuevo)
+- **[🧪 Testing](./docs/TESTING.md)** - Guía de tests y coverage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Arquitectura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **[📐 Estructura del Proyecto](./docs/ARCHITECTURE.md)** - Organización de carpetas y archivos
+- **[🔄 Hooks Personalizados](./docs/HOOKS.md)** - useReciboData, useReciboValidation
+- **[⚙️ Server Actions](./docs/ACTIONS.md)** - Acciones del servidor Next.js
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Stack Tecnológico
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Categoría | Tecnología |
+|-----------|------------|
+| **Framework** | Next.js 14 (App Router) |
+| **Base de Datos** | PostgreSQL + Prisma ORM |
+| **Autenticación** | NextAuth.js |
+| **Estado Global** | Zustand |
+| **Estilos** | Tailwind CSS |
+| **Validación** | Zod |
+| **Testing** | Jest + React Testing Library |
+| **Lenguaje** | TypeScript |
+
+---
+
+## 📊 Módulos del Sistema
+
+### 1. Clientes
+Gestión de propietarios e inquilinos con datos completos (DNI, CUIT, contacto).
+
+### 2. Propiedades
+Administración de inmuebles con tipos, ubicaciones y características.
+
+### 3. Contratos
+- Tipos de contrato (IPC/ICL)
+- Periodicidad de ajustes
+- Duración y renovaciones
+- Montos históricos
+
+### 4. Recibos
+- Estados: PENDIENTE → GENERADO → PAGADO → IMPRESO → ANULADO
+- Items tipificados con validaciones
+- Regeneración inteligente
+- Exportación a PDF
+
+### 5. Índices Económicos
+- Carga manual o automática de IPC
+- Importación de ICL desde BCRA
+- Históricos y consultas
+
+---
+
+## 🎨 Capturas
+
+*(Agregar screenshots del sistema aquí)*
+
+---
+
+## 🔑 Variables de Entorno
+
+```env
+# Base de Datos
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+
+# Autenticación
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Email (opcional)
+EMAIL_SERVER_USER="email@example.com"
+EMAIL_SERVER_PASSWORD="app-password"
+EMAIL_FROM="noreply@eucar.com"
+```
+
+Ver [.env.example](./.env.example) para más detalles.
+
+---
+
+## � Scripts Disponibles
+
+```bash
+# Desarrollo
+npm run dev          # Servidor de desarrollo
+npm run build        # Build de producción
+npm run start        # Servidor de producción
+
+# Base de Datos
+npm run db:studio    # Explorador visual (Prisma Studio)
+npm run db:migrate   # Ejecutar migraciones
+npm run db:seed      # Cargar datos iniciales
+npm run db:reset     # Resetear base de datos
+
+# Testing
+npm test            # Ejecutar tests
+npm run test:watch  # Tests en modo watch
+npm run test:coverage # Generar coverage
+```
+
+---
+
+## � Actualizaciones Recientes
+
+### v2.0 - Sistema TipoItem (Noviembre 2024)
+
+- ✅ Nueva tabla `TipoItem` con tipos configurables
+- ✅ Items con comportamiento dinámico (modificable, eliminable)
+- ✅ UI con colores por tipo de item
+- ✅ Helpers type-safe para validaciones
+- ✅ Migración de items existentes
+
+Ver [CHANGELOG.md](./CHANGELOG.md) para historial completo.
+
+---
+
+## 🤝 Contribución
+
+1. Fork del proyecto
+2. Crear branch de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit de cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para guía detallada.
+
+---
+
+## � Licencia
+
+Este proyecto es privado y confidencial. Todos los derechos reservados.
+
+---
+
+## 📧 Soporte
+
+Para consultas o reportar problemas:
+- **Issues**: [GitHub Issues](link-to-issues)
+- **Email**: soporte@eucar.com
+- **Documentación**: [Wiki del Proyecto](link-to-wiki)
+
+---
+
+## 👥 Equipo
+
+Desarrollado por el equipo de EUCAR.
+
+---
+
+**Estado del Proyecto**: 🟢 En Desarrollo Activo
+
+**Última Actualización**: Noviembre 2024
 
 
 ## Calculos en la usados en aplicacion

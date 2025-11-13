@@ -10,7 +10,7 @@
 
 ## 🎯 **RESUMEN EJECUTIVO**
 
-Se implementó un sistema de autenticación robusto y seguro que controla el acceso a la aplicación mediante un sistema de invitaciones. Solo los administradores pueden invitar nuevos usuarios, garantizando que solo personas autorizadas tengan acceso al sistema.
+Sistema de autenticación que controla el acceso a la aplicación mediante un sistema de invitaciones. Solo los administradores pueden invitar nuevos usuarios, garantizando que solo personas autorizadas tengan acceso al sistema.
 
 ### **Características Principales:**
 - 🔐 **Autenticación segura** con NextAuth.js

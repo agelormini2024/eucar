@@ -31,6 +31,12 @@ export type {
     ReciboConRelaciones 
 } from './recibo';
 
+// Re-exports de tipos de item y tipoItem (desde store)
+export type { 
+    ItemRecibo,
+    TipoItem 
+} from '../stores/storeRecibos';
+
 // Re-exports de tipos de índices
 export type { 
     Ipc,

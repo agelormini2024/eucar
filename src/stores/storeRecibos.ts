@@ -1,9 +1,32 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+/**
+ * Tipo para TipoItem de la base de datos
+ */
+export type TipoItem = {
+    id: number
+    codigo: string
+    nombre: string
+    descripcion: string | null
+    esModificable: boolean
+    esEliminable: boolean
+    permiteNegativo: boolean
+    esObligatorio: boolean
+    orden: number
+    color: string | null
+    activo: boolean
+}
+
+/**
+ * Tipo para items de recibo en el formulario
+ * Puede tener tipoItem cargado (cuando viene de BD) o solo tipoItemId (cuando es nuevo)
+ */
 export type ItemRecibo = {
     descripcion: string
     monto: number
+    tipoItemId?: number
+    tipoItem?: TipoItem
 }
 
 export type RecibosFormState = {
@@ -98,7 +121,7 @@ const useRecibosFormStore = create<RecibosFormState>()(
             habilitarBoton: false,
             tipoIndice: "",
             mesesRestaActualizar: 0,
-            items: [{ descripcion: "Alquiler", monto: 0 }] // Ítem inicial del alquiler
+            items: [] // Sin ítems iniciales - se cargarán desde useReciboValidation o BD
         },
         setFormValues: (values) => set((state) => {
             const newFormValues = { ...state.formValues, ...values };
@@ -161,7 +184,7 @@ const useRecibosFormStore = create<RecibosFormState>()(
                 habilitarBoton: false,
                 tipoIndice: "",
                 mesesRestaActualizar: 0,
-                items: [{ descripcion: "Alquiler", monto: 0 }] // Ítem inicial del alquiler
+                items: [] // Sin ítems iniciales - se cargarán desde useReciboValidation o BD
             }
         })),
         setHabilitarBoton: (opc) => set((state) => ({

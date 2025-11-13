@@ -24,7 +24,7 @@ export default async function EditReciboPage({ params }: { params: Promise<(Segm
             <div>
                 {!recibo ? (
                     <div>
-                        <p>No se encontró un recibo generado de este contrato para este Mes.</p>
+                        <p>No se encontró un recibo de este contrato para el mes actual que se pueda editar.</p>
                         <ButtonGoBack />
                     </div>
                 ) : (

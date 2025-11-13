@@ -24,7 +24,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
 
     // Usar los custom hooks para manejar la lógica
     useReciboData(contrato, recibo as RecibosConRelaciones | null)
-    useReciboValidation(contrato)
+    useReciboValidation(contrato, recibo as RecibosConRelaciones | null)
 
     useEffect(() => {
         return () => {

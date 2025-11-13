@@ -8,7 +8,23 @@ export async function buscarItemsRecibo(reciboId: number) {
             },
             select: {
                 descripcion: true,
-                monto: true
+                monto: true,
+                tipoItemId: true,
+                tipoItem: {
+                    select: {
+                        id: true,
+                        codigo: true,
+                        nombre: true,
+                        descripcion: true,
+                        esModificable: true,
+                        esEliminable: true,
+                        permiteNegativo: true,
+                        esObligatorio: true,
+                        orden: true,
+                        color: true,
+                        activo: true
+                    }
+                }
             },
             orderBy: {
                 id: 'asc' // Mantener el orden original
