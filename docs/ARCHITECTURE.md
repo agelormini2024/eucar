@@ -1035,11 +1035,11 @@ try {
 
 ## 🔄 Historial de Cambios
 
-### v2.1.0 (13 Nov 2024)
+### v2.1.0 (13 Nov 2025)
 - Inferencia automática de TipoItem
 - Mejoras en delete-recibo-action
 
-### v2.0.0 (13 Nov 2024)
+### v2.0.0 (13 Nov 2025)
 - Sistema TipoItem implementado
 - Migración a App Router completa
 - Documentación arquitectónica
