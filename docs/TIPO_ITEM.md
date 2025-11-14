@@ -285,6 +285,154 @@ if (!validarMontoItem(item, nuevoMonto)) {
 
 ---
 
+## 🤖 Inferencia Automática de Tipos
+
+### Descripción
+
+A partir de la versión 2.0, el sistema **determina automáticamente** el tipo de cada item basándose en su contenido, sin necesidad de que el usuario lo seleccione manualmente.
+
+### Lógica de Inferencia
+
+La función `determinarTipoItem()` en `create-recibo-action.ts` aplica las siguientes reglas:
+
+```typescript
+async function determinarTipoItem(item: ItemData, tipoAlquilerId: number): Promise<number> {
+    // 1. Si ya tiene tipoItemId asignado → respetarlo
+    if (item.tipoItemId) {
+        return item.tipoItemId
+    }
+    
+    // 2. Si es el item de Alquiler → ALQUILER
+    if (esItemAlquiler(item)) {
+        return tipoAlquilerId
+    }
+    
+    // 3. Si el monto es negativo → REINTEGRO
+    if (item.monto < 0) {
+        return await getTipoItemId('REINTEGRO')
+    }
+    
+    // 4. Por defecto → EXTRA
+    return await getTipoItemId('EXTRA')
+}
+```
+
+### Reglas de Asignación
+
+| Condición | Tipo Asignado | Razón |
+|-----------|---------------|-------|
+| Item con `tipoItemId` definido | **Respeta el tipo** | Ya fue asignado previamente |
+| Descripción = "Alquiler" | **ALQUILER** | Item principal del recibo |
+| `monto < 0` | **REINTEGRO** | Descuentos, devoluciones, bonificaciones |
+| `monto >= 0` (y no es Alquiler) | **EXTRA** | Gastos adicionales, servicios, cargos |
+
+### Ejemplos Prácticos
+
+#### Ejemplo 1: Recibo Simple
+
+```typescript
+const items = [
+  { descripcion: "Alquiler", monto: 100000 },
+  { descripcion: "Descuento pago anticipado", monto: -5000 },
+  { descripcion: "Gastos de limpieza", monto: 3000 }
+]
+
+// Resultado automático:
+// ✅ "Alquiler" → ALQUILER (tipoItemId = 1)
+// ✅ "Descuento..." (monto < 0) → REINTEGRO (tipoItemId = 3)
+// ✅ "Gastos..." (monto > 0) → EXTRA (tipoItemId = 5)
+```
+
+#### Ejemplo 2: Múltiples Items Negativos
+
+```typescript
+const items = [
+  { descripcion: "Alquiler", monto: 150000 },
+  { descripcion: "Bonificación inquilino antiguo", monto: -10000 },
+  { descripcion: "Reintegro reparación", monto: -8000 },
+  { descripcion: "ABL", monto: 5000 }
+]
+
+// Resultado:
+// ✅ "Alquiler" → ALQUILER
+// ✅ "Bonificación..." → REINTEGRO (automático por monto < 0)
+// ✅ "Reintegro..." → REINTEGRO (automático por monto < 0)
+// ✅ "ABL" → EXTRA (monto positivo)
+```
+
+### ¿Cuándo se Aplica?
+
+La inferencia automática se ejecuta en dos momentos:
+
+1. **Creación de recibo nuevo** (`crearNuevoRecibo`)
+2. **Actualización de recibo PENDIENTE** (`actualizarReciboPendiente`)
+
+```typescript
+// En create-recibo-action.ts
+const itemsConTipo = await Promise.all(
+    items.map(async (item) => ({
+        reciboId: nuevoRecibo.id,
+        descripcion: item.descripcion,
+        monto: item.monto,
+        tipoItemId: await determinarTipoItem(item, tipoAlquilerId) // ← Inferencia
+    }))
+);
+
+await tx.itemRecibo.createMany({
+    data: itemsConTipo
+});
+```
+
+### Optimización: Caché de Tipos
+
+Para evitar consultas repetidas a la BD, los IDs de tipos se cachean en memoria:
+
+```typescript
+const cachedTipoItemIds: Record<string, number> = {}
+
+async function getTipoItemId(codigo: string): Promise<number> {
+    if (cachedTipoItemIds[codigo]) {
+        return cachedTipoItemIds[codigo] // ← Retorna desde caché
+    }
+    
+    const tipo = await prisma.tipoItem.findUnique({
+        where: { codigo }
+    })
+    
+    cachedTipoItemIds[codigo] = tipo.id // ← Guarda en caché
+    return tipo.id
+}
+```
+
+### Ventajas
+
+✅ **Simplicidad:** Usuario no necesita seleccionar tipo manualmente  
+✅ **Automático:** Funciona "out of the box" sin configuración  
+✅ **Inteligente:** Detecta descuentos por signo del monto  
+✅ **Extensible:** Fácil agregar más reglas en el futuro  
+✅ **Performance:** Caché reduce queries a la BD  
+
+### Mejora Futura: UI Selector
+
+Para casos más complejos, se puede agregar un selector manual en el formulario:
+
+```typescript
+// Futuro: ItemsSection.tsx
+<select
+  value={item.tipoItemId}
+  onChange={(e) => updateItemTipo(index, e.target.value)}
+>
+  <option value={tipoAlquilerId}>Alquiler</option>
+  <option value={tipoReintegroId}>Reintegro</option>
+  <option value={tipoExtraId}>Extra</option>
+  <option value={tipoServicioId}>Servicio</option>
+</select>
+```
+
+Esta mejora permitirá que el usuario sobrescriba la inferencia automática cuando sea necesario.
+
+---
+
 ## 💻 Uso en Componentes
 
 ### Ejemplo: ItemsSection.tsx

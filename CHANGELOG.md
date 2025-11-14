@@ -7,6 +7,63 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [2.1.0] - 2024-11-13
+
+### 🎉 Agregado
+
+#### Inferencia Automática de TipoItem
+- Sistema inteligente de asignación automática de tipos de items
+- Función `determinarTipoItem()` en `create-recibo-action.ts`
+- Función `getTipoItemId()` con caché de tipos para performance
+- Lógica simple y efectiva:
+  - Monto < 0 → REINTEGRO (descuentos, devoluciones)
+  - Monto >= 0 → EXTRA (gastos adicionales)
+  - Descripción "Alquiler" → ALQUILER
+- Documentación completa en `docs/TIPO_ITEM.md` (sección Inferencia Automática)
+
+#### Mejoras en Eliminación de Recibos
+- Cálculo dinámico de `mesesRestaActualizar` en `delete-recibo-action.ts`
+- Lógica condicional mejorada para actualización de contratos
+- Fix de asignación incorrecta usando strings en lugar de valores
+
+### 🔧 Modificado
+
+- `create-recibo-action.ts`:
+  - Usa `Promise.all` para determinar tipos en paralelo
+  - Aplica inferencia en `crearNuevoRecibo` y `actualizarReciboPendiente`
+  - Eliminado fallback hardcodeado `item.tipoItemId || tipoAlquilerId`
+- `delete-recibo-action.ts`:
+  - Cálculo de `nuevoMesesRestaActualizar` basado en condiciones de negocio
+  - Código simplificado y más legible
+- `docs/TIPO_ITEM.md`:
+  - Nueva sección completa sobre inferencia automática
+  - Ejemplos prácticos con casos de uso reales
+  - Documentación de caché y optimizaciones
+
+### 🐛 Corregido
+
+- **Bug crítico:** Todos los items se guardaban con `tipoItemId = 1` (ALQUILER)
+  - Causa: Fallback incorrecto `item.tipoItemId || tipoAlquilerId`
+  - Solución: Inferencia automática basada en monto
+- **Bug en delete-recibo:** Variable `sumarMes` como string no funcionaba en Prisma
+  - Causa: Intentar usar string para construir objeto Prisma
+  - Solución: Calcular valor numérico directamente
+- Tipo `any` → `unknown` en `useReciboData.ts` línea 98
+
+### ✨ Mejoras de Performance
+
+- Caché de IDs de tipos (`cachedTipoItemIds`) reduce queries a BD
+- Queries paralelas con `Promise.all` en asignación de tipos
+- Función `getTipoAlquilerId()` mantiene caché existente
+
+### 📚 Documentación
+
+- Actualizado `docs/TIPO_ITEM.md` con sección de inferencia automática
+- Ejemplos prácticos de uso en diferentes escenarios
+- Documentación de mejoras futuras (UI selector de tipos)
+
+---
+
 ## [2.0.0] - 2024-11-13
 
 ### 🎉 Agregado

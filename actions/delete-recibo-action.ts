@@ -69,11 +69,46 @@ export async function deleteRecibo(id: number, data: unknown) {
                 },
                 orderBy: { fechaImpreso: 'desc' } // El más reciente primero
             });
+
             // 7. Modificar mesesRestaActualizar en el contrato asociado
+
+            const contratoEncontrado = await tx.contrato.findFirst({
+                where: { id: existingRecibo.contratoId }
+            });
+
+            if (!contratoEncontrado) {
+                return {
+                    success: false,
+                    errors: [{
+                        path: ['contratoId'],
+                        message: "El contrato especificado no existe"
+                    }]
+                };
+            }
+
+            const tc = await tx.tipoContrato.findFirst({
+                where: { id: contratoEncontrado.tipoContratoId }
+            });
+
+            if (!tc) {
+                return {
+                    success: false,
+                    errors: [{
+                        path: ['tipoContratoId'],
+                        message: "El tipo de contrato especificado no existe"
+                    }]
+                };
+            }
+
+            // Determinar el nuevo valor de mesesRestaActualizar basado en la condición
+            const nuevoMesesRestaActualizar = tc.cantidadMesesActualizacion === contratoEncontrado.mesesRestaActualizar 
+                ? 0 
+                : contratoEncontrado.mesesRestaActualizar + 1;
+
             await tx.contrato.update({
                 where: { id: existingRecibo.contratoId },
                 data: {
-                    mesesRestaActualizar: { increment: 1 },
+                    mesesRestaActualizar: nuevoMesesRestaActualizar,
                     cantidadMesesDuracion: { increment: 1 },
                     // Spreading condicional: solo agrega montoAlquilerUltimo si ultimoRecibo existe
                     ...(ultimoRecibo 

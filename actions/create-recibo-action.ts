@@ -55,6 +55,59 @@ async function getTipoAlquilerId(): Promise<number> {
 }
 
 /**
+ * Caché para IDs de tipos de items
+ */
+const cachedTipoItemIds: Record<string, number> = {}
+
+/**
+ * Obtiene el ID de un TipoItem por su código
+ */
+async function getTipoItemId(codigo: string): Promise<number> {
+    if (cachedTipoItemIds[codigo]) {
+        return cachedTipoItemIds[codigo]
+    }
+    
+    const tipo = await prisma.tipoItem.findUnique({
+        where: { codigo },
+        select: { id: true }
+    })
+    
+    if (!tipo) {
+        throw new Error(`TipoItem con código ${codigo} no encontrado en la base de datos`)
+    }
+    
+    cachedTipoItemIds[codigo] = tipo.id
+    return tipo.id
+}
+
+/**
+ * Determina el tipoItemId correcto para un item según su contenido
+ * Lógica simple:
+ * - Si es ALQUILER → tipoAlquilerId
+ * - Si monto < 0 → REINTEGRO (descuento/devolución)
+ * - Resto → EXTRA
+ */
+async function determinarTipoItem(item: ItemData, tipoAlquilerId: number): Promise<number> {
+    // Si ya tiene tipoItemId asignado, usarlo
+    if (item.tipoItemId) {
+        return item.tipoItemId
+    }
+    
+    // Si es el item de Alquiler
+    if (esItemAlquiler(item)) {
+        return tipoAlquilerId
+    }
+    
+    // Si el monto es negativo → REINTEGRO
+    if (item.monto < 0) {
+        return await getTipoItemId('REINTEGRO')
+    }
+    
+    // Por defecto → EXTRA
+    return await getTipoItemId('EXTRA')
+}
+
+/**
  * Crea o actualiza un recibo en el sistema
  * Maneja la lógica compleja de:
  * 1. Validación de datos y verificación de recibos existentes
@@ -254,14 +307,18 @@ async function crearNuevoRecibo(
         // Crear el recibo
         const nuevoRecibo = await tx.recibo.create({ data: reciboData });
 
-        // Crear los ítems del recibo - asegurar que todos tengan tipoItemId
-        await tx.itemRecibo.createMany({
-            data: items.map(item => ({
+        // Crear los ítems del recibo con tipo determinado automáticamente
+        const itemsConTipo = await Promise.all(
+            items.map(async (item) => ({
                 reciboId: nuevoRecibo.id,
                 descripcion: item.descripcion,
                 monto: item.monto,
-                tipoItemId: item.tipoItemId || tipoAlquilerId // Fallback a ALQUILER si no se especifica
+                tipoItemId: await determinarTipoItem(item, tipoAlquilerId)
             }))
+        );
+
+        await tx.itemRecibo.createMany({
+            data: itemsConTipo
         });
 
         return {
@@ -297,13 +354,18 @@ async function actualizarReciboPendiente(
             where: { reciboId }
         });
 
-        await tx.itemRecibo.createMany({
-            data: items.map(item => ({
+        // Crear items con tipo determinado automáticamente
+        const itemsConTipo = await Promise.all(
+            items.map(async (item) => ({
                 reciboId,
                 descripcion: item.descripcion,
                 monto: item.monto,
-                tipoItemId: item.tipoItemId || tipoAlquilerId // Fallback a ALQUILER si no se especifica
+                tipoItemId: await determinarTipoItem(item, tipoAlquilerId)
             }))
+        );
+
+        await tx.itemRecibo.createMany({
+            data: itemsConTipo
         });
 
         // Solo actualizar contrato si el recibo pasó a estado GENERADO
