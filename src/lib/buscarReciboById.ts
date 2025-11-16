@@ -42,6 +42,11 @@ export async function buscarReciboById(id: number) {
                         },
                         
                     }
+                },
+                estadoRecibo: {
+                    select: {
+                        descripcion: true
+                    }
                 }
             }
         });

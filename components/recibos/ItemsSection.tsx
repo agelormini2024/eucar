@@ -4,7 +4,11 @@ import { useEffect } from 'react'
 import useRecibosFormStore, { ItemRecibo } from '@/src/stores/storeRecibos'
 import { esItemAlquiler, puedeEliminarItem, puedeModificarItem, getColorItem } from '@/src/utils/itemHelpers'
 
-export default function ItemsSection() {
+type ItemsSectionProps = {
+    readOnly?: boolean
+}
+
+export default function ItemsSection({ readOnly = false }: ItemsSectionProps) {
     const { formValues, addItem, removeItem, updateItem, setFormValues } = useRecibosFormStore()
     const { items } = formValues
 
@@ -29,13 +33,15 @@ export default function ItemsSection() {
         <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Ítems del Recibo</h3>
-                <button
-                    type="button"
-                    onClick={addItem}
-                    className="px-4 py-1.5 bg-blue-500 font-bold text-white rounded hover:bg-blue-600"
-                >
-                    Agregar Ítem
-                </button>
+                {!readOnly && (
+                    <button
+                        type="button"
+                        onClick={addItem}
+                        className="px-4 py-1.5 bg-blue-500 font-bold text-white rounded hover:bg-blue-600"
+                    >
+                        Agregar Ítem
+                    </button>
+                )}
             </div>
 
             <div className="space-y-2">
@@ -65,7 +71,7 @@ export default function ItemsSection() {
                                     value={item.descripcion}
                                     onChange={(e) => handleUpdateItem(index, 'descripcion', e.target.value)}
                                     className="w-full bg-slate-200 p-2 border rounded"
-                                    disabled={!esModificable} // Usar helper para determinar si es modificable
+                                    disabled={readOnly || !esModificable} // Combinar readOnly con helper
                                 />
                                 {isAlquiler && (
                                     <span className="text-xs text-slate-500 italic ml-1">
@@ -84,10 +90,10 @@ export default function ItemsSection() {
                                         !esModificable ? 'bg-slate-200' :
                                         item.monto < 0 ? 'bg-red-100 text-red-700' : 'bg-slate-200'
                                     }`}
-                                    disabled={!esModificable} // Usar helper para determinar si es modificable
+                                    disabled={readOnly || !esModificable} // Combinar readOnly con helper
                                 />
                             </div>
-                            {esEliminable && ( // Usar helper para determinar si se puede eliminar
+                            {!readOnly && esEliminable && ( // Solo mostrar botón si NO es readOnly
                                 <button
                                     type="button"
                                     onClick={() => removeItem(index)}

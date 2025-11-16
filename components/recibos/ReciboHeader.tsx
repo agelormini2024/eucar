@@ -8,6 +8,7 @@ type ReciboHeaderProps = {
 };
 
 export default function ReciboHeader({ contrato, formValues, handleInputChange }: ReciboHeaderProps) {
+    // Nota: readOnly prop removida ya que todos los campos están siempre disabled
     return (
         <div className="space-y-4">
             {/* Contrato */}

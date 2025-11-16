@@ -3,6 +3,7 @@ import { ReciboFormValues } from "@/src/types/recibo";
 type ReciboServicesProps = {
     formValues: ReciboFormValues;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    readOnly?: boolean;
 };
 
 const services = [
@@ -14,7 +15,7 @@ const services = [
     { name: 'otros', label: 'Otros' }
 ] as const;
 
-export default function ReciboServices({ formValues, handleInputChange }: ReciboServicesProps) {
+export default function ReciboServices({ formValues, handleInputChange, readOnly = false }: ReciboServicesProps) {
     return (
         <div className="grid lg:grid-cols-2 gap-4 mt-4 mb-4">
             <div className="grid lg:grid-cols-2 gap-4">
@@ -33,6 +34,7 @@ export default function ReciboServices({ formValues, handleInputChange }: Recibo
                             className="align-middle ml-2"
                             onChange={handleInputChange}
                             checked={formValues[service.name] || false}
+                            disabled={readOnly}
                         />
                     </div>
                 ))}
@@ -53,6 +55,7 @@ export default function ReciboServices({ formValues, handleInputChange }: Recibo
                         value={formValues.observaciones || ''}
                         className="block w-full p-6 bg-slate-200 mt-2"
                         placeholder="Observaciones del Recibo"
+                        disabled={readOnly}
                     />
                 </div>
             </div>

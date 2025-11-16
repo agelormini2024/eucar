@@ -8,12 +8,13 @@ import ErrorComponent from "../ui/ErrorComponent";
 type ReciboFormProps = {
     contrato: number
     recibo?: Recibo | null
+    readOnly?: boolean
 }
 
 /**
  * Componente servidor que carga y valida el contrato para el formulario de recibo
  */
-export default async function ReciboForm({ contrato, recibo }: ReciboFormProps) {
+export default async function ReciboForm({ contrato, recibo, readOnly = false }: ReciboFormProps) {
     // Validación mínima defensiva sin try/catch para evitar problemas de sesión
     if (!contrato || contrato <= 0) {
         return <ErrorComponent message="ID de recibo inválido" />;
@@ -37,7 +38,7 @@ export default async function ReciboForm({ contrato, recibo }: ReciboFormProps) 
         // Renderizar formulario
         return (
             <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
-                <ReciboFormDynamic contrato={parsed.data} recibo={recibo} />
+                <ReciboFormDynamic contrato={parsed.data} recibo={recibo} readOnly={readOnly} />
             </div>
         );
 

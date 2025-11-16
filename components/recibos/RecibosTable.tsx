@@ -13,7 +13,40 @@ export default function RecibosTable({ data }: RecibosTableProps) {
 
     const columns = useMemo<MRT_ColumnDef<RecibosConRelaciones>[]>(
         () => [
-
+            {
+                id: "verRecibo",
+                header: "",
+                size: 80,
+                Cell: ({ row }) => (
+                    <Link
+                        href={`${row.original.id}/view`}
+                        className="bg-red-800 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        title="Ver recibo en detalle"
+                    >
+                        <svg 
+                            className="h-5 w-5" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" 
+                            />
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
+                            />
+                        </svg>
+                    </Link>
+                ),
+                muiTableHeadCellProps: { style: { textAlign: "center", color: "darkred", fontSize: "1rem" } },
+                muiTableBodyCellProps: { style: { textAlign: "center" } },
+            },
             {
                 id: "imprimirRecibo", 
                 header: "",
@@ -77,7 +110,7 @@ export default function RecibosTable({ data }: RecibosTableProps) {
                 Cell: ({ row }) => (
                     <Link
                         href={`${row.original.id}/borrar`}
-                        className="bg-red-600 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
+                        className="bg-red-500 text-white px-2 py-2 font-bold rounded hover:bg-slate-500 transition-colors duration-400 flex items-center justify-center"
                         title="Eliminar recibo"
                     >
                             <svg

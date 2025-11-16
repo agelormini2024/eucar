@@ -5,6 +5,7 @@ type ReciboAmountsProps = {
     formValues: ReciboFormValues;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     setFormValues: ReciboFormSetValues;
+    readOnly?: boolean;
 };
 export default function ReciboAmounts({ formValues, handleInputChange, setFormValues }: ReciboAmountsProps) {
 

@@ -15,9 +15,10 @@ import { RecibosConRelaciones } from "@/src/types";
 type ReciboFormDynamicProps = {
     contrato: Contrato
     recibo?: Recibo | null
+    readOnly?: boolean
 }
 
-export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynamicProps) {
+export default function ReciboFormDynamic({ contrato, recibo, readOnly = false }: ReciboFormDynamicProps) {
     const formValues = useRecibosFormStore((state) => state.formValues)
     const setFormValues = useRecibosFormStore((state) => state.setFormValues)
     const resetForm = useRecibosFormStore((state) => state.resetForm)
@@ -41,7 +42,7 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             <ReciboHeader 
                 contrato={contrato} 
                 formValues={formValues} 
-                handleInputChange={handleInputChange} 
+                handleInputChange={handleInputChange}
             />
             
             <ReciboAmounts 
@@ -52,11 +53,12 @@ export default function ReciboFormDynamic({ contrato, recibo }: ReciboFormDynami
             
             <ReciboServices 
                 formValues={formValues} 
-                handleInputChange={handleInputChange} 
+                handleInputChange={handleInputChange}
+                readOnly={readOnly}
             />
             
             <div className="border-t pt-6">
-                <ItemsSection />
+                <ItemsSection readOnly={readOnly} />
             </div>
         </div>
     )

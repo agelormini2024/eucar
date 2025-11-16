@@ -26,7 +26,7 @@ useReciboData    useReciboValidation  ReciboHeader    formHandlers  formatters
 
 ### 1️⃣ **Inicialización del Componente**
 ```typescript
-ReciboFormDynamic({ contrato, recibo })
+ReciboFormDynamic({ contrato, recibo, readOnly = false })
 │
 ├─ 🎛️ Extracción del estado global (Zustand)
 │   ├─ formValues = useRecibosFormStore(state => state.formValues)
@@ -95,15 +95,15 @@ return (
 │   ├─ 💰 Input: Monto Anterior (disabled)
 │   └─ 💰 Input: Monto Total (disabled) 
 │
-├─ 🧩 <ReciboServices formValues handleInputChange />
-│   ├─ ☑️ Checkboxes: expensas, abl, aysa, luz, gas, otros
-│   └─ 📝 Textarea: observaciones
+├─ 🧩 <ReciboServices formValues handleInputChange readOnly />
+│   ├─ ☑️ Checkboxes: expensas, abl, aysa, luz, gas, otros (disabled={readOnly})
+│   └─ 📝 Textarea: observaciones (disabled={readOnly})
 │
-└─ 🧩 <ItemsSection /> (existente)
+└─ 🧩 <ItemsSection readOnly />
     ├─ 🗄️ useRecibosFormStore() directo
-    ├─ ➕ addItem()
-    ├─ ➖ removeItem()
-    ├─ ✏️ updateItem()
+    ├─ ➕ addItem() (oculto si readOnly)
+    ├─ ➖ removeItem() (oculto si readOnly)
+    ✏️ updateItem() (disabled si readOnly)
     └─ 🧮 Cálculo automático de totales
 ```
 
@@ -138,6 +138,7 @@ User Input (onChange)
 ## 🔗 **Dependencias y Importaciones**
 
 ```typescript
+```typescript
 ReciboFormDynamic.tsx
 ├─ React: { useEffect, useCallback }
 ├─ Prisma: { Recibo }
@@ -147,4 +148,71 @@ ReciboFormDynamic.tsx
 ├─ Utils: { handleReciboInputChange }
 ├─ Components: { ReciboHeader, ReciboAmounts, ReciboServices, ItemsSection }
 └─ Types: { ReciboFormValues, ReciboFormSetValues }
+```
+
+---
+
+## 👁️ **Modo Solo Lectura (Read-Only Mode)**
+
+### Props
+
+```typescript
+interface ReciboFormDynamicProps {
+  contrato: number
+  recibo?: Recibo
+  readOnly?: boolean  // Prop opcional, default: false
+}
+```
+
+### Comportamiento
+
+Cuando `readOnly={true}`:
+
+#### ReciboServices
+- ✅ Checkboxes deshabilitados: `disabled={readOnly}`
+- ✅ Textarea deshabilitado: `disabled={readOnly}`
+- 🎨 Apariencia: Gris (estado disabled nativo)
+
+#### ItemsSection
+- ✅ Inputs deshabilitados: `disabled={readOnly || !esModificable}`
+- 🚫 Botón "Agregar Ítem" oculto: `{!readOnly && <button>}`
+- 🚫 Botones eliminar ocultos: `{!readOnly && esEliminable && <button>}`
+- 🎨 Solo visualización de items existentes
+
+#### ReciboHeader
+- ℹ️ No requiere prop readOnly (todos los campos siempre disabled)
+
+#### ReciboAmounts
+- ℹ️ No usa prop readOnly (todos los campos siempre disabled por diseño)
+
+### Uso
+
+```typescript
+// Vista de solo lectura
+<ReciboFormDynamic 
+  contrato={contratoId} 
+  recibo={reciboData}
+  readOnly={true}  // Activa modo visualización
+/>
+
+// Vista editable (por defecto)
+<ReciboFormDynamic 
+  contrato={contratoId} 
+  recibo={reciboData}
+/>
+```
+
+### Rutas
+
+- **Edición**: `/admin/recibos/[id]/edit`
+- **Solo Lectura**: `/admin/recibos/[id]/view`
+
+### Arquitectura SOLID
+
+- 🔄 **95% reutilización de código**: Mismo componente para edición y visualización
+- 📦 **Single Responsibility**: Componente único con comportamiento dual controlado por prop
+- 🎯 **Consistencia**: Misma estructura, estilos y validaciones
+- ✨ **Mantenibilidad**: Cambios en una vista se reflejan automáticamente en ambas
+
+````
 ```

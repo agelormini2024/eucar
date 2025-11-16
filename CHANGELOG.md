@@ -7,6 +7,67 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [2.2.0] - 2024-11-16
+
+### 🎉 Agregado
+
+#### Vista de Recibo en Solo Lectura
+- Nueva funcionalidad para visualizar recibos en modo de solo lectura siguiendo el principio SOLID
+- Componente `ViewReciboForm.tsx` - Wrapper para vista sin edición (sin submit)
+- Ruta `/admin/recibos/[id]/view` - Página dedicada para visualización
+- Prop `readOnly` en componentes de recibo:
+  - `ReciboFormDynamic`: Prop opcional que se propaga a componentes hijos
+  - `ReciboServices`: Deshabilita checkboxes y textarea observaciones
+  - `ItemsSection`: Deshabilita inputs y oculta botones de agregar/eliminar
+  - `ReciboForm`: Reenvío de prop readOnly
+- Botón "Ver" en `RecibosTable.tsx`:
+  - Color azul distintivo (bg-blue-700)
+  - Ícono de ojo para visualización
+  - Posicionado antes del botón "Imprimir"
+- Badge de estado del recibo en vista de solo lectura:
+  - Color dinámico según estadoReciboId
+  - Amarillo: PENDIENTE, Verde: GENERADO, Azul: PAGADO, Morado: IMPRESO, Gris: ANULADO
+  - Muestra descripción del estado desde BD
+
+#### Mejoras en itemHelpers.ts
+- Limpieza de código: eliminadas 3 funciones no utilizadas
+  - Removido `permiteMontoNegativo()` (0 usos)
+  - Removido `validarMontoItem()` (0 usos)
+  - Removido `esItemObligatorio()` (0 usos)
+- Reducción de 168 a 121 líneas (-28%)
+- Alcanzado 100% de tasa de uso de funciones
+
+### 🔧 Modificado
+
+- `buscarReciboById.ts`:
+  - Incluye relación `estadoRecibo` con campo `descripcion`
+  - Fix: corregido campo de `nombre` a `descripcion` (schema correcto)
+- `app/admin/recibos/[id]/view/page.tsx`:
+  - Usa directamente `recibo.estadoRecibo?.descripcion` en lugar de mapeo hardcodeado
+
+### 📐 Arquitectura
+
+- **Reutilización de código del 95%**: Solo 2 archivos nuevos necesarios
+- **Patrón SOLID aplicado**: Single Responsibility Principle
+- **Jerarquía de componentes**:
+  ```
+  ViewReciboForm → ReciboForm → ReciboFormDynamic → Componentes hijos
+  ```
+- **Renderizado condicional**: `{!readOnly && <Component />}` para botones de acción
+- **Props opcionales**: `readOnly?: boolean = false` mantiene compatibilidad
+
+### 🐛 Corregido
+
+- Error de tipo TypeScript en `buscarReciboById.ts`: campo `nombre` no existía en `EstadoRecibo`
+- Prop `readOnly` innecesaria en `ReciboAmounts` (todos los campos ya estaban disabled por diseño)
+
+### 📚 Documentación
+
+- Actualizado `CHANGELOG.md` con nueva funcionalidad de vista de solo lectura
+- Documentación de arquitectura y patrón de reutilización de componentes
+
+---
+
 ## [2.1.0] - 2024-11-13
 
 ### 🎉 Agregado
