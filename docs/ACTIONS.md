@@ -691,6 +691,177 @@ await tx.contrato.update({
 
 ---
 
+### update-recibo-action.ts
+
+**Reglas de edición específicas:**
+
+⚠️ **Solo se pueden editar recibos en estado PENDIENTE** (estadoReciboId = 1)  
+🔒 **El item "Alquiler" NO se puede modificar** (se genera automáticamente)  
+✏️ **Se pueden agregar/editar/eliminar items EXTRA y REINTEGRO**  
+🔄 **El montoPagado se recalcula automáticamente**  
+📋 **NO se modifica el contrato** (solo en creación/generación)
+
+```typescript
+export async function updateRecibo(id: number, data: unknown) {
+  try {
+    // 1. Validar datos
+    const result = ReciboSchema.safeParse(data)
+    if (!result.success) {
+      return { success: false, errors: result.error.issues }
+    }
+
+    // 2. Obtener ID del tipo ALQUILER
+    const tipoAlquilerId = await getTipoAlquilerId()
+
+    // 3. Filtrar items del usuario (sin el Alquiler)
+    const itemsSinAlquiler = filtrarItemsSinAlquiler(result.data.items)
+
+    // 4. Asegurar que existe el item "Alquiler" con monto correcto
+    const resultadoItems = await asegurarItemAlquiler(
+      itemsSinAlquiler, 
+      result.data.montoTotal, 
+      tipoAlquilerId
+    )
+    
+    if (!resultadoItems.success) {
+      return {
+        success: false,
+        errors: [{ path: ['items'], message: resultadoItems.error }]
+      }
+    }
+
+    // 5. Calcular montoPagado automáticamente
+    const montoPagado = calcularMontoPagado(resultadoItems.items)
+
+    // 6. Validar que el monto sea razonable
+    const validacionMonto = validarMontoPagado(montoPagado)
+    if (!validacionMonto.success) {
+      return {
+        success: false,
+        errors: [{ path: ['items'], message: validacionMonto.error! }]
+      }
+    }
+
+    // 7. Transacción atómica
+    const resultado = await prisma.$transaction(async (tx) => {
+      // Verificar existencia
+      const existingRecibo = await tx.recibo.findUnique({ where: { id } })
+      
+      if (!existingRecibo) {
+        return {
+          success: false,
+          errors: [{ path: ['id'], message: "El Recibo no existe" }]
+        }
+      }
+
+      // VALIDACIÓN CRÍTICA: Solo permitir editar PENDIENTES
+      if (existingRecibo.estadoReciboId !== 1) {
+        return {
+          success: false,
+          errors: [{
+            path: ['estadoReciboId'],
+            message: "Solo se pueden editar recibos en estado 'Pendiente'"
+          }]
+        }
+      }
+
+      // Actualizar recibo (sin tocar el contrato)
+      const reciboActualizado = await tx.recibo.update({
+        where: { id },
+        data: {
+          ...updateData,
+          montoPagado // Usar el calculado automáticamente
+        }
+      })
+
+      // Reemplazar items
+      await tx.itemRecibo.deleteMany({ where: { reciboId: id } })
+      
+      const itemsParaInsertar = await procesarItemsParaRecibo(
+        resultadoItems.items, 
+        id, 
+        tipoAlquilerId
+      )
+      
+      await tx.itemRecibo.createMany({ data: itemsParaInsertar })
+
+      return { success: true, data: reciboActualizado }
+    })
+
+    return resultado
+  } catch (error) {
+    console.error("Error al actualizar Recibo:", error)
+    return {
+      success: false,
+      errors: [{ path: ['general'], message: "Error interno del servidor" }]
+    }
+  }
+}
+```
+
+**Utilidades compartidas** (en `src/utils/reciboHelpers.ts`):
+
+```typescript
+// Filtrar items sin el Alquiler
+export function filtrarItemsSinAlquiler(items: ItemData[]): ItemData[] {
+  return items.filter(item => !esItemAlquiler(item))
+}
+
+// Asegurar que existe el item Alquiler
+export async function asegurarItemAlquiler(
+  items: ItemData[],
+  montoTotal: number,
+  tipoAlquilerId: number
+): Promise<{ success: true; items: ItemData[] } | { success: false; error: string }> {
+  const itemAlquiler = items.find(item => esItemAlquiler(item))
+  
+  if (!itemAlquiler) {
+    // Si no existe, crear el ítem "Alquiler"
+    return {
+      success: true,
+      items: [
+        { descripcion: "Alquiler", monto: montoTotal, tipoItemId: tipoAlquilerId },
+        ...items
+      ]
+    }
+  }
+  
+  // Si existe, validar monto
+  const validacion = validarItemAlquiler(items, montoTotal)
+  return validacion.success 
+    ? { success: true, items } 
+    : { success: false, error: validacion.error! }
+}
+
+// Calcular monto total a pagar
+export function calcularMontoPagado(items: ItemData[]): number {
+  return items.reduce((sum, item) => sum + item.monto, 0)
+}
+
+// Procesar items para recibo (asigna reciboId y tipoItemId)
+export async function procesarItemsParaRecibo(
+  items: ItemData[],
+  reciboId: number,
+  tipoAlquilerId: number
+): Promise<Array<ItemConTipo & { reciboId: number }>> {
+  const itemsConTipo = await procesarItemsConTipo(items, tipoAlquilerId)
+  return itemsConTipo.map(item => ({ ...item, reciboId }))
+}
+```
+
+**Diferencias clave con createRecibo:**
+
+| Aspecto | createRecibo | updateRecibo |
+|---------|-------------|--------------|
+| Estados permitidos | PENDIENTE o nuevo | Solo PENDIENTE |
+| Item Alquiler | Se genera automáticamente | Se genera automáticamente |
+| Otros items | Se pueden agregar | Se pueden modificar |
+| Actualiza contrato | ✅ Sí (mesesRestaActualizar, etc.) | ❌ No |
+| Regeneración | ✅ Permite regenerar PENDIENTES | ❌ No aplica |
+| Validación tipoItemId | Inferencia automática | Inferencia automática |
+
+---
+
 ## 🧪 Testing de Server Actions
 
 ### Test Básico

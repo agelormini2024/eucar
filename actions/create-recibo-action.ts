@@ -2,7 +2,14 @@
 import { buscarReciboMesActual } from "@/src/lib/buscarRecibo"
 import { prisma } from "@/src/lib/prisma"
 import { ReciboSchema } from "@/src/schema"
-import { esItemAlquiler, CODIGO_ALQUILER } from "@/src/utils/itemHelpers"
+import { 
+    getTipoAlquilerId, 
+    asegurarItemAlquiler,
+    calcularMontoPagado,
+    validarMontoPagado,
+    procesarItemsParaRecibo,
+    type ItemData
+} from "@/src/utils/reciboHelpers"
 
 // Tipos para mejor type safety
 type TransactionClient = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
@@ -24,88 +31,7 @@ type ReciboData = {
     gas: boolean;
     otros: boolean;
 }
-type ItemData = { 
-    descripcion: string
-    monto: number
-    tipoItemId?: number
-}
 type NuevoValorMeses = { decrement: number } | number
-
-/**
- * Obtiene el ID del TipoItem de ALQUILER desde la BD
- * Se cachea en memoria durante la ejecución del servidor
- */
-let cachedTipoAlquilerId: number | null = null
-async function getTipoAlquilerId(): Promise<number> {
-    if (cachedTipoAlquilerId !== null) {
-        return cachedTipoAlquilerId
-    }
-    
-    const tipoAlquiler = await prisma.tipoItem.findUnique({
-        where: { codigo: CODIGO_ALQUILER },
-        select: { id: true }
-    })
-    
-    if (!tipoAlquiler) {
-        throw new Error(`TipoItem con código ${CODIGO_ALQUILER} no encontrado en la base de datos`)
-    }
-    
-    cachedTipoAlquilerId = tipoAlquiler.id
-    return cachedTipoAlquilerId
-}
-
-/**
- * Caché para IDs de tipos de items
- */
-const cachedTipoItemIds: Record<string, number> = {}
-
-/**
- * Obtiene el ID de un TipoItem por su código
- */
-async function getTipoItemId(codigo: string): Promise<number> {
-    if (cachedTipoItemIds[codigo]) {
-        return cachedTipoItemIds[codigo]
-    }
-    
-    const tipo = await prisma.tipoItem.findUnique({
-        where: { codigo },
-        select: { id: true }
-    })
-    
-    if (!tipo) {
-        throw new Error(`TipoItem con código ${codigo} no encontrado en la base de datos`)
-    }
-    
-    cachedTipoItemIds[codigo] = tipo.id
-    return tipo.id
-}
-
-/**
- * Determina el tipoItemId correcto para un item según su contenido
- * Lógica simple:
- * - Si es ALQUILER → tipoAlquilerId
- * - Si monto < 0 → REINTEGRO (descuento/devolución)
- * - Resto → EXTRA
- */
-async function determinarTipoItem(item: ItemData, tipoAlquilerId: number): Promise<number> {
-    // Si ya tiene tipoItemId asignado, usarlo
-    if (item.tipoItemId) {
-        return item.tipoItemId
-    }
-    
-    // Si es el item de Alquiler
-    if (esItemAlquiler(item)) {
-        return tipoAlquilerId
-    }
-    
-    // Si el monto es negativo → REINTEGRO
-    if (item.monto < 0) {
-        return await getTipoItemId('REINTEGRO')
-    }
-    
-    // Por defecto → EXTRA
-    return await getTipoItemId('EXTRA')
-}
 
 /**
  * Crea o actualiza un recibo en el sistema
@@ -136,41 +62,31 @@ export async function createRecibo(data: unknown) {
         const tipoAlquilerId = await getTipoAlquilerId();
 
         // Asegurar que SIEMPRE exista el ítem "Alquiler" con el monto correcto
-        let itemsFinales = [...items];
-        const itemAlquiler = items.find(item => esItemAlquiler(item));
+        const resultadoItems = await asegurarItemAlquiler(items, rest.montoTotal, tipoAlquilerId);
         
-        if (!itemAlquiler) {
-            // Si no existe, crear el ítem "Alquiler" con el montoTotal
-            itemsFinales = [
-                { descripcion: "Alquiler", monto: rest.montoTotal, tipoItemId: tipoAlquilerId } as ItemData,
-                ...items
-            ];
-        } else {
-            // VALIDACIÓN: Si existe, verificar que coincida con montoTotal
-            // Usamos tolerancia de 0.01 para evitar problemas con decimales
-            if (Math.abs(itemAlquiler.monto - rest.montoTotal) > 0.01) {
-                return {
-                    success: false,
-                    errors: [{
-                        path: ['items'],
-                        message: `El monto del alquiler ($${itemAlquiler.monto}) no coincide con el monto calculado ($${rest.montoTotal}). Por favor, recargue el formulario.`
-                    }]
-                };
-            }
-        }
-
-        // Calcular montos (puede incluir ítems negativos para descuentos/reintegros)
-        const montoPagado = itemsFinales.reduce((sum, item) => sum + item.monto, 0);
-
-        // VALIDACIÓN: Verificar que montoPagado sea razonable (mayor a cero)
-        // El montoPagado nunca debería ser 0 porque siempre hay un ítem "Alquiler"
-        // con el monto calculado (o montoAnterior si no hay índice)
-        if (montoPagado < 0) {
+        if (!resultadoItems.success) {
             return {
                 success: false,
                 errors: [{
                     path: ['items'],
-                    message: "El monto total a pagar debe ser mayor o igual a cero. Verifique los descuentos aplicados."
+                    message: resultadoItems.error
+                }]
+            };
+        }
+
+        const itemsFinales = resultadoItems.items;
+
+        // Calcular montos (puede incluir ítems negativos para descuentos/reintegros)
+        const montoPagado = calcularMontoPagado(itemsFinales);
+
+        // VALIDACIÓN: Verificar que montoPagado sea razonable (mayor a cero)
+        const validacionMonto = validarMontoPagado(montoPagado);
+        if (!validacionMonto.success) {
+            return {
+                success: false,
+                errors: [{
+                    path: ['items'],
+                    message: validacionMonto.error!
                 }]
             };
         }
@@ -308,17 +224,10 @@ async function crearNuevoRecibo(
         const nuevoRecibo = await tx.recibo.create({ data: reciboData });
 
         // Crear los ítems del recibo con tipo determinado automáticamente
-        const itemsConTipo = await Promise.all(
-            items.map(async (item) => ({
-                reciboId: nuevoRecibo.id,
-                descripcion: item.descripcion,
-                monto: item.monto,
-                tipoItemId: await determinarTipoItem(item, tipoAlquilerId)
-            }))
-        );
+        const itemsParaInsertar = await procesarItemsParaRecibo(items, nuevoRecibo.id, tipoAlquilerId);
 
         await tx.itemRecibo.createMany({
-            data: itemsConTipo
+            data: itemsParaInsertar
         });
 
         return {
@@ -355,17 +264,10 @@ async function actualizarReciboPendiente(
         });
 
         // Crear items con tipo determinado automáticamente
-        const itemsConTipo = await Promise.all(
-            items.map(async (item) => ({
-                reciboId,
-                descripcion: item.descripcion,
-                monto: item.monto,
-                tipoItemId: await determinarTipoItem(item, tipoAlquilerId)
-            }))
-        );
+        const itemsParaInsertar = await procesarItemsParaRecibo(items, reciboId, tipoAlquilerId);
 
         await tx.itemRecibo.createMany({
-            data: itemsConTipo
+            data: itemsParaInsertar
         });
 
         // Solo actualizar contrato si el recibo pasó a estado GENERADO

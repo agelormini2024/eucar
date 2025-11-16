@@ -158,6 +158,169 @@ if (existeRecibo.estadoReciboId === 2) {
 
 ---
 
+## ✏️ Edición de Recibos
+
+### Reglas de Edición
+
+⚠️ **Solo se pueden editar recibos en estado PENDIENTE**
+
+```typescript
+// ✅ PERMITIDO: Editar recibo PENDIENTE
+if (recibo.estadoReciboId === 1) {
+    // Se puede modificar items, observaciones, servicios
+}
+
+// ❌ NO PERMITIDO: Editar recibo GENERADO/PAGADO/IMPRESO
+if (recibo.estadoReciboId === 2 || recibo.estadoReciboId === 3 || recibo.estadoReciboId === 4) {
+    return {
+        success: false,
+        errors: [{
+            message: "Solo se pueden editar recibos en estado 'Pendiente'"
+        }]
+    }
+}
+```
+
+---
+
+### ¿Qué se puede editar?
+
+#### ✅ PERMITIDO
+
+| Campo/Item | ¿Se puede editar? | Notas |
+|------------|-------------------|-------|
+| **Items EXTRA** | ✅ Sí | Agregar, modificar, eliminar |
+| **Items REINTEGRO** | ✅ Sí | Agregar, modificar, eliminar (montos negativos) |
+| **Observaciones** | ✅ Sí | Texto libre |
+| **Servicios incluidos** | ✅ Sí | Checkboxes (expensas, ABL, etc.) |
+| **montoPagado** | 🔄 Auto | Se recalcula automáticamente |
+
+#### ❌ NO PERMITIDO
+
+| Campo/Item | ¿Se puede editar? | Razón |
+|------------|-------------------|-------|
+| **Item Alquiler** | ❌ No | Se genera automáticamente por el sistema |
+| **montoTotal** | ❌ No | Calculado por IPC/ICL |
+| **montoAnterior** | ❌ No | Dato histórico inmutable |
+| **contratoId** | ❌ No | No se puede cambiar de contrato |
+| **Estado del contrato** | ❌ No | Solo se actualiza al GENERAR |
+
+---
+
+### Lógica de Edición
+
+```typescript
+export async function updateRecibo(id: number, data: unknown) {
+    // 1. Validar datos
+    const result = ReciboSchema.safeParse(data)
+    
+    // 2. Filtrar items del usuario (SIN el Alquiler)
+    const itemsSinAlquiler = filtrarItemsSinAlquiler(result.data.items)
+    
+    // 3. Asegurar que existe el item "Alquiler" con monto correcto
+    const resultadoItems = await asegurarItemAlquiler(
+        itemsSinAlquiler,
+        result.data.montoTotal, // Monto calculado por sistema
+        tipoAlquilerId
+    )
+    
+    // 4. Calcular montoPagado automáticamente
+    const montoPagado = calcularMontoPagado(resultadoItems.items)
+    // montoPagado = Item Alquiler + Items EXTRA + Items REINTEGRO
+    
+    // 5. Transacción
+    await prisma.$transaction(async (tx) => {
+        // Verificar que sea PENDIENTE
+        if (existingRecibo.estadoReciboId !== 1) {
+            throw new Error("Solo se pueden editar recibos PENDIENTES")
+        }
+        
+        // Actualizar recibo (sin tocar el contrato)
+        await tx.recibo.update({
+            where: { id },
+            data: {
+                ...updateData,
+                montoPagado // Automático
+            }
+        })
+        
+        // Reemplazar items
+        await tx.itemRecibo.deleteMany({ where: { reciboId: id } })
+        await tx.itemRecibo.createMany({
+            data: itemsConTipoItemId // Con inferencia automática
+        })
+    })
+}
+```
+
+---
+
+### Ejemplo de Edición
+
+**Situación inicial:**
+
+```javascript
+Recibo PENDIENTE:
+  - Alquiler: $105,000 (generado por sistema)
+  - Total a pagar: $105,000
+```
+
+**Usuario agrega servicios:**
+
+```javascript
+Items editados por usuario:
+  - ABL: $5,000
+  - Gastos de limpieza: $3,000
+  - Descuento pago anticipado: -$2,000
+```
+
+**Resultado final:**
+
+```javascript
+Items finales del recibo:
+  - Alquiler: $105,000 (automático, NO modificado por usuario)
+  - ABL: $5,000
+  - Gastos de limpieza: $3,000
+  - Descuento pago anticipado: -$2,000
+  
+montoTotal: $105,000 (inmutable, calculado por IPC/ICL)
+montoPagado: $111,000 (automático: 105000 + 5000 + 3000 - 2000)
+```
+
+---
+
+### Diferencia: Edición vs Regeneración
+
+| Aspecto | **Edición** | **Regeneración** |
+|---------|------------|------------------|
+| **Acción** | `updateRecibo()` | `createRecibo()` con estado PENDIENTE |
+| **¿Cuándo?** | Modificar items/servicios | Aplicar nuevos índices IPC/ICL |
+| **Item Alquiler** | Mantiene monto actual | Recalcula con nuevos índices |
+| **montoTotal** | No cambia | ✅ Cambia si hay nuevo índice |
+| **Actualiza contrato** | ❌ No | ❌ No (solo GENERADO actualiza) |
+| **Típico uso** | Agregar servicios extras | Esperar índices actualizados |
+
+**Ejemplo:**
+
+```typescript
+// EDICIÓN: Solo cambia items extras
+// montoTotal sigue siendo $105,000
+await updateRecibo(reciboId, {
+    items: [
+        { descripcion: "ABL", monto: 5000 }
+    ]
+})
+
+// REGENERACIÓN: Recalcula montoTotal con nuevo IPC
+// Si IPC subió 3% → montoTotal pasa a $108,150
+await createRecibo({
+    contratoId,
+    estadoReciboId: 1 // PENDIENTE
+})
+```
+
+---
+
 ## 💰 Cálculo de Montos
 
 ### Tres Montos Diferentes

@@ -100,38 +100,6 @@ export function puedeModificarItem(item: unknown): boolean {
 }
 
 /**
- * Verifica si un tipo de item permite montos negativos
- * @param item - ItemRecibo con relación tipoItem cargada
- */
-export function permiteMontoNegativo(item: unknown): boolean {
-  if (!tieneTipoCompleto(item)) {
-    // Fallback: permitir negativos para items con monto < 0
-    if (typeof item === 'object' && item !== null && 'monto' in item && typeof item.monto === 'number') {
-      return item.monto < 0
-    }
-    return false
-  }
-  return item.tipoItem.permiteNegativo === true
-}
-
-/**
- * Valida que el monto de un item sea coherente con su tipo
- * @param item - ItemRecibo con relación tipoItem cargada
- * @param monto - Monto a validar
- * @returns true si el monto es válido, false si no
- */
-export function validarMontoItem(item: unknown, monto: number): boolean {
-  // Montos cero siempre válidos
-  if (monto === 0) return true
-  
-  // Si permite negativos, cualquier valor es válido
-  if (permiteMontoNegativo(item)) return true
-  
-  // Si no permite negativos, debe ser positivo
-  return monto > 0
-}
-
-/**
  * Obtiene el color asociado a un tipo de item
  * @param item - ItemRecibo con relación tipoItem cargada
  * @returns Color en formato string (ej: "red", "green", "blue")
@@ -148,20 +116,5 @@ export function getColorItem(item: unknown): string {
     return 'yellow' // extra
   }
   return item.tipoItem.color || 'gray'
-}
-
-/**
- * Verifica si un item es obligatorio (debe existir en todo recibo)
- * @param item - ItemRecibo con relación tipoItem cargada
- */
-export function esItemObligatorio(item: unknown): boolean {
-  if (!tieneTipoCompleto(item)) {
-    // Fallback: solo "Alquiler" es obligatorio
-    if (typeof item === 'object' && item !== null && 'descripcion' in item && typeof item.descripcion === 'string') {
-      return item.descripcion.toLowerCase().trim() === 'alquiler'
-    }
-    return false
-  }
-  return item.tipoItem.esObligatorio === true
 }
 

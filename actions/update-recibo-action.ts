@@ -1,16 +1,31 @@
 "use server"
 import { prisma } from "@/src/lib/prisma"
 import { ReciboSchema } from "@/src/schema"
+import { 
+    getTipoAlquilerId,
+    filtrarItemsSinAlquiler,
+    asegurarItemAlquiler,
+    calcularMontoPagado,
+    validarMontoPagado,
+    procesarItemsParaRecibo
+} from "@/src/utils/reciboHelpers"
 
 
 /**
  * Actualiza un Recibo existente en el sistema
+ * 
+ * REGLAS DE EDICIÓN:
+ * - Solo se pueden editar recibos en estado PENDIENTE (estadoReciboId = 1)
+ * - No se puede modificar el item "Alquiler" (se genera automáticamente)
+ * - Se pueden agregar/editar/eliminar items EXTRA y REINTEGRO
+ * - El montoPagado se recalcula automáticamente
+ * - No se modifica el contrato (eso solo ocurre en creación/generación)
+ * 
  * @param id - ID del Recibo a actualizar
  * @param data - Datos actualizados del Recibo
  * @returns Objeto con success/error y datos/errores correspondientes
  */
 export async function updateRecibo(id: number, data: unknown) {
-
     try {
         // 1. Validar los datos
         const result = ReciboSchema.safeParse(data)        
@@ -21,9 +36,49 @@ export async function updateRecibo(id: number, data: unknown) {
                 errors: result.error.issues
             }
         }
-        // 6. Ejecutar transacción atómica
+
+        // 2. Extraer datos validados
+        const { items, ...rest } = result.data;
+
+        // 3. Obtener el ID del tipo ALQUILER
+        const tipoAlquilerId = await getTipoAlquilerId();
+
+        // 4. Filtrar items del usuario (sin el Alquiler, que se genera automáticamente)
+        const itemsSinAlquiler = filtrarItemsSinAlquiler(items);
+
+        // 5. Asegurar que existe el item "Alquiler" con el monto correcto
+        const resultadoItems = await asegurarItemAlquiler(itemsSinAlquiler, rest.montoTotal, tipoAlquilerId);
+        
+        if (!resultadoItems.success) {
+            return {
+                success: false,
+                errors: [{
+                    path: ['items'],
+                    message: resultadoItems.error
+                }]
+            };
+        }
+
+        const itemsFinales = resultadoItems.items;
+
+        // 6. Calcular montoPagado automáticamente
+        const montoPagado = calcularMontoPagado(itemsFinales);
+
+        // 7. Validar que el monto sea razonable
+        const validacionMonto = validarMontoPagado(montoPagado);
+        if (!validacionMonto.success) {
+            return {
+                success: false,
+                errors: [{
+                    path: ['items'],
+                    message: validacionMonto.error!
+                }]
+            };
+        }
+
+        // 8. Ejecutar transacción atómica
         const resultado = await prisma.$transaction(async (tx) => {
-            // 2. Verificar que el registro existe
+            // Verificar que el registro existe
             const existingRecibo = await tx.recibo.findUnique({
                 where: { id }
             });
@@ -38,23 +93,24 @@ export async function updateRecibo(id: number, data: unknown) {
                 };
             }
 
-            // 3. Validaciones de negocio para actualización
-            if (existingRecibo.estadoReciboId === 3 || existingRecibo.estadoReciboId === 4) { //  3 es "Pagado" y 4 es "Impreso"
+            // VALIDACIÓN CRÍTICA: Solo permitir editar recibos PENDIENTES
+            if (existingRecibo.estadoReciboId !== 1) {
                 return {
                     success: false,
                     errors: [{
                         path: ['estadoReciboId'],
-                        message: "No se puede modificar un recibo en estado 'Pagado' o 'Impreso'"
+                        message: "Solo se pueden editar recibos en estado 'Pendiente'"
                     }]
                 };
             }
 
-            // 4. Preparar datos para actualización (excluir campos de relación e items)
+            // Preparar datos para actualización (excluir contratoId e items)
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { contratoId: _contratoId, items, ...reciboData } = result.data;
+            const { contratoId: _contratoId, items: _items, ...reciboData } = result.data;
             
             const updateData = {
                 ...reciboData,
+                montoPagado, // Usar el calculado automáticamente
                 fechaPendiente: new Date(result.data.fechaPendiente),
                 fechaGenerado: result.data.fechaGenerado && result.data.fechaGenerado.trim() !== '' 
                     ? new Date(result.data.fechaGenerado) 
@@ -67,28 +123,23 @@ export async function updateRecibo(id: number, data: unknown) {
                     : null,
             };
 
-            // 5. Actualizar el recibo (sin contratoId ni items)
+            // Actualizar el recibo (sin tocar el contrato)
             const reciboActualizado = await tx.recibo.update({
-                where: { id: id },
+                where: { id },
                 data: updateData
             });
 
-            // 6. Eliminar ítems existentes y crear los nuevos
+            // Eliminar ítems existentes
             await tx.itemRecibo.deleteMany({
-                where: { reciboId: id } // Corregir: usar reciboId en lugar de id
+                where: { reciboId: id }
             });
 
-            // 7. Crear nuevos ítems
-            if (items && items.length > 0) {
-                await tx.itemRecibo.createMany({
-                    data: items.map(item => ({
-                        reciboId: id,
-                        descripcion: item.descripcion,
-                        monto: item.monto
-                    }))
-                });
+            // Crear nuevos ítems con tipoItemId asignado automáticamente
+            const itemsParaInsertar = await procesarItemsParaRecibo(itemsFinales, id, tipoAlquilerId);
 
-            }
+            await tx.itemRecibo.createMany({
+                data: itemsParaInsertar
+            });
 
             return {
                 success: true,
