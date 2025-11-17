@@ -73,17 +73,12 @@ export default function ItemsSection({ readOnly = false }: ItemsSectionProps) {
                                     className="w-full bg-slate-200 p-2 border rounded"
                                     disabled={readOnly || !esModificable} // Combinar readOnly con helper
                                 />
-                                {isAlquiler && (
-                                    <span className="text-xs text-slate-500 italic ml-1">
-                                        (Monto calculado automáticamente)
-                                    </span>
-                                )}
                             </div>
                             <div className="w-32">
                                 <input
                                     type="number"
                                     step="0.01"
-                                    placeholder={isAlquiler ? "Monto" : "Monto (- para descuentos)"}
+                                    placeholder={isAlquiler ? "Monto" : "ej: 1500.00"}
                                     value={item.monto || ''}
                                     onChange={(e) => handleUpdateItem(index, 'monto', Number(e.target.value))}
                                     className={`w-full p-2 border rounded font-bold text-right ${
@@ -107,34 +102,14 @@ export default function ItemsSection({ readOnly = false }: ItemsSectionProps) {
                 })}
             </div>
 
-            <div className="bg-gray-100 p-3 rounded">
-                <div className="flex justify-between items-center font-bold">
-                    <span>Total a Cobrar:</span>
-                    <span className={`text-3xl ${
-                        totalItems > formValues.montoTotal ? 'text-orange-600' : 
-                        totalItems < formValues.montoTotal ? 'text-blue-600' : 
-                        'text-green-600'
-                    }`}>
-                        ${totalItems.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+            {/* Totalizador Simple */}
+            <div className="bg-gray-100 p-4 rounded border-2 border-gray-300">
+                <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-slate-700">Total a Cobrar:</span>
+                    <span className="text-3xl font-black text-green-600">
+                        ${totalItems.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                 </div>
-                
-                {/* Indicador de diferencia con montoTotal */}
-                {totalItems !== formValues.montoTotal && formValues.montoTotal > 0 && (
-                    <div className="text-sm mt-2 text-slate-600">
-                        Alquiler base: ${formValues.montoTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-                        <br />
-                        {totalItems > formValues.montoTotal ? (
-                            <span className="text-orange-600 font-semibold">
-                                + ${(totalItems - formValues.montoTotal).toLocaleString('es-AR', { minimumFractionDigits: 2 })} (extras)
-                            </span>
-                        ) : (
-                            <span className="text-blue-600 font-semibold">
-                                - ${(formValues.montoTotal - totalItems).toLocaleString('es-AR', { minimumFractionDigits: 2 })} (descuentos/reintegros)
-                            </span>
-                        )}
-                    </div>
-                )}
             </div>
         </div>
     )

@@ -4,7 +4,6 @@ import useRecibosFormStore from '@/src/stores/storeRecibos'
 // import { Recibo } from '@prisma/client'
 import { formatDateForInput, formatPropiedadAddress, formatFullName } from '@/src/utils/recibo/formatters'
 import { RecibosConRelaciones } from '../types'
-import { esItemAlquiler } from '@/src/utils/itemHelpers'
 
 /**
  * Custom hook para manejar la carga de datos del recibo
@@ -89,22 +88,9 @@ export function useReciboData(contrato: Contrato, recibo?: RecibosConRelaciones 
             .then(res => res.json())
             .then(itemsExistentes => {
                 if (itemsExistentes && itemsExistentes.length > 0) {
-                    // Si es un recibo PENDIENTE, NO cargar el item "Alquiler" porque useReciboValidation
-                    // lo recalculará con los índices actualizados
-                    // Solo cargar items adicionales (descuentos, extras, etc.)
-                    if (estadoReciboId === 1) {
-                        // Filtrar el item "Alquiler", solo cargar los demás
-                        const itemsAdicionales = itemsExistentes.filter(
-                            (item: unknown) => !esItemAlquiler(item)
-                        );
-                        if (itemsAdicionales.length > 0) {
-                            setFormValues({ items: itemsAdicionales });
-                        }
-                        // Si solo había "Alquiler", no cargar nada, useReciboValidation lo creará
-                    } else {
-                        // No es PENDIENTE, cargar todos los items tal cual están en la BD
-                        setFormValues({ items: itemsExistentes });
-                    }
+                    // Cargar TODOS los items tal cual están en la BD
+                    // Esto incluye el item "Alquiler" que ya tiene el monto correcto guardado
+                    setFormValues({ items: itemsExistentes });
                 }
             })
             .catch(error => {

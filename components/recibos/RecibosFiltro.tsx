@@ -75,11 +75,11 @@ export default function RecibosFiltro({ mesActual, añoActual }: RecibosFiltroPr
 
                 {/* Selector de Año */}
                 <div className="flex-1">
-                    <label htmlFor="año" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="anio" className="block text-sm font-medium text-gray-700 mb-1">
                         Año
                     </label>
                     <select
-                        id="año"
+                        id="anio"
                         value={año}
                         onChange={(e) => setAño(Number(e.target.value))}
                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 font-bold"

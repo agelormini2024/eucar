@@ -6,6 +6,9 @@ import useRecibosFormStore from '@/src/stores/storeRecibos'
 import { RecibosConRelaciones } from '../types'
 import { esItemAlquiler } from '@/src/utils/itemHelpers'
 
+// ID del tipo de item ALQUILER en la base de datos
+const TIPO_ITEM_ALQUILER_ID = 1
+
 /**
  * Custom hook para manejar validaciones del recibo
  * Incluye validación de IPC, cálculo de montos y habilitación de botones
@@ -30,17 +33,17 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
             // los datos ya están finalizados y no deben recalcularse
             if (recibo && recibo.id && recibo.estadoReciboId !== 1) {
                 // Recibo existe y NO es PENDIENTE - datos ya finalizados
-                console.log('🔵 useReciboValidation: Recibo NO es PENDIENTE, saltando recálculo');
+                // console.log('🔵 useReciboValidation: Recibo NO es PENDIENTE, saltando recálculo');
                 return;
             }
             
-            console.log('🟢 useReciboValidation: Ejecutando recálculo...', {
-                reciboId: recibo?.id,
-                estadoRecibo: recibo?.estadoReciboId,
-                mesesRestaActualizar: formValues.mesesRestaActualizar,
-                tipoIndice: formValues.tipoIndice,
-                fechaPendiente: formValues.fechaPendiente
-            });
+            // console.log('🟢 useReciboValidation: Ejecutando recálculo...', {
+            //     reciboId: recibo?.id,
+            //     estadoRecibo: recibo?.estadoReciboId,
+            //     mesesRestaActualizar: formValues.mesesRestaActualizar,
+            //     tipoIndice: formValues.tipoIndice,
+            //     fechaPendiente: formValues.fechaPendiente
+            // });
             
             // Si llegamos aquí: recibo nuevo O recibo PENDIENTE (necesita verificar índices)
             // Calcular monto anterior por si lo necesitamos
@@ -56,13 +59,13 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                 if (formValues.tipoIndice === 'IPC') {
                     // TODO: verificar si es necesario tipoIndice ICL
                     indicesDisponibles = await verificaIpcActual(formValues.fechaPendiente);
-                    console.log('📊 Verificación IPC:', { indicesDisponibles, fechaPendiente: formValues.fechaPendiente });
+                    // console.log('📊 Verificación IPC:', { indicesDisponibles, fechaPendiente: formValues.fechaPendiente });
                 }
                 
                 if (indicesDisponibles) {
                     // Caso 1A: Corresponde actualización Y hay índices
                     const { montoCalculado } = calculaImporteRecibo(contrato);
-                    console.log('✅ Caso 1A: Calculando con índices', { montoCalculado });
+                    // console.log('✅ Caso 1A: Calculando con índices', { montoCalculado });
                     
                     // Si hay items cargados (regeneración), actualizar solo el monto del "Alquiler"
                     // Si no hay items (nuevo recibo), crear el array con el item "Alquiler"
@@ -79,13 +82,13 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                         } else {
                             // Si no tiene item "Alquiler", agregarlo al inicio
                             itemsActualizados = [
-                                { descripcion: "Alquiler", monto: montoCalculado },
+                                { descripcion: "Alquiler", monto: montoCalculado, tipoItemId: TIPO_ITEM_ALQUILER_ID },
                                 ...formValues.items
                             ];
                         }
                     } else {
                         // Nuevo recibo: crear array con item "Alquiler"
-                        itemsActualizados = [{ descripcion: "Alquiler", monto: montoCalculado }];
+                        itemsActualizados = [{ descripcion: "Alquiler", monto: montoCalculado, tipoItemId: TIPO_ITEM_ALQUILER_ID }];
                     }
                     
                     setFormValues({
@@ -95,7 +98,7 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                     });
                 } else {
                     // Caso 1C: Corresponde actualización PERO NO hay índices
-                    console.log('⏳ Caso 1C: Sin índices, usando monto anterior', { montoAnterior });
+                    // console.log('⏳ Caso 1C: Sin índices, usando monto anterior', { montoAnterior });
                     
                     // Si hay items cargados, actualizar solo el monto del "Alquiler"
                     // Si no hay items, crear el array con el item "Alquiler"
@@ -110,12 +113,12 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                             );
                         } else {
                             itemsActualizados = [
-                                { descripcion: "Alquiler", monto: montoAnterior },
+                                { descripcion: "Alquiler", monto: montoAnterior, tipoItemId: TIPO_ITEM_ALQUILER_ID },
                                 ...formValues.items
                             ];
                         }
                     } else {
-                        itemsActualizados = [{ descripcion: "Alquiler", monto: montoAnterior }];
+                        itemsActualizados = [{ descripcion: "Alquiler", monto: montoAnterior, tipoItemId: TIPO_ITEM_ALQUILER_ID }];
                     }
                     
                     setFormValues({
@@ -126,7 +129,7 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                 }
             } else {
                 // Caso 1B: NO le corresponde actualización - usar monto anterior directamente
-                console.log('📋 Caso 1B: No corresponde actualización', { montoAnterior });
+                // console.log('📋 Caso 1B: No corresponde actualización', { montoAnterior });
                 
                 // Si hay items cargados, actualizar solo el monto del "Alquiler"
                 // Si no hay items, crear el array con el item "Alquiler"
@@ -141,12 +144,12 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                         );
                     } else {
                         itemsActualizados = [
-                            { descripcion: "Alquiler", monto: montoAnterior },
+                            { descripcion: "Alquiler", monto: montoAnterior, tipoItemId: TIPO_ITEM_ALQUILER_ID },
                             ...formValues.items
                         ];
                     }
                 } else {
-                    itemsActualizados = [{ descripcion: "Alquiler", monto: montoAnterior }];
+                    itemsActualizados = [{ descripcion: "Alquiler", monto: montoAnterior, tipoItemId: TIPO_ITEM_ALQUILER_ID }];
                 }
                 
                 setFormValues({

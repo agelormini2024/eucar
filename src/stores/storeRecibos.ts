@@ -134,7 +134,7 @@ const useRecibosFormStore = create<RecibosFormState>()(
         addItem: () => set((state) => ({
             formValues: {
                 ...state.formValues,
-                items: [...state.formValues.items, { descripcion: "", monto: 0 }]
+                items: [...state.formValues.items, { descripcion: "", monto: 0, tipoItemId: 3 }] // tipoItemId: 3 = EXTRA
             }
         })),
         removeItem: (index) => set((state) => ({
