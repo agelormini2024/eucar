@@ -7,6 +7,116 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [2.3.0] - 2024-11-18
+
+### 🎉 Agregado
+
+#### Componente InfoAlert - Sistema de Alertas Profesional
+- Nuevo componente reutilizable `components/ui/InfoAlert.tsx`
+- **4 variantes** con diseño profesional y color-coded:
+  - `info` (azul): Mensajes informativos
+  - `warning` (amarillo): Advertencias y validaciones
+  - `success` (verde): Confirmaciones exitosas
+  - `error` (rojo): Errores críticos
+- **Props**:
+  - `title`: Título principal del mensaje
+  - `message`: Mensaje descriptivo
+  - `subMessage?`: Mensaje adicional opcional
+  - `variant?`: Tipo de alerta (por defecto "info")
+  - `showBackButton?`: Mostrar botón de volver (por defecto true)
+- Íconos dinámicos según variante (Lucide React)
+- Integrado botón "Volver" interno (elimina duplicación)
+
+#### Validaciones de Edición de Recibos
+- **Validación por Estado** en `/admin/recibos/[id]/edit`:
+  - ❌ Error: Recibo no encontrado
+  - ⚠️ Warning: Recibo no editable (estados GENERADO/PAGADO/IMPRESO/ANULADO)
+  - 💡 Info: Recibo listo para regenerar (índices disponibles)
+  - ✅ Success: Permite editar (PENDIENTE sin índices)
+
+- **Validación de Índices Disponibles**:
+  - Detecta cuando recibo PENDIENTE ya puede regenerarse
+  - Verifica disponibilidad de IPC según `mesesRestaActualizar`
+  - Bloquea edición y redirige a regenerar
+  - Mensaje claro: "Los índices IPC necesarios ya están disponibles"
+
+#### Mejoras en Alta de Recibos
+- Refactorización con InfoAlert en `/admin/recibos/alta/[contratoId]`:
+  - **Warning**: Recibo ya generado (estados 2/3/4)
+  - **Info**: Índices no disponibles aún
+- Reducción de ~24 líneas de HTML repetitivo a ~5 líneas por alerta
+
+### 🔧 Modificado
+
+#### Fixes en Sistema de Items
+- **itemHelpers.ts** - Nuevo sistema de mapeo hardcoded:
+  - `TIPO_ITEM_MAP`: Mapeo ID → código string (1='ALQUILER', 2='DESCUENTO', etc.)
+  - `TIPO_ITEM_PROPS`: Mapeo ID → propiedades (esModificable, esEliminable, color)
+  - `obtenerCodigoItem()`: Helper para obtener código desde tipoItem O tipoItemId
+  - `obtenerPropsItem()`: Helper para obtener propiedades desde tipoItem O tipoItemId
+- Todos los helpers refactorizados para trabajar con ambos formatos
+- **Fix**: Eliminadas advertencias de consola "Item sin tipoItem cargado"
+
+- **storeRecibos.ts**:
+  - `addItem()` ahora crea items con `tipoItemId: 3` (EXTRA)
+  
+- **useReciboValidation.ts**:
+  - Agregada constante `TIPO_ITEM_ALQUILER_ID = 1`
+  - Todos los items Alquiler creados incluyen `tipoItemId: 1`
+
+#### Fix Crítico - Totalizador de Recibo
+- **useReciboData.ts** - Removido filtro condicional:
+  - **Antes**: Filtraba items Alquiler para recibos PENDIENTE (causaba race condition)
+  - **Después**: Carga TODOS los items tal cual están en BD
+  - **Impacto**: Totalizador muestra suma correcta en view/edit/regenerar
+  
+- **ItemsSection.tsx** - Simplificación del totalizador:
+  - Removida lógica confusa de comparación con montoTotal
+  - Ahora muestra: suma simple de todos los items
+  - Display limpio en verde con formato de moneda
+
+#### Fix - Accesibilidad
+- **RecibosFiltro.tsx**:
+  - Cambiado `id="año"` a `id="anio"` (caracteres ASCII)
+  - Fix warning: "label's for attribute doesn't match"
+
+#### Modo View - Datos Sin Recalcular
+- **useReciboValidation.ts**:
+  - Agregado parámetro opcional `readOnly?: boolean`
+  - Validación temprana: si `readOnly === true`, retorna sin recalcular
+  - Preserva datos guardados en BD en modo visualización
+  
+- **ReciboFormDynamic.tsx**:
+  - Pasa prop `readOnly` a `useReciboValidation()`
+  - Cadena completa: view/page → ReciboForm → ReciboFormDynamic → useReciboValidation
+
+### 📐 Arquitectura
+
+- **Componente Reutilizable**: InfoAlert elimina duplicación en toda la app
+- **Validaciones en Cadena**: 4 niveles de validación en página de edición
+- **Type Safety**: Mapeos hardcoded tipados para datos estables de BD
+- **SOLID**: Separación de responsabilidades (view vs edit vs regenerar)
+- **DRY**: 50+ líneas de HTML reducidas a componente de 96 líneas reutilizable
+
+### 🐛 Corregido
+
+- Console warnings por items sin tipoItem
+- Totalizador mostrando suma incorrecta en recibos existentes
+- Warning de accesibilidad en labels (caracteres no-ASCII)
+- Modo view recalculando montos en lugar de mostrar datos guardados
+- Permitir editar recibos que deberían regenerarse
+
+---
+
+## [2.2.0] - 2024-11-16elog
+
+Todos los cambios notables en este proyecto serán documentados en este archivo.
+
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
+y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
+
+---
+
 ## [2.2.0] - 2024-11-16
 
 ### 🎉 Agregado

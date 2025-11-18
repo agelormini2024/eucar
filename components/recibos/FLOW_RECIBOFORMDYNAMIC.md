@@ -35,7 +35,7 @@ ReciboFormDynamic({ contrato, recibo, readOnly = false })
 │
 ├─ 🔗 Custom Hooks (Lógica de negocio)
 │   ├─ useReciboData(contrato, recibo)
-│   └─ useReciboValidation(contrato)
+│   └─ useReciboValidation(contrato, recibo, readOnly)
 │
 └─ 🎛️ Handler de formulario
     └─ handleInputChange = useCallback(handleReciboInputChange)
@@ -65,12 +65,18 @@ useReciboData(contrato, recibo)
 
 ### 3️⃣ **useReciboValidation Hook (Validaciones)**
 ```typescript
-useReciboValidation(contrato)
+useReciboValidation(contrato, recibo, readOnly)
 │
-├─ 🔍 Validación de IPC/ICL
+├─ � Validación readOnly
+│   └─ Si readOnly === true → return (no recalcular)
+│
+├─ 🔒 Validación estado recibo
+│   └─ Si recibo existe Y NO es PENDIENTE → return (datos finalizados)
+│
+├─ �🔍 Validación de IPC/ICL
 │   ├─ 📊 verificaIpcActual(fechaPendiente)
 │   ├─ 🧮 calculaImporteRecibo(contrato)
-│   └─ 🗄️ setFormValues({ montoTotal/estadoReciboId })
+│   └─ 🗄️ setFormValues({ montoTotal/estadoReciboId/items })
 │
 └─ 🔍 Validación de servicios
     ├─ Compara servicios: contrato vs formValues
@@ -213,6 +219,213 @@ Cuando `readOnly={true}`:
 - 📦 **Single Responsibility**: Componente único con comportamiento dual controlado por prop
 - 🎯 **Consistencia**: Misma estructura, estilos y validaciones
 - ✨ **Mantenibilidad**: Cambios en una vista se reflejan automáticamente en ambas
+
+---
+
+## 🛡️ **Validaciones en Páginas de Recibo**
+
+### Validaciones en Edición (`/admin/recibos/[id]/edit`)
+
+La página de edición implementa **4 validaciones en cadena** usando el componente `InfoAlert`:
+
+```typescript
+// 1. Recibo no existe
+if (!recibo) {
+  return <InfoAlert 
+    variant="error"
+    title="Recibo no encontrado"
+    message="No se encontró el recibo solicitado..."
+  />
+}
+
+// 2. Recibo NO está en estado PENDIENTE
+if (recibo.estadoReciboId !== 1) {
+  return <InfoAlert 
+    variant="warning"
+    title="Recibo no editable"
+    message={`Este recibo está en estado ${estadosMap[estadoReciboId]}...`}
+  />
+}
+
+// 3. Recibo PENDIENTE pero índices disponibles (debe regenerarse)
+if (puedeRegenerar) {
+  return <InfoAlert 
+    variant="info"
+    title="Recibo listo para regenerar"
+    message={`Los índices ${tipoIndice} necesarios ya están disponibles...`}
+  />
+}
+
+// 4. Permite editar (PENDIENTE sin índices disponibles)
+return <EditReciboForm>...</EditReciboForm>
+```
+
+### Validaciones en Alta/Regenerar (`/admin/recibos/alta/[contratoId]`)
+
+```typescript
+// 1. Recibo ya generado (estados 2/3/4)
+if (recibo && estadoReciboId !== 1) {
+  return <InfoAlert 
+    variant="warning"
+    title="Recibo ya generado"
+    message="Ya existe un recibo generado..."
+  />
+}
+
+// 2. Recibo PENDIENTE sin índices disponibles
+if (recibo && estadoReciboId === 1 && !indicesDisponibles) {
+  return <InfoAlert 
+    variant="info"
+    title="Índices no disponibles"
+    message={`Aún no están cargados los índices ${tipoIndice}...`}
+  />
+}
+
+// 3. Permite crear/regenerar
+return <AddReciboForm>...</AddReciboForm>
+```
+
+### Componente InfoAlert
+
+**Props:**
+```typescript
+interface InfoAlertProps {
+  title: string           // Título principal
+  message: string         // Mensaje descriptivo
+  subMessage?: string     // Mensaje adicional opcional
+  variant?: "info" | "warning" | "success" | "error"  // Tipo de alerta
+  showBackButton?: boolean  // Mostrar botón volver (default: true)
+}
+```
+
+**Variantes:**
+
+| Variante | Color | Ícono | Uso |
+|----------|-------|-------|-----|
+| `info` | Azul | ℹ️ Info | Mensajes informativos, índices no disponibles |
+| `warning` | Amarillo | ⚠️ AlertTriangle | Advertencias, recibo no editable |
+| `success` | Verde | ✓ CheckCircle | Confirmaciones exitosas |
+| `error` | Rojo | ✗ XCircle | Errores críticos, recibo no encontrado |
+
+**Ventajas:**
+- ✅ Componente reutilizable en toda la app
+- ✅ Diseño profesional y consistente
+- ✅ Elimina duplicación de código
+- ✅ Botón "Volver" integrado
+- ✅ Mensajes claros y color-coded
+
+---
+
+## 🔄 **Modo Read-Only: Preservación de Datos**
+
+### Problema Resuelto
+
+**Antes**: En modo view, `useReciboValidation` recalculaba el `montoTotal` si el recibo era PENDIENTE y los índices estaban disponibles.
+
+**Solución**: Parámetro `readOnly` en `useReciboValidation` que previene recálculos.
+
+### Flujo de Datos en Modo View
+
+```
+view/page.tsx (readOnly=true)
+    ↓
+ReciboForm (recibe readOnly, lo pasa)
+    ↓
+ReciboFormDynamic (recibe readOnly, lo pasa al hook)
+    ↓
+useReciboValidation (recibe readOnly, retorna temprano si es true)
+    ↓
+NO recalcula montoTotal ✅
+    ↓
+Muestra los datos TAL CUAL están en la BD ✅
+```
+
+### Comportamiento por Modo
+
+| Modo | `readOnly` | useReciboValidation | Comportamiento |
+|------|-----------|---------------------|----------------|
+| **View** | `true` | Retorna temprano | Muestra datos guardados SIN recalcular |
+| **Edit** | `false` | Ejecuta validaciones | Recalcula si es PENDIENTE sin índices |
+| **Alta/Regenerar** | `false` | Ejecuta validaciones | Recalcula según índices disponibles |
+
+### Código
+
+```typescript
+// En useReciboValidation.ts
+export function useReciboValidation(
+  contrato: Contrato, 
+  recibo?: RecibosConRelaciones | null,
+  readOnly?: boolean  // Parámetro para modo view
+) {
+  useEffect(() => {
+    async function checkMesHabilitado() {
+      // Si es readOnly (modo view), NO recalcular nada
+      if (readOnly) {
+        return;  // Preserva datos guardados
+      }
+      
+      // ... resto de validaciones y recálculos
+    }
+    
+    checkMesHabilitado();
+  }, [..., readOnly])  // readOnly en dependencias
+}
+```
+
+---
+
+## 📊 **Resumen de Arquitectura**
+
+### Componentes
+
+| Componente | Responsabilidad | Recibe readOnly |
+|------------|----------------|-----------------|
+| `ReciboForm` | Server Component - Carga contrato | ✅ Pasa |
+| `ReciboFormDynamic` | Client - Orquestador principal | ✅ Pasa |
+| `ReciboServices` | Checkboxes servicios | ✅ Usa |
+| `ItemsSection` | Gestión de ítems | ✅ Usa |
+| `ReciboHeader` | Datos contrato/propiedad | ❌ Siempre disabled |
+| `ReciboAmounts` | Montos y fechas | ❌ Siempre disabled |
+
+### Hooks
+
+| Hook | Parámetros | Responsabilidad |
+|------|-----------|----------------|
+| `useReciboData` | `(contrato, recibo)` | Carga datos desde BD |
+| `useReciboValidation` | `(contrato, recibo, readOnly)` | Validaciones y recálculos |
+
+### Utilities
+
+| Utilidad | Propósito |
+|----------|-----------|
+| `handleReciboInputChange` | Handler onChange genérico |
+| `formatters` | Formateo de fechas, nombres, direcciones |
+| `verificaIpcActual` | Verifica disponibilidad de índices IPC |
+| `calculaImporteRecibo` | Calcula monto con índices |
+
+---
+
+## 🎯 **Principios de Diseño**
+
+1. **DRY (Don't Repeat Yourself)**
+   - Componente único para view/edit
+   - InfoAlert reutilizable para alertas
+   - Helpers compartidos
+
+2. **SOLID**
+   - Single Responsibility: Cada componente/hook una función
+   - Open/Closed: Extensible via props (readOnly)
+   - Dependency Inversion: Hooks abstraen lógica
+
+3. **Type Safety**
+   - TypeScript estricto
+   - Validación con Zod
+   - Tipos compartidos
+
+4. **User Experience**
+   - Validaciones claras con InfoAlert
+   - Mensajes descriptivos
+   - Navegación intuitiva
 
 ````
 ```

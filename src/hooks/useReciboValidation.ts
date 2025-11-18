@@ -12,8 +12,9 @@ const TIPO_ITEM_ALQUILER_ID = 1
 /**
  * Custom hook para manejar validaciones del recibo
  * Incluye validación de IPC, cálculo de montos y habilitación de botones
+ * @param readOnly - Si es true, no recalcula montos (modo view)
  */
-export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelaciones | null) {
+export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelaciones | null, readOnly?: boolean) {
     const [selectContrato, setSelectContrato] = useState<Contrato>()
     
     const formValues = useRecibosFormStore((state) => state.formValues)
@@ -28,6 +29,11 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
     // Validación de mes habilitado e IPC
     useEffect(() => {
         async function checkMesHabilitado() {
+            // Si es readOnly (modo view), NO recalcular nada - mostrar datos tal cual están guardados
+            if (readOnly) {
+                return;
+            }
+            
             // Solo calcular y pre-cargar ítem si NO hay recibo existente O si es PENDIENTE
             // Si el recibo existe pero NO es PENDIENTE (GENERADO, PAGADO, IMPRESO, ANULADO),
             // los datos ya están finalizados y no deben recalcularse
