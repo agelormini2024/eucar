@@ -48,17 +48,6 @@ export async function updateRecibo(id: number, data: unknown) {
 
         // 5. Asegurar que existe el item "Alquiler" con el monto correcto
         const resultadoItems = await asegurarItemAlquiler(itemsSinAlquiler, rest.montoTotal, tipoAlquilerId);
-        
-        if (!resultadoItems.success) {
-            return {
-                success: false,
-                errors: [{
-                    path: ['items'],
-                    message: resultadoItems.error
-                }]
-            };
-        }
-
         const itemsFinales = resultadoItems.items;
 
         // 6. Calcular montoPagado automáticamente

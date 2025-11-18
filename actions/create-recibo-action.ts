@@ -62,18 +62,8 @@ export async function createRecibo(data: unknown) {
         const tipoAlquilerId = await getTipoAlquilerId();
 
         // Asegurar que SIEMPRE exista el ítem "Alquiler" con el monto correcto
+        // En regeneración, esto ACTUALIZA el monto del Alquiler al valor recalculado
         const resultadoItems = await asegurarItemAlquiler(items, rest.montoTotal, tipoAlquilerId);
-        
-        if (!resultadoItems.success) {
-            return {
-                success: false,
-                errors: [{
-                    path: ['items'],
-                    message: resultadoItems.error
-                }]
-            };
-        }
-
         const itemsFinales = resultadoItems.items;
 
         // Calcular montos (puede incluir ítems negativos para descuentos/reintegros)

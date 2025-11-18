@@ -173,18 +173,18 @@ export function calcularMontoPagado(items: ItemData[]): number {
 /**
  * Asegura que el item "Alquiler" existe en el array de items
  * Si no existe, lo crea con el monto especificado
- * Si existe, valida que su monto sea correcto
+ * Si existe, ACTUALIZA su monto al valor correcto (importante para regeneración)
  * 
  * @param items - Array original de items
  * @param montoTotal - Monto que debería tener el item Alquiler
  * @param tipoAlquilerId - ID del tipo ALQUILER
- * @returns Objeto con items procesados o error
+ * @returns Objeto con items procesados (siempre success: true)
  */
 export async function asegurarItemAlquiler(
     items: ItemData[],
     montoTotal: number,
     tipoAlquilerId: number
-): Promise<{ success: true; items: ItemData[] } | { success: false; error: string }> {
+): Promise<{ success: true; items: ItemData[] }> {
     
     const itemAlquiler = items.find(item => esItemAlquiler(item))
     
@@ -197,13 +197,14 @@ export async function asegurarItemAlquiler(
         return { success: true, items: itemsConAlquiler }
     }
     
-    // Si existe, validar que el monto coincida
-    const validacion = validarItemAlquiler(items, montoTotal)
-    if (!validacion.success) {
-        return { success: false, error: validacion.error! }
-    }
+    // Si existe, ACTUALIZAR su monto al valor correcto (regeneración)
+    const itemsActualizados = items.map(item =>
+        esItemAlquiler(item)
+            ? { ...item, monto: montoTotal }  // Actualizar monto
+            : item                             // Mantener otros items
+    )
     
-    return { success: true, items }
+    return { success: true, items: itemsActualizados }
 }
 
 /**

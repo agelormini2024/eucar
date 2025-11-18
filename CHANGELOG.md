@@ -105,6 +105,73 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Warning de accesibilidad en labels (caracteres no-ASCII)
 - Modo view recalculando montos en lugar de mostrar datos guardados
 - Permitir editar recibos que deberían regenerarse
+- **Error de validación en regeneración de recibos** (crítico)
+- **Totalizador mostrando monto incorrecto durante regeneración** (crítico)
+
+#### Fix: Error "El monto del alquiler no coincide" en Regeneración
+**Problema**: Al regenerar un recibo PENDIENTE, se producía error de validación:
+```
+El monto del alquiler ($600,000) no coincide con el monto calculado ($650,730.24)
+```
+
+**Causa**: 
+- Frontend enviaba items con Alquiler de monto viejo ($600,000)
+- Backend validaba que coincidiera con montoTotal nuevo ($650,730.24)
+- La validación rechazaba la operación
+
+**Solución**:
+- **reciboHelpers.ts** - `asegurarItemAlquiler()`:
+  - Cambió de **validar** a **actualizar** el monto del Alquiler
+  - Ahora siempre actualiza el item Alquiler al `montoTotal` recibido
+  - Eliminado retorno de error (siempre success: true)
+  - Usa `.map()` para actualizar preservando otros items
+  
+- **create-recibo-action.ts** y **update-recibo-action.ts**:
+  - Eliminado manejo del caso de error de `asegurarItemAlquiler`
+  - Simplificado flujo (ya no puede fallar)
+
+**Resultado**: Regeneración funciona correctamente, el backend actualiza el monto automáticamente
+
+#### Fix: Totalizador Incorrecto Durante Regeneración
+**Problema**: El "Total a Cobrar" mostraba suma con monto viejo del Alquiler:
+```
+Items en array:
+- Alquiler: $600,000    ← Monto viejo de BD
+- Extra: $1,500
+- Descuento: -$500
+─────────────────────
+Total: $601,000         ← INCORRECTO
+```
+
+Pero debería mostrar el total con el Alquiler actualizado:
+```
+- Alquiler: $650,730.24 ← Monto calculado con índices
+- Extra: $1,500
+- Descuento: -$500
+─────────────────────
+Total: $651,730.24      ← CORRECTO
+```
+
+**Solución**:
+- **ItemsSection.tsx** - Lógica híbrida en totalizador:
+  ```typescript
+  // 1. Filtrar items sin Alquiler
+  const itemsSinAlquiler = items.filter(item => !esItemAlquiler(item))
+  const totalExtras = itemsSinAlquiler.reduce((sum, item) => sum + item.monto, 0)
+  
+  // 2. Usar montoTotal (con índices) + extras/descuentos
+  const totalItems = formValues.montoTotal > 0 
+      ? formValues.montoTotal + totalExtras  // Regeneración: Alquiler actualizado
+      : items.reduce((sum, item) => sum + item.monto, 0)  // Normal: suma simple
+  ```
+
+**Ventajas**:
+- ✅ En regeneración: Usa Alquiler calculado con índices
+- ✅ En edición: Suma normal con cambios en tiempo real
+- ✅ Considera todos los items (extras, descuentos, servicios)
+- ✅ Fallback seguro si montoTotal es 0
+
+**Resultado**: El totalizador muestra el valor correcto que se guardará en BD
 
 ---
 

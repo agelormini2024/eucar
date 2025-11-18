@@ -17,7 +17,15 @@ export default function ItemsSection({ readOnly = false }: ItemsSectionProps) {
         updateItem(index, updatedItem)
     }
 
-    const totalItems = items.reduce((sum, item) => sum + (item.monto || 0), 0)
+    // Calcular total separando Alquiler de otros items
+    const itemsSinAlquiler = items.filter(item => !esItemAlquiler(item))
+    const totalExtras = itemsSinAlquiler.reduce((sum, item) => sum + (item.monto || 0), 0)
+    
+    // Total correcto: montoTotal (Alquiler con índices) + extras/descuentos
+    // Si montoTotal > 0, usarlo. Si no, calcular la suma normal de todos los items
+    const totalItems = formValues.montoTotal > 0 
+        ? formValues.montoTotal + totalExtras 
+        : items.reduce((sum, item) => sum + (item.monto || 0), 0)
 
     // Actualizar montoPagado automáticamente cuando cambien los ítems
     // Solo si NO es un recibo ya generado/impreso
