@@ -54,7 +54,7 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
                 toast.error("Error de conexión al generar el recibo");
                 return;
             }
-            
+
             if (!response.success) {
                 // Mostrar errores específicos si existen
                 if (response.errors && response.errors.length > 0) {
@@ -84,20 +84,28 @@ export default function AddReciboForm({ children }: { children: React.ReactNode 
             <form
                 className="space-y-5"
                 onSubmit={(e) => {
-                    e.preventDefault();              
+                    e.preventDefault();
                     const formData = new FormData(e.currentTarget); // Obtener los datos del formulario
                     handleSubmit(formData); // Llamar a la función de envío
                 }}
             >
                 {children}
-
-                <input
-                    type="submit"
-                    className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
+                <div className="flex flex-col md:flex-row gap-2 md:gap-5 mt-10">
+                    <input
+                        type="submit"
+                        className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
                     cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
-                    value="Generar Recibo"
-                    disabled={!formValues.habilitarBoton}
-                />
+                        value="G e n e r a r     R e c i b o"
+                        disabled={!formValues.habilitarBoton}
+                    />
+                    <input
+                        type="button"
+                        className='bg-slate-800 hover:bg-slate-600 text-white p-3 rounded-md w-full 
+                    cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
+                        value="Cancelar Generación"
+                        onClick={() => router.push('/admin/contratos/list')}
+                    />
+                </div>
             </form>
         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { calculaImporteRecibo } from '@/src/lib/calculaImporteRecibo'
 import { verificaIpcActual } from '@/src/lib/verificaIpcActual'
+import { verificaIclActual } from '@/src/lib/verificaIclActual'
 import { Contrato } from '@/src/schema'
 import useRecibosFormStore from '@/src/stores/storeRecibos'
 import { RecibosConRelaciones } from '../types'
@@ -63,9 +64,11 @@ export function useReciboValidation(contrato: Contrato, recibo?: RecibosConRelac
                 let indicesDisponibles = true;
                 
                 if (formValues.tipoIndice === 'IPC') {
-                    // TODO: verificar si es necesario tipoIndice ICL
                     indicesDisponibles = await verificaIpcActual(formValues.fechaPendiente);
                     // console.log('📊 Verificación IPC:', { indicesDisponibles, fechaPendiente: formValues.fechaPendiente });
+                } else if (formValues.tipoIndice === 'ICL') {
+                    indicesDisponibles = await verificaIclActual(new Date(formValues.fechaPendiente));
+                    // console.log('📊 Verificación ICL:', { indicesDisponibles, fechaPendiente: formValues.fechaPendiente });
                 }
                 
                 if (indicesDisponibles) {
