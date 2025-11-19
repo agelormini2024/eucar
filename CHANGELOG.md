@@ -11,6 +11,15 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### 🎉 Agregado
 
+#### Verificación de Índices ICL
+- **Nueva función**: `src/lib/verificaIclActual.ts`
+  - Verifica disponibilidad de índices ICL antes de calcular montos
+  - Busca índices dentro del mes de la fecha de generación
+  - Retorna `true` si existe al menos un índice ICL en el mes
+  - Retorna `false` si no hay índices disponibles
+- **Previene cálculos prematuros** con datos ICL potencialmente incorrectos
+- **Consistencia** con verificación IPC existente
+
 #### Componente InfoAlert - Sistema de Alertas Profesional
 - Nuevo componente reutilizable `components/ui/InfoAlert.tsx`
 - **4 variantes** con diseño profesional y color-coded:
@@ -47,6 +56,31 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Reducción de ~24 líneas de HTML repetitivo a ~5 líneas por alerta
 
 ### 🔧 Modificado
+
+#### Lógica de Validación de Índices
+- **Actualizado**: `src/hooks/useReciboValidation.ts`
+  - Agregada verificación de índices **ICL** (antes solo IPC)
+  - Nueva condición: `else if (formValues.tipoIndice === 'ICL')`
+  - Llama a `verificaIclActual()` con conversión de fecha
+  - Import agregado: `import { verificaIclActual } from '@/src/lib/verificaIclActual'`
+
+**Antes:**
+```typescript
+if (formValues.tipoIndice === 'IPC') {
+    indicesDisponibles = await verificaIpcActual(formValues.fechaPendiente);
+}
+// ICL e ICP → quedaban en true por defecto
+```
+
+**Después:**
+```typescript
+if (formValues.tipoIndice === 'IPC') {
+    indicesDisponibles = await verificaIpcActual(formValues.fechaPendiente);
+} else if (formValues.tipoIndice === 'ICL') {
+    indicesDisponibles = await verificaIclActual(new Date(formValues.fechaPendiente));
+}
+// Solo ICP → queda en true por defecto
+```
 
 #### Fixes en Sistema de Items
 - **itemHelpers.ts** - Nuevo sistema de mapeo hardcoded:
@@ -107,6 +141,53 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Permitir editar recibos que deberían regenerarse
 - **Error de validación en regeneración de recibos** (crítico)
 - **Totalizador mostrando monto incorrecto durante regeneración** (crítico)
+- **Contratos ICL calculando con datos incorrectos** (crítico)
+
+#### Fix: Contratos ICL Calculando Sin Verificar Índices
+**Problema**: Contratos con `tipoIndice = 'ICL'` calculaban `montoTotal` inmediatamente sin verificar si los índices ICL estaban disponibles en la base de datos.
+
+**Escenario del bug**:
+```
+Contrato: tipoIndice = 'ICL', mesesRestaActualizar = 0
+Esperado: montoAnterior = $600,000, montoTotal = $600,000 (esperar índices)
+Actual:   montoAnterior = $600,000, montoTotal = $638,091 (calculado con ICL viejo/incorrecto)
+```
+
+**Causa raíz**:
+```typescript
+// useReciboValidation.ts - ANTES
+let indicesDisponibles = true;  // ← Asume disponibles por defecto
+
+if (formValues.tipoIndice === 'IPC') {
+    indicesDisponibles = await verificaIpcActual(...);
+}
+// ICL e ICP → quedaban en true, calculaban inmediatamente ❌
+```
+
+**Solución implementada**:
+1. **Nueva función** `verificaIclActual()` en `src/lib/verificaIclActual.ts`
+   - Verifica si existe índice ICL en el mes de generación
+   - Similar a `verificaIpcActual()` pero adaptada a tabla ICL
+   - Usa query con `fecha >= inicioMes AND fecha < inicioMesSiguiente`
+
+2. **Actualizado** `useReciboValidation.ts`:
+   ```typescript
+   // DESPUÉS
+   if (formValues.tipoIndice === 'IPC') {
+       indicesDisponibles = await verificaIpcActual(formValues.fechaPendiente);
+   } else if (formValues.tipoIndice === 'ICL') {
+       indicesDisponibles = await verificaIclActual(new Date(formValues.fechaPendiente));
+   }
+   // Solo ICP queda en true por defecto ✅
+   ```
+
+**Impacto**:
+- ✅ Contratos ICL esperan índices antes de calcular
+- ✅ Muestra `montoAnterior` correctamente cuando `indicesDisponibles = false`
+- ✅ Evita usar valores ICL obsoletos/incorrectos
+- ✅ Consistencia con flujo de IPC
+
+**Documentación técnica**: Ver `docs/FIX_VERIFICACION_ICL.md`
 
 #### Fix: Error "El monto del alquiler no coincide" en Regeneración
 **Problema**: Al regenerar un recibo PENDIENTE, se producía error de validación:
