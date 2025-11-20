@@ -1,15 +1,19 @@
 "use client";
 import { pdf } from "@react-pdf/renderer";
-import ButtonGoBack from "../ui/ButtonGoBack";
+import { useRouter } from "next/navigation";
+// import ButtonGoBack from "../ui/ButtonGoBack";
 import PDFRecibo from "./PDFRecibo";
 import { ReciboConRelaciones } from "@/src/types/recibo";
 import { formatCurrency, formatFecha } from "@/src/utils";
+
 
 type ImprimirReciboProps = {
     recibo: ReciboConRelaciones;
 };
 
 export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
+
+    const router = useRouter();
 
     const handleOpenPdf = async () => {
         try {
@@ -52,21 +56,58 @@ export default function ImprimirRecibo({ recibo }: ImprimirReciboProps) {
                             {recibo.fechaImpreso ? formatFecha(new Date(recibo.fechaImpreso)) : 'N/A'}
                         </span>
                     </div>
-                    <div className="text-2xl">
-                        Monto Total : <span className="font-bold text-3xl text-red-900">{`${recibo.montoTotal ? formatCurrency(recibo.montoTotal) : formatCurrency(recibo.montoAnterior)}`}</span>
+
+                    {/* Detalle de Items */}
+                    {recibo.itemsRecibo && recibo.itemsRecibo.length > 0 && (
+                        <div className="mt-6 border-t-2 border-slate-300 pt-4">
+                            <h3 className="text-lg font-bold text-slate-700 mb-3">Detalle:</h3>
+                            <div className="space-y-2">
+                                {recibo.itemsRecibo.map((item, index) => (
+                                    <div key={item.id || index} className="flex justify-between items-center px-3 py-2 bg-slate-50 rounded">
+                                        <span className="text-slate-700">{item.descripcion}</span>
+                                        <span className="font-semibold text-slate-900">
+                                            {formatCurrency(item.monto)}
+                                        </span>
+                                    </div>
+                                ))}
+                                {/* Línea separadora */}
+                                <div className="border-t-2 border-slate-400 mt-3 pt-2">
+                                    <div className="flex justify-between items-center px-3 py-2">
+                                        <span className="text-lg font-bold text-slate-900">TOTAL</span>
+                                        <span className="text-lg font-bold text-slate-900">
+                                            {formatCurrency(recibo.montoPagado)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="text-2xl mt-4">
+                        Monto Recibido : <span className="font-bold text-3xl text-red-900">{formatCurrency(recibo.montoPagado)}</span>
                     </div>
 
                 </section>
 
-                <div className="flex justify-between items-center">
-                    <button
+                <div className="flex flex-col md:flex-row gap-2 md:gap-5">
+                    <input
                         type="button"
                         onClick={handleOpenPdf}
-                        className="mt-4 uppercase bg-slate-800 text-white px-4 py-2 font-bold rounded hover:bg-cyan-800 transition-colors duration-400 cursor-pointer w-48"
-                    >
-                        Imprimir PDF
-                    </button>
-                    <ButtonGoBack />
+                        className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
+                    cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
+                        value="I m p r i m i r     PDF"
+                    />
+
+
+                    {/* <ButtonGoBack /> */}
+                    <input
+                        type="button"
+                        className='bg-slate-800 hover:bg-slate-600 text-white p-3 rounded-md w-full 
+                    cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
+                        value="Cancelar Generación"
+                        onClick={() => router.push('/admin/recibos/list')}
+                    />
+
                 </div>
 
             </div>

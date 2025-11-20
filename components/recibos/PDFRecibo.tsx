@@ -47,8 +47,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
-        borderBottom: '1 solid #CCCCCC',
+        marginBottom: 10,
         paddingBottom: 10
     },
     receiptTitle: {
@@ -186,7 +185,12 @@ export default function PDFRecibo({ recibo }: PDFReciboProps) {
 
                 {/* Título y fecha */}
                 <View style={styles.titleSection}>
-                    <Text style={styles.receiptTitle}>{tipoRecibo}</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <Text style={styles.receiptTitle}>{tipoRecibo}</Text>
+                        <Text style={styles.receiptTitle}>N° {recibo.id.toString().padStart(8, '0')}</Text>
+                    </View>
+                </View>
+                <View style={{ marginBottom: 20, paddingBottom: 10, borderBottom: '1 solid #CCCCCC' }}>
                     <Text style={styles.locationDate}>Buenos Aires, {fechaFormateada}</Text>
                 </View>
 
@@ -196,11 +200,32 @@ export default function PDFRecibo({ recibo }: PDFReciboProps) {
                         Recibimos de <Text style={styles.bold}>{inquilinoCompleto}</Text> la suma de <Text style={styles.bold}>{montoEnLetras}</Text> por el pago del alquiler del inmueble <Text style={styles.bold}>{recibo.contrato.propiedad.tipoPropiedad?.descripcion || 'inmueble'}</Text> ubicado en <Text style={styles.bold}>{direccionCompleta}</Text>, correspondiente al mes de <Text style={styles.bold}>{mesRecibo} {anioRecibo}</Text>.
                     </Text>
 
-                    {/* Sección de detalle: filas con dos columnas */}
+                    {/* Sección de detalle: items del recibo */}
                     <View style={styles.detailSection}>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailLeft}>Alquiler {mesRecibo} {anioRecibo}</Text>
-                            <Text style={styles.detailRight}>$ {recibo.montoTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</Text>
+                        {recibo.itemsRecibo && recibo.itemsRecibo.length > 0 ? (
+                            recibo.itemsRecibo.map((item, index) => (
+                                <View key={item.id || index} style={styles.detailRow}>
+                                    <Text style={styles.detailLeft}>{item.descripcion}</Text>
+                                    <Text style={styles.detailRight}>
+                                        $ {item.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                                    </Text>
+                                </View>
+                            ))
+                        ) : (
+                            <View style={styles.detailRow}>
+                                <Text style={styles.detailLeft}>Alquiler {mesRecibo} {anioRecibo}</Text>
+                                <Text style={styles.detailRight}>$ {recibo.montoTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</Text>
+                            </View>
+                        )}
+                        
+                        {/* Línea separadora antes del total */}
+                        <View style={{ borderTop: '1 solid #333333', marginTop: 8, paddingTop: 8 }}>
+                            <View style={styles.detailRow}>
+                                <Text style={[styles.detailLeft, styles.bold]}>TOTAL</Text>
+                                <Text style={[styles.detailRight, { fontSize: 13 }]}>
+                                    $ {recibo.montoPagado.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                                </Text>
+                            </View>
                         </View>
                     </View>
 
@@ -208,9 +233,6 @@ export default function PDFRecibo({ recibo }: PDFReciboProps) {
                         Monto: $ {recibo.montoPagado.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
                     </Text>
 
-                    <Text style={styles.paragraph}>
-                        Recibo N°: <Text style={styles.bold}>{recibo.id.toString().padStart(8, '0')}</Text>
-                    </Text>
                 </View>
 
                 {/* Footer */}

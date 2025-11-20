@@ -94,6 +94,17 @@ export type ReciboConRelaciones = {
     luz: boolean;
     gas: boolean;
     otros: boolean;
+    itemsRecibo?: Array<{
+        id: number;
+        descripcion: string;
+        monto: number;
+        tipoItemId: number;
+        observaciones?: string | null;
+        tipoItem: {
+            codigo: string;
+            nombre: string;
+        };
+    }>;
     contrato: {
         clienteInquilino: {
             apellido: string;

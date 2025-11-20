@@ -19,6 +19,19 @@ export default async function ImprimirReciboPage({ params }: { params: Promise<(
         const reciboFromDb = await prisma.recibo.findUnique({
             where: { id: Number(id) },
             include: {
+                itemsRecibo: {
+                    include: {
+                        tipoItem: {
+                            select: {
+                                codigo: true,
+                                nombre: true,
+                            }
+                        }
+                    },
+                    orderBy: {
+                        tipoItemId: 'asc'  // Ordenar items (Alquiler primero)
+                    }
+                },
                 contrato: {
                     include: {
                         clienteInquilino: {
