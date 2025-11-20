@@ -51,6 +51,15 @@
 
 - **[INSTALLATION.md](./INSTALLATION.md)** - Guía de instalación del proyecto
 
+### 🎓 Guías Didácticas
+
+- **[MODAL_SELECCION_PROPIEDAD.md](./MODAL_SELECCION_PROPIEDAD.md)** - Explicación completa del modal de selección con búsqueda
+  - Conceptos fundamentales (State, useMemo, Modal)
+  - Estructura paso a paso del código
+  - Flujo de funcionamiento completo
+  - Ejemplos prácticos de búsqueda
+  - Mejores prácticas y optimización
+
 ---
 
 ## 🗂️ Documentos por Módulo
@@ -112,6 +121,9 @@ Para ver el historial completo de cambios, consulta:
 
 ### ¿Por qué los contratos ICL no calculan correctamente?
 → [FIX_VERIFICACION_ICL.md](./FIX_VERIFICACION_ICL.md)
+
+### ¿Cómo funciona el modal de selección con búsqueda?
+→ [MODAL_SELECCION_PROPIEDAD.md](./MODAL_SELECCION_PROPIEDAD.md)
 
 ### ¿Qué estructura tiene la base de datos?
 → [DATABASE.md](./DATABASE.md)

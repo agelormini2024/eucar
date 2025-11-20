@@ -75,7 +75,7 @@ export default async function ImprimirReciboPage({ params }: { params: Promise<(
                 where: { id: Number(id) },
                 data: {
                     fechaImpreso: new Date(fechaImpreso),
-                    estadoReciboId: 3 // Cambiar a "Impreso"
+                    estadoReciboId: 4 // Cambiar a "Impreso"
                 }
             });
             
@@ -83,7 +83,7 @@ export default async function ImprimirReciboPage({ params }: { params: Promise<(
             const reciboActualizado: ReciboConRelaciones = {
                 ...recibo,
                 fechaImpreso,
-                estadoReciboId: 3
+                estadoReciboId: 4
             };
             
             return <ImprimirRecibo recibo={reciboActualizado} />;

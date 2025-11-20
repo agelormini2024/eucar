@@ -32,9 +32,21 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
     // Filtro de propiedades basado en la búsqueda
     const filteredPropiedades = useMemo(() => {
         if (!searchProp) return propiedades;
-        return propiedades.filter((p) =>
-            p.descripcion.toLowerCase().includes(searchProp.toLowerCase())
-        );
+        const searchLower = searchProp.toLowerCase();
+        return propiedades.filter((p) => {
+            // Construir dirección completa para buscar
+            const direccion = [
+                p.calle,
+                p.numero?.toString(),
+                p.piso ? `piso ${p.piso}` : '',
+                p.departamento ? `depto ${p.departamento}` : ''
+            ].filter(Boolean).join(' ').toLowerCase();
+
+            return (
+                p.descripcion.toLowerCase().includes(searchLower) ||
+                direccion.includes(searchLower)
+            );
+        });
     }, [searchProp, propiedades]);
 
     // Filtro de clientes (inquilinos) basado en la búsqueda
@@ -235,6 +247,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                     Propiedad :
                 </label>
                 <button
+                    id="propiedadId"
                     type="button"
                     className="block w-full p-3 bg-slate-200 text-left rounded hover:bg-slate-300 transition-colors"
                     onClick={() => setShowPropModal(true)}
@@ -250,33 +263,51 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                     <div className="mb-4">
                         <input
                             type="text"
-                            placeholder="Buscar propiedad..."
+                            placeholder="Buscar por descripción o dirección..."
                             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                             value={searchProp}
                             onChange={(e) => setSearchProp(e.target.value)}
                         />
                     </div>
-                    <div className="max-h-60 overflow-y-auto">
+                    <div className="max-h-96 overflow-y-auto">
                         {filteredPropiedades.length === 0 && (
                             <div className="text-gray-500 text-center py-4">
                                 No se encontraron propiedades.
                             </div>
                         )}
-                        {filteredPropiedades.map((propiedad) => (
-                            <div
-                                key={propiedad.id}
-                                className={`p-3 cursor-pointer hover:bg-slate-100 rounded border-b last:border-b-0 transition-colors ${
-                                    formValues.propiedadId === propiedad.id ? 'bg-slate-200 font-bold' : ''
-                                }`}
-                                onClick={() => {
-                                    setFormValues({ propiedadId: propiedad.id });
-                                    setShowPropModal(false);
-                                    setSearchProp(""); // Limpiar búsqueda al seleccionar
-                                }}
-                            >
-                                {propiedad.descripcion}
+                        {/* Encabezados de columnas */}
+                        {filteredPropiedades.length > 0 && (
+                            <div className="grid grid-cols-2 gap-4 p-3 bg-slate-700 text-white font-bold sticky top-0 z-10 rounded">
+                                <div>Descripción</div>
+                                <div>Dirección</div>
                             </div>
-                        ))}
+                        )}
+                        {filteredPropiedades.map((propiedad) => {
+                            // Construir dirección completa
+                            const direccion = [
+                                propiedad.calle,
+                                propiedad.numero,
+                                propiedad.piso ? `Piso ${propiedad.piso}` : null,
+                                propiedad.departamento ? `Depto ${propiedad.departamento}` : null
+                            ].filter(Boolean).join(' ');
+
+                            return (
+                                <div
+                                    key={propiedad.id}
+                                    className={`grid grid-cols-2 gap-4 p-3 cursor-pointer hover:bg-slate-100 rounded border-b last:border-b-0 transition-colors ${
+                                        formValues.propiedadId === propiedad.id ? 'bg-slate-200 font-bold' : ''
+                                    }`}
+                                    onClick={() => {
+                                        setFormValues({ propiedadId: propiedad.id });
+                                        setShowPropModal(false);
+                                        setSearchProp(""); // Limpiar búsqueda al seleccionar
+                                    }}
+                                >
+                                    <div className="font-medium">{propiedad.descripcion}</div>
+                                    <div className="text-gray-700">{direccion}</div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </Modal>
             </div>
@@ -354,6 +385,7 @@ export default function ContratoFormDynamic({ clientes, propiedades, tiposContra
                         Inquilino :
                     </label>
                     <button
+                        id="clienteIdInquilino"
                         type="button"
                         className="block w-full p-3 bg-slate-200 text-left rounded hover:bg-slate-300 transition-colors"
                         onClick={() => setShowInquilinoModal(true)}

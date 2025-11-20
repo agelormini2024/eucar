@@ -64,7 +64,7 @@ export default function EditReciboForm({ children }: { children: React.ReactNode
                 return;
             }
 
-            if (!response.success) {        
+            if (!response.success) {
                 toast.error(` Error al actualizar el recibo: ${response.errors!.map(e => e.message).join(', ')}`);
                 return;
             }
@@ -88,14 +88,22 @@ export default function EditReciboForm({ children }: { children: React.ReactNode
                 }}
             >
                 {children}
-
-                <input
-                    type="submit"
-                    className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
+                <div className="flex flex-col md:flex-row gap-2 md:gap-5 mt-10">
+                    <input
+                        type="submit"
+                        className='bg-red-800 hover:bg-red-600 text-white p-3 rounded-md w-full 
                     cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
-                    value="Guardar Recibo"
-                    disabled={!formValues.habilitarBoton}
-                />
+                        value="G u r d a r    R e c i b o"
+                        disabled={!formValues.habilitarBoton}
+                    />
+                    <input
+                        type="button"
+                        className='bg-slate-800 hover:bg-slate-600 text-white p-3 rounded-md w-full 
+                    cursor-pointer font-bold uppercase mt-5 disabled:bg-gray-400 disabled:cursor-not-allowed'
+                        value="Cancelar Edición"
+                        onClick={() => router.push('/admin/recibos/list')}
+                    />
+                </div>
             </form>
         </div>
     )
