@@ -1,8 +1,10 @@
 import { execSync } from 'child_process'
 import * as fs from 'fs'
+import 'dotenv/config'
 
-const neonUrl = "postgresql://neondb_owner:npg_gu8D1MTqpvIc@ep-dry-bar-acbjwofx-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-const localUrl = "postgresql://postgres:iona3736@localhost:5432/postgres?schema=public"
+// Obtener las URLs de conexión desde las variables de entorno
+const neonUrl = process.env.DATABASE_URL_NEON // Neon
+const localUrl = process.env.DATABASE_URL // Local
 
 console.log('🔍 Comparando estructuras de BD...\n')
 
@@ -61,7 +63,7 @@ try {
     console.log('   diff schema-local.txt schema-neon.txt\n')
   }
 
-} catch (error: any) {
-  console.error('❌ Error:', error?.message || error)
+} catch (error: unknown) {
+  console.error('❌ Error:', error instanceof Error ? error.message : error)
   process.exit(1)
 }
