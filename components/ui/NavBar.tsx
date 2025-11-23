@@ -4,14 +4,16 @@ import { authOptions } from "@/src/auth/options";
 import ButtonGoHome from "./ButtonGoHome";
 import ButtonInvitaciones from "./ButtonInvitaciones";
 import ButtonProfile from "./ButtonProfile";
+import packageJson from "@/package.json";
 
 export default async function NavBar() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const session = await getServerSession(authOptions) as any // Casting temporal
+    const appVersion = packageJson.version
 
     return (
-        <nav className="flex justify-between p-4">
+        <nav className="flex justify-between items-center p-4">
             <ul className="flex space-x-4">
                 {session?.user ? (
                     <>
@@ -27,14 +29,17 @@ export default async function NavBar() {
                 ) : (
                     <>
                         <li>
-                            <p className="text-sm font-bold">Soares Parente Propiedades</p>                        </li>
-                        <li>
-                            <p className="text-sm">v.1.0.1</p>
+                            <p className="text-sm font-bold">Soares Parente Propiedades</p>
                         </li>
                     </>
                 )
                 }
             </ul>
+            
+            {/* Versión de la aplicación - visible siempre */}
+            <div className="text-xs text-gray-900 ml-8">
+                v{appVersion}
+            </div>
         </nav>
     )
 }

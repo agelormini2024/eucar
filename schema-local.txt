@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                 Int                  @id @default(autoincrement())
+  email              String               @unique
+  password           String
+  nombre             String
+  confirmado         Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  rol                String               @default("usuario")
+  Invitacion         Invitacion[]
+  PasswordResetToken PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  usado     Boolean  @default(false)
+  createdAt DateTime @default(now())
+  usuario   Usuario  @relation(fields: [email], references: [email])
+
+  @@index([email])
+  @@index([token])
+}
+
+model Pais {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  sigla       String
+  clientes    Cliente[]
+  propiedades Propiedad[]
+  provincias  Provincia[]
+}
+
+model Provincia {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  paisId      Int
+  clientes    Cliente[]
+  propiedades Propiedad[]
+  pais        Pais        @relation(fields: [paisId], references: [id])
+}
+
+model Cliente {
+  id                   Int         @id @default(autoincrement())
+  nombre               String
+  apellido             String
+  razonSocial          String?
+  cuit                 String      @unique
+  telefono1            String?
+  telefono2            String?
+  celular              String
+  email                String
+  paisId               Int
+  provinciaId          Int
+  localidad            String
+  codigoPostal         String
+  observaciones        String?
+  calle                String
+  departamento         String?
+  piso                 String?
+  activo               Boolean     @default(true)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  numero               Int
+  pais                 Pais        @relation(fields: [paisId], references: [id])
+  provincia            Provincia   @relation(fields: [provinciaId], references: [id])
+  contratosInquilino   Contrato[]  @relation("ClienteInquilino")
+  contratosPropietario Contrato[]  @relation("ClientePropietario")
+  propiedades          Propiedad[]
+}
+
+model TipoPropiedad {
+  id          Int         @id @default(autoincrement())
+  descripcion String
+  propiedades Propiedad[]
+}
+
+model Propiedad {
+  id              Int           @id @default(autoincrement())
+  localidad       String
+  provinciaId     Int
+  paisId          Int
+  codigoPostal    String
+  ambientes       Int
+  dormitorios     Int
+  banios          Int
+  metrosCuadrados Int
+  observaciones   String?
+  tipoPropiedadId Int
+  calle           String
+  departamento    String?
+  descripcion     String
+  imagen          String?
+  piso            String?
+  activo          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  antiguedad      Int?
+  cochera         Int
+  expensas        Float?
+  metrosCubiertos Int
+  numero          Int
+  clienteId       Int
+  contratos       Contrato[]
+  cliente         Cliente       @relation(fields: [clienteId], references: [id])
+  pais            Pais          @relation(fields: [paisId], references: [id])
+  provincia       Provincia     @relation(fields: [provinciaId], references: [id])
+  tipoPropiedad   TipoPropiedad @relation(fields: [tipoPropiedadId], references: [id])
+}
+
+model TipoContrato {
+  id                         Int        @id @default(autoincrement())
+  descripcion                String
+  cantidadMesesActualizacion Int        @unique
+  icl                        Float      @default(0)
+  ipc                        Float      @default(0)
+  ultimaActualizacion        DateTime?
+  icp                        Float      @default(0)
+  contratos                  Contrato[]
+}
+
+model TipoIndice {
+  id          Int        @id @default(autoincrement())
+  descripcion String
+  nombre      String
+  contratos   Contrato[]
+}
+
+model Ipc {
+  id         Int    @id @default(autoincrement())
+  annoMes    String @unique
+  porcentaje Float
+}
+
+model Icl {
+  id     Int      @id @default(autoincrement())
+  fecha  DateTime @unique
+  indice Float
+}
+
+model Contrato {
+  id                    Int          @id @default(autoincrement())
+  propiedadId           Int
+  cantidadMesesDuracion Int
+  diaMesVencimiento     Int
+  fechaInicio           DateTime
+  fechaVencimiento      DateTime
+  tipoContratoId        Int
+  tipoIndiceId          Int
+  descripcion           String
+  clienteIdInquilino    Int
+  clienteIdPropietario  Int
+  abl                   Boolean
+  aysa                  Boolean
+  expensas              Boolean
+  gas                   Boolean
+  luz                   Boolean
+  montoAlquilerInicial  Float
+  otros                 Boolean
+  observaciones         String?
+  montoAlquilerUltimo   Float?       @default(0)
+  mesesRestaActualizar  Int
+  clienteInquilino      Cliente      @relation("ClienteInquilino", fields: [clienteIdInquilino], references: [id])
+  clientePropietario    Cliente      @relation("ClientePropietario", fields: [clienteIdPropietario], references: [id])
+  propiedad             Propiedad    @relation(fields: [propiedadId], references: [id])
+  tipoContrato          TipoContrato @relation(fields: [tipoContratoId], references: [id])
+  tipoIndice            TipoIndice   @relation(fields: [tipoIndiceId], references: [id])
+  recibos               Recibo[]
+}
+
+model EstadoRecibo {
+  id          Int      @id @default(autoincrement())
+  descripcion String
+  recibos     Recibo[]
+}
+
+model Recibo {
+  id             Int          @id @default(autoincrement())
+  contratoId     Int
+  montoTotal     Float
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  abl            Boolean
+  aysa           Boolean
+  expensas       Boolean
+  gas            Boolean
+  luz            Boolean
+  observaciones  String?
+  otros          Boolean
+  estadoReciboId Int
+  fechaGenerado  DateTime?
+  fechaImpreso   DateTime?
+  fechaPendiente DateTime
+  fechaAnulado   DateTime?
+  montoAnterior  Float
+  montoPagado    Float
+  itemsRecibo    ItemRecibo[]
+  contrato       Contrato     @relation(fields: [contratoId], references: [id])
+  estadoRecibo   EstadoRecibo @relation(fields: [estadoReciboId], references: [id])
+}
+
+model TipoItem {
+  id              Int          @id @default(autoincrement())
+  codigo          String       @unique
+  nombre          String
+  descripcion     String?
+  esModificable   Boolean      @default(true)
+  esEliminable    Boolean      @default(true)
+  permiteNegativo Boolean      @default(false)
+  esObligatorio   Boolean      @default(false)
+  orden           Int          @default(0)
+  color           String?      @default("#6B7280")
+  activo          Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  itemsRecibo     ItemRecibo[]
+
+  @@index([codigo])
+  @@index([activo])
+}
+
+model ItemRecibo {
+  id            Int      @id @default(autoincrement())
+  descripcion   String
+  monto         Float
+  reciboId      Int
+  createdAt     DateTime @default(now())
+  observaciones String?
+  tipoItemId    Int
+  recibo        Recibo   @relation(fields: [reciboId], references: [id], onDelete: Cascade)
+  tipoItem      TipoItem @relation(fields: [tipoItemId], references: [id])
+
+  @@index([reciboId])
+  @@index([tipoItemId])
+}
+
+model Invitacion {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  codigo    String    @unique
+  creadoPor Int
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usado     Boolean   @default(false)
+  usadoAt   DateTime?
+  creador   Usuario   @relation(fields: [creadoPor], references: [id])
+}
+
+

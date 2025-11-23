@@ -16,26 +16,26 @@ describe('useRecibosFormStore - Items Management', () => {
     })
 
     describe('Estado inicial', () => {
-        it('Debería inicializar con un ítem de Alquiler por defecto', () => {
+        it('Debería inicializar con array vacío de items (se cargarán desde hook o BD)', () => {
             const { result } = renderHook(() => useRecibosFormStore())
             
-            expect(result.current.formValues.items).toEqual([
-                { descripcion: "Alquiler", monto: 0 }
-            ])
+            // CAMBIO: Ahora el estado inicial es un array vacío
+            // Los items se cargan desde useReciboValidation o desde la BD
+            expect(result.current.formValues.items).toEqual([])
         })
     })
 
     describe('addItem', () => {
-        it('Debería agregar un nuevo ítem vacío al final del array', () => {
+        it('Debería agregar un nuevo ítem EXTRA vacío al final del array', () => {
             const { result } = renderHook(() => useRecibosFormStore())
 
             act(() => {
                 result.current.addItem()
             })
 
+            // CAMBIO: Ahora incluye tipoItemId: 3 (EXTRA)
             expect(result.current.formValues.items).toEqual([
-                { descripcion: "Alquiler", monto: 0 },
-                { descripcion: "", monto: 0 }
+                { descripcion: "", monto: 0, tipoItemId: 3 }
             ])
         })
 
@@ -47,11 +47,10 @@ describe('useRecibosFormStore - Items Management', () => {
                 result.current.addItem()
             })
 
-            expect(result.current.formValues.items).toHaveLength(3)
+            expect(result.current.formValues.items).toHaveLength(2)
             expect(result.current.formValues.items).toEqual([
-                { descripcion: "Alquiler", monto: 0 },
-                { descripcion: "", monto: 0 },
-                { descripcion: "", monto: 0 }
+                { descripcion: "", monto: 0, tipoItemId: 3 },
+                { descripcion: "", monto: 0, tipoItemId: 3 }
             ])
         })
     })
@@ -64,6 +63,7 @@ describe('useRecibosFormStore - Items Management', () => {
             act(() => {
                 result.current.addItem()
                 result.current.addItem()
+                result.current.addItem()
             })
 
             // Eliminar el ítem del medio (índice 1)
@@ -73,8 +73,8 @@ describe('useRecibosFormStore - Items Management', () => {
 
             expect(result.current.formValues.items).toHaveLength(2)
             expect(result.current.formValues.items).toEqual([
-                { descripcion: "Alquiler", monto: 0 },
-                { descripcion: "", monto: 0 }
+                { descripcion: "", monto: 0, tipoItemId: 3 },
+                { descripcion: "", monto: 0, tipoItemId: 3 }
             ])
         })
 
@@ -108,7 +108,12 @@ describe('useRecibosFormStore - Items Management', () => {
         it('Debería actualizar el ítem en el índice especificado', () => {
             const { result } = renderHook(() => useRecibosFormStore())
 
-            const nuevoItem: ItemRecibo = { descripcion: "Expensas", monto: 50000 }
+            // Primero agregar un ítem
+            act(() => {
+                result.current.addItem()
+            })
+
+            const nuevoItem: ItemRecibo = { descripcion: "Expensas", monto: 50000, tipoItemId: 2 }
 
             act(() => {
                 result.current.updateItem(0, nuevoItem)
@@ -148,6 +153,11 @@ describe('useRecibosFormStore - Items Management', () => {
         it('Debería poder actualizar solo la descripción de un ítem', () => {
             const { result } = renderHook(() => useRecibosFormStore())
 
+            // Agregar un ítem primero
+            act(() => {
+                result.current.addItem()
+            })
+
             const itemOriginal = result.current.formValues.items[0]
             const itemActualizado: ItemRecibo = { ...itemOriginal, descripcion: "Alquiler Mensual" }
 
@@ -157,12 +167,18 @@ describe('useRecibosFormStore - Items Management', () => {
 
             expect(result.current.formValues.items[0]).toEqual({
                 descripcion: "Alquiler Mensual",
-                monto: 0
+                monto: 0,
+                tipoItemId: 3
             })
         })
 
         it('Debería poder actualizar solo el monto de un ítem', () => {
             const { result } = renderHook(() => useRecibosFormStore())
+
+            // Agregar un ítem primero
+            act(() => {
+                result.current.addItem()
+            })
 
             const itemOriginal = result.current.formValues.items[0]
             const itemActualizado: ItemRecibo = { ...itemOriginal, monto: 450000 }
@@ -172,23 +188,24 @@ describe('useRecibosFormStore - Items Management', () => {
             })
 
             expect(result.current.formValues.items[0]).toEqual({
-                descripcion: "Alquiler",
-                monto: 450000
+                descripcion: "",
+                monto: 450000,
+                tipoItemId: 3
             })
         })
     })
 
     describe('resetForm', () => {
-        it('Debería resetear los ítems al ítem por defecto de Alquiler', () => {
+        it('Debería resetear los ítems a array vacío (sin items por defecto)', () => {
             const { result } = renderHook(() => useRecibosFormStore())
 
             // Modificar el estado primero
             act(() => {
                 result.current.setFormValues({
                     items: [
-                        { descripcion: "Alquiler", monto: 400000 },
-                        { descripcion: "Expensas", monto: 50000 },
-                        { descripcion: "ABL", monto: 15000 }
+                        { descripcion: "Alquiler", monto: 400000, tipoItemId: 1 },
+                        { descripcion: "Expensas", monto: 50000, tipoItemId: 2 },
+                        { descripcion: "ABL", monto: 15000, tipoItemId: 3 }
                     ]
                 })
             })
@@ -198,9 +215,8 @@ describe('useRecibosFormStore - Items Management', () => {
                 result.current.resetForm()
             })
 
-            expect(result.current.formValues.items).toEqual([
-                { descripcion: "Alquiler", monto: 0 }
-            ])
+            // CAMBIO: Ahora resetea a array vacío, no a item Alquiler
+            expect(result.current.formValues.items).toEqual([])
         })
     })
 

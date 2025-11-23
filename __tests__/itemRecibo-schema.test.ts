@@ -167,7 +167,7 @@ describe("ReciboSchema - Validación de items", () => {
     });
 
     describe("Validación fallida de ítems", () => {
-        it("Debería fallar sin ítems", () => {
+        it("Debería PERMITIR array vacío de ítems (backend agrega Alquiler automáticamente)", () => {
             const recibo = {
                 ...reciboBase,
                 items: []
@@ -175,10 +175,8 @@ describe("ReciboSchema - Validación de items", () => {
 
             const result = ReciboSchema.safeParse(recibo);
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Debe tener al menos un ítem (el alquiler)");
-            }
+            // CAMBIO: Ahora debe PASAR porque el backend crea "Alquiler" automáticamente
+            expect(result.success).toBe(true);
         });
 
         it("Debería fallar si no se incluye la propiedad items", () => {

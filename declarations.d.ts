@@ -1,5 +1,10 @@
 declare module "xlsx-populate";
 
+// Permitir importar package.json para obtener la versión
+declare module "*/package.json" {
+    export const version: string;
+}
+
 // Extender tipos de NextAuth
 declare module "next-auth" {
     interface User {

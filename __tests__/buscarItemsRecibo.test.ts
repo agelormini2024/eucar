@@ -22,9 +22,60 @@ describe("buscarItemsRecibo", () => {
         // Arrange
         const reciboId = 1;
         const mockItems = [
-            { descripcion: "Alquiler", monto: 400000 },
-            { descripcion: "Expensas", monto: 50000 },
-            { descripcion: "ABL", monto: 15000 }
+            { 
+                descripcion: "Alquiler", 
+                monto: 400000,
+                tipoItemId: 1,
+                tipoItem: {
+                    id: 1,
+                    codigo: "ALQUILER",
+                    nombre: "Alquiler",
+                    descripcion: "Monto del alquiler",
+                    esModificable: false,
+                    esEliminable: false,
+                    permiteNegativo: false,
+                    esObligatorio: true,
+                    orden: 1,
+                    color: "#3b82f6",
+                    activo: true
+                }
+            },
+            { 
+                descripcion: "Expensas", 
+                monto: 50000,
+                tipoItemId: 2,
+                tipoItem: {
+                    id: 2,
+                    codigo: "EXPENSAS",
+                    nombre: "Expensas",
+                    descripcion: "Expensas del edificio",
+                    esModificable: true,
+                    esEliminable: true,
+                    permiteNegativo: false,
+                    esObligatorio: false,
+                    orden: 2,
+                    color: "#10b981",
+                    activo: true
+                }
+            },
+            { 
+                descripcion: "ABL", 
+                monto: 15000,
+                tipoItemId: 3,
+                tipoItem: {
+                    id: 3,
+                    codigo: "ABL",
+                    nombre: "ABL",
+                    descripcion: "Alumbrado, Barrido y Limpieza",
+                    esModificable: true,
+                    esEliminable: true,
+                    permiteNegativo: false,
+                    esObligatorio: false,
+                    orden: 3,
+                    color: "#f59e0b",
+                    activo: true
+                }
+            }
         ];
 
         itemReciboFindManyMock.mockResolvedValue(mockItems);
@@ -40,7 +91,23 @@ describe("buscarItemsRecibo", () => {
             },
             select: {
                 descripcion: true,
-                monto: true
+                monto: true,
+                tipoItemId: true,
+                tipoItem: {
+                    select: {
+                        id: true,
+                        codigo: true,
+                        nombre: true,
+                        descripcion: true,
+                        esModificable: true,
+                        esEliminable: true,
+                        permiteNegativo: true,
+                        esObligatorio: true,
+                        orden: true,
+                        color: true,
+                        activo: true
+                    }
+                }
             },
             orderBy: {
                 id: 'asc'
@@ -64,7 +131,23 @@ describe("buscarItemsRecibo", () => {
             },
             select: {
                 descripcion: true,
-                monto: true
+                monto: true,
+                tipoItemId: true,
+                tipoItem: {
+                    select: {
+                        id: true,
+                        codigo: true,
+                        nombre: true,
+                        descripcion: true,
+                        esModificable: true,
+                        esEliminable: true,
+                        permiteNegativo: true,
+                        esObligatorio: true,
+                        orden: true,
+                        color: true,
+                        activo: true
+                    }
+                }
             },
             orderBy: {
                 id: 'asc'
@@ -114,11 +197,28 @@ describe("buscarItemsRecibo", () => {
         );
     });
 
-    it("Debería solo seleccionar los campos descripcion y monto", async () => {
+    it("Debería seleccionar descripcion, monto, tipoItemId y tipoItem completo", async () => {
         // Arrange
         const reciboId = 1;
         const mockItems = [
-            { descripcion: "Alquiler", monto: 400000 }
+            { 
+                descripcion: "Alquiler", 
+                monto: 400000,
+                tipoItemId: 1,
+                tipoItem: {
+                    id: 1,
+                    codigo: "ALQUILER",
+                    nombre: "Alquiler",
+                    descripcion: "Monto del alquiler",
+                    esModificable: false,
+                    esEliminable: false,
+                    permiteNegativo: false,
+                    esObligatorio: true,
+                    orden: 1,
+                    color: "#3b82f6",
+                    activo: true
+                }
+            }
         ];
 
         itemReciboFindManyMock.mockResolvedValue(mockItems);
@@ -131,7 +231,23 @@ describe("buscarItemsRecibo", () => {
             expect.objectContaining({
                 select: {
                     descripcion: true,
-                    monto: true
+                    monto: true,
+                    tipoItemId: true,
+                    tipoItem: {
+                        select: {
+                            id: true,
+                            codigo: true,
+                            nombre: true,
+                            descripcion: true,
+                            esModificable: true,
+                            esEliminable: true,
+                            permiteNegativo: true,
+                            esObligatorio: true,
+                            orden: true,
+                            color: true,
+                            activo: true
+                        }
+                    }
                 }
             })
         );
