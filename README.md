@@ -196,8 +196,7 @@ Este proyecto es privado y confidencial. Todos los derechos reservados.
 
 Para consultas o reportar problemas:
 - **Issues**: [GitHub Issues](link-to-issues)
-- **Email**: soporte@eucar.com
-- **Documentación**: [Wiki del Proyecto](link-to-wiki)
+- **Email**: ale.gelormini@gmail.com
 
 ---
 
